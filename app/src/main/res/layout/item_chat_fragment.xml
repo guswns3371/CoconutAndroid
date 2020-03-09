@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/PrimaryColor"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:foreground="?attr/selectableItemBackground">
+
+
+        <FrameLayout
+            android:layout_margin="5dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp">
+
+        <!--            1명-->
+            <FrameLayout
+                android:id="@+id/image_layout_for_one"
+                android:visibility="gone"
+                android:layout_width="55dp"
+                android:layout_height="55dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:cardBackgroundColor="@color/transparent_00"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:id="@+id/chat_list_image11"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/account_default" />
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+        <!--            1명-->
+
+        <!--            2명-->
+            <FrameLayout
+                android:id="@+id/image_layout_for_two"
+                android:visibility="gone"
+                android:layout_width="55dp"
+                android:layout_height="55dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="start|top"
+                    app:cardBackgroundColor="@color/transparent_00"
+                    app:cardCornerRadius="11dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:id="@+id/chat_list_image21"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:foregroundGravity="center"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/account_default" />
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="end|bottom"
+                    app:cardBackgroundColor="@color/transparent_00"
+                    app:cardCornerRadius="11dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:id="@+id/chat_list_image22"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:foregroundGravity="center"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/account_default" />
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+        <!--            2명-->
+
+        <!--            3명-->
+            <LinearLayout
+                android:id="@+id/image_layout_for_three"
+                android:visibility="gone"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="55dp"
+                android:layout_height="55dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image31"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image32"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image33"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        <!--            3명-->
+
+        <!--            4명-->
+            <LinearLayout
+                android:id="@+id/image_layout_for_four"
+                android:visibility="gone"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_width="55dp"
+                android:layout_height="55dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image41"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image42"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                     android:orientation="horizontal">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image43"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        app:cardBackgroundColor="@color/transparent_00"
+                        app:cardCornerRadius="10dp"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:id="@+id/chat_list_image44"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:foregroundGravity="center"
+                            android:padding="2dp"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/account_default" />
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        <!--            4명-->
+        </FrameLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/chat_list_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="205dp"
+                        android:paddingBottom="5dp"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="Name"
+                        android:textColor="@color/PrimaryColorText"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/chat_list_people_size"
+                        android:visibility="invisible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/grey"
+                        android:padding="5dp"
+                        android:text="3" />
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/chat_list_last_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="240dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textSize="13sp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:background="@color/transparent_10"
+                    android:text="TextView"
+                    android:textColor="@color/grey"
+                    android:gravity="center_vertical"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/chat_list_last_time"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="10dp"
+                    android:padding="2dp"
+                    android:textColor="@color/grey"
+                    android:text="Time" />
+
+
+                <TextView
+                    android:id="@+id/chat_list_unread_num"
+                    android:visibility="invisible"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/round_backgrounnd"
+                    android:textColor="@color/PrimaryColorText"
+                    android:text="888" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

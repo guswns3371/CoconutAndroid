@@ -1,9 +1,9 @@
 package com.example.coconut.base
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import com.google.android.material.snackbar.Snackbar
@@ -51,6 +51,10 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
      */
     abstract fun initAfterBinding()
 
+    abstract var toolbar : Toolbar?
+
+    fun setToolbarTitle(title : String) { toolbar?.let { it.title = title } }
+
     private var isSetBackButtonValid = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +64,7 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
 
         snackbarObserving()
         initStartView()
+        setToolbar()
         initDataBinding()
         initAfterBinding()
     }
@@ -70,6 +75,23 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
         }
         viewModel.observeSnackbarMessageStr(this){
             Snackbar.make(findViewById(android.R.id.content), it, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun setToolbar(){
+        toolbar?.run {
+            setSupportActionBar(this)
+        }
+        supportActionBar?.run {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowHomeEnabled(true)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.coconut.ui.auth.register
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import com.example.coconut.R
 import com.example.coconut.base.BaseKotlinActivity
@@ -16,6 +17,7 @@ class RegisterActivity : BaseKotlinActivity<ActivityRegisterBinding,RegisterView
     override val layoutResourceId: Int
         get() = R.layout.activity_register
     override val viewModel: RegisterViewModel by viewModel()
+    override var toolbar: Toolbar? = null
 
 
     override fun initStartView() {
@@ -69,5 +71,6 @@ class RegisterActivity : BaseKotlinActivity<ActivityRegisterBinding,RegisterView
 
     override fun initAfterBinding() {
     }
+
 
 }

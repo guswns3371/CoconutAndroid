@@ -2,24 +2,20 @@ package com.example.coconut.ui.auth.register
 
 import android.text.TextUtils
 import android.util.Log
-import android.util.Patterns
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
-import com.example.coconut.model.UserDataModel
+import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.RegisterPostData
-import com.example.coconut.model.response.RegisterResponse
-import com.example.coconut.model.response.RegisterVaild
-import com.example.coconut.ui.ActivityNavigater
-import com.example.coconut.ui.auth.AuthListener
-import io.reactivex.Scheduler
+import com.example.coconut.model.response.auth.RegisterResponse
+import com.example.coconut.model.response.auth.RegisterVaild
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 
-class RegisterViewModel(private val model : UserDataModel) : BaseKotlinViewModel() {
+class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel() {
 
     private val TAG = "RegisterViewModel"
 
@@ -86,7 +82,11 @@ class RegisterViewModel(private val model : UserDataModel) : BaseKotlinViewModel
     }
     fun registerButton(){
         addDisposable(model.doRegister(
-            RegisterPostData(email.get().toString(),id.get().toString(),name.get().toString(),password.get().toString()))
+            RegisterPostData(
+                email.get().toString().trim(),
+                id.get().toString().trim(),
+                name.get().toString().trim(),
+                password.get().toString().trim()))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -104,12 +104,19 @@ class RegisterViewModel(private val model : UserDataModel) : BaseKotlinViewModel
     private fun registerValidation(){
 
         val emailValid = !TextUtils.isEmpty(email.get()) &&  email.get().toString().matches(emailPattern.toRegex())
-        val nameValid = !TextUtils.isEmpty(name.get()) && name.get().toString().length>=2 && name.get().toString().length <=8
-        val idValid = !TextUtils.isEmpty(id.get()) && id.get().toString().length>=2 && id.get().toString().length <=10
+        val nameValid = !TextUtils.isEmpty(name.get()) && name.get().toString().length>=2 && name.get().toString().length <=8 && !name.get().toString().contains(" ")
+        val idValid = !TextUtils.isEmpty(id.get()) && id.get().toString().length>=2 && id.get().toString().length <=20 && !id.get().toString().contains(" ")
         val passwordValid  = !TextUtils.isEmpty(password.get())
         val passwordConfirmValid  = !TextUtils.isEmpty(passwordConfirm.get()) && (password.get().toString() == passwordConfirm.get().toString())
 
-        _registerVaildLiveData.postValue(RegisterVaild(idValid,nameValid,passwordValid,passwordConfirmValid))
+        _registerVaildLiveData.postValue(
+            RegisterVaild(
+                idValid,
+                nameValid,
+                passwordValid,
+                passwordConfirmValid
+            )
+        )
 
         isEmailValid.set(emailValid)
         isValid.set(emailValid && nameValid && idValid && passwordValid && passwordConfirmValid && isValidEmail)

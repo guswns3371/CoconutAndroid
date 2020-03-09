@@ -29,10 +29,9 @@
             android:textSize="30sp"
             android:textStyle="bold"
             android:padding="5dp"
-            android:text="Email" />
+            android:text="@string/prompt_email" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/emailTextInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -40,6 +39,7 @@
             android:textColorHint="@color/PrimaryColorDarkText">
 
             <EditText
+                android:id="@+id/emailTextInput"
                 android:padding="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -58,7 +58,7 @@
             android:textSize="30sp"
             android:textStyle="bold"
             android:padding="5dp"
-            android:text="Password" />
+            android:text="@string/prompt_password" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passwordTextInput"

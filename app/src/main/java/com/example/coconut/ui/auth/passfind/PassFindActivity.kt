@@ -1,7 +1,6 @@
 package com.example.coconut.ui.auth.passfind
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
+import androidx.appcompat.widget.Toolbar
 import com.example.coconut.R
 import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.databinding.ActivityPassFindBinding
@@ -9,6 +8,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PassFindActivity : BaseKotlinActivity<ActivityPassFindBinding, PassFindViewModel>() {
     private val TAG = "PassFindActivity"
+    override var toolbar: Toolbar? = null
     override val layoutResourceId: Int
         get() = R.layout.activity_pass_find
     override val viewModel: PassFindViewModel by viewModel()
@@ -25,4 +25,5 @@ class PassFindActivity : BaseKotlinActivity<ActivityPassFindBinding, PassFindVie
 
     override fun initAfterBinding() {
     }
+
 }

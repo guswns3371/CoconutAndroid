@@ -1,25 +1,57 @@
 <resources>
     <string name="app_name">Coconut</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="title_account">Account</string>
-    <string name="title_chat">Chat</string>
-    <string name="title_search">Search</string>
+    <string name="title_account">친구</string>
+    <string name="title_chat">채팅</string>
+    <string name="title_hashtag">해쉬태그</string>
+    <string name="title_more">더보기</string>
+
+    <string name="cancel">취소</string>
+    <string name="okay">확인</string>
+
     <string name="title_activity_login">Sign in</string>
     <string name="prompt_email">Email</string>
+    <string name="prompt_verify_email">Verify Your Email</string>
+    <string name="prompt_verify">Verify</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
+    <string name="send_code">Send Code</string>
+    <string name="permission_denied">앨범 및 카메라 권한이 허가없이\n\n서비스를 원활히 이용하실 수 없습니다</string>
 
-    <string name="invalid_username">이름(2 ~ 8자)</string>
-    <string name="invalid_userid">아이디(2 ~ 10자)</string>
+    <string name="invalid_username">이름(2 ~ 10자)</string>
+    <string name="invalid_userid">아이디(2 ~ 20자)</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
 
-    <string name="valid_email">Valid Email</string>
-    <string name="invalid_email">Invalid Email</string>
+    <string name="valid_email">사용 가능한 이메일</string>
+    <string name="verify_email">가입한 이메일로 전송된 코드를 입력해주세요</string>
+    <string name="invalid_email">사용중인 이메일</string>
     <string name="invalid_passCon">비밀번호가 다릅니다</string>
-    <string name="forgot_password">비밀번호를 복구할 방법을 \n\n선택해주세요</string>
-    <string name="find_password_by_email">이메일로 \n\n비밀번호 \n\n찾기</string>
-    <string name="find_password_by_message">문자 메시지로 \n\n비밀번호 \n\n찾기</string>
+    <string name="forgot_password">비밀번호를 변경할 방법을 \n\n선택해주세요</string>
+    <string name="find_password_by_email">이메일로 \n\n비밀번호 \n\n변경</string>
+    <string name="find_password_by_message">SMS로 \n\n비밀번호 \n\n변경</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_register">Have Your Coconut</string>
+
+    <!--    Setting-->
+    <string name="setting_logout">Logout</string>
+
+    <!--    toolbar menu-->
+    <string name="toolbar_account_setting">전체설정</string>
+    <string name="toolbar_account_friends">친구관리</string>
+    <string name="toolbar_account_edit">편집</string>
+
+    <string name="invite">대화상대 초대</string>
+    <string name="chatting">채 팅</string>
+    <string name="chatting_to_myself">나에게 채팅</string>
+    <string name="calling">전 화</string>
+    <string name="editing">프로필 편집</string>
+    <string name="edit_complete">편집 완료</string>
+    <string name="edit_cancel_alert">나가기 하면 변경사항은 저장되지 않습니다. 정말 나가시겠습니까?</string>
+    <string name="changing_user_id">아이디 변경</string>
+    <string name="changing_user_name">이름 변경</string>
+    <string name="changing_user_desc">상태메시지 변경</string>
+    <string name="loading">로딩중</string>
 </resources>

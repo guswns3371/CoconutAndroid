@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.coconut.ui.main.account.AccountViewModel" />
+    </data>
+        <LinearLayout
+            android:background="@color/PrimaryColor"
+            android:paddingTop="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/chat_add_tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:titleTextColor="@color/PrimaryColorText"
+                android:background="@color/PrimaryColor"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chat_add_horiz_recycler_view"
+                android:overScrollMode="never"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:orientation="horizontal"
+                android:background="@color/PrimaryColor"
+                android:layout_width="match_parent"
+                android:layout_height="90dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chat_add_recycler_view"
+                android:overScrollMode="never"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:padding="10dp"
+                />
+        </LinearLayout>
+</layout>

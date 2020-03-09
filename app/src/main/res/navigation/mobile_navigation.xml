@@ -3,23 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_account">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.example.coconut.ui.account.AccountFragment"
+        android:id="@+id/navigation_account"
+        android:name="com.example.coconut.ui.main.account.AccountFragment"
         android:label="@string/title_account"
         tools:layout="@layout/fragment_account" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.coconut.ui.chat.ChatFragment"
+        android:id="@+id/navigation_chat"
+        android:name="com.example.coconut.ui.main.chat.ChatFragment"
         android:label="@string/title_chat"
         tools:layout="@layout/fragment_chat" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.example.coconut.ui.search.SearchFragment"
-        android:label="@string/title_search"
-        tools:layout="@layout/fragment_search" />
+        android:id="@+id/navigation_hashtag"
+        android:name="com.example.coconut.ui.main.hashtag.HashTagFragment"
+        android:label="@string/title_hashtag"
+        tools:layout="@layout/fragment_hashtag" />
+
+    <fragment
+        android:id="@+id/navigation_more"
+        android:name="com.example.coconut.ui.main.more.MoreFragment"
+        android:label="@string/title_more"
+        tools:layout="@layout/fragment_more" />
 </navigation>

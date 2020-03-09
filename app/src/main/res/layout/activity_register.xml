@@ -26,7 +26,7 @@
             android:fontFamily="@font/gotham_medium"
             android:paddingStart="5dp"
             android:paddingBottom="20dp"
-            android:text="Have Your Coconut"
+            android:text="@string/title_activity_register"
             android:textColor="@color/baseTextColor"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -44,7 +44,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:padding="5dp"
-                android:text="Email" />
+                android:text="@string/prompt_email" />
             <TextView
                 android:id="@+id/emailErrorText"
                 android:layout_width="wrap_content"
@@ -216,7 +216,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:padding="5dp"
-            android:text="Password" />
+            android:text="@string/prompt_password" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

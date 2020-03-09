@@ -3,9 +3,10 @@ package com.example.coconut.ui.auth.passfind
 import android.util.Log
 import androidx.databinding.ObservableField
 import com.example.coconut.base.BaseKotlinViewModel
-import com.example.coconut.model.UserDataModel
+import com.example.coconut.model.MyRepository
 
-class PassFindViewModel(private val modelUser : UserDataModel): BaseKotlinViewModel() {
+class PassFindViewModel(private val modelUser : MyRepository): BaseKotlinViewModel() {
+
     private val TAG = "PassFindViewModel"
 
     val emailClicked = ObservableField<Boolean>()
@@ -20,14 +21,14 @@ class PassFindViewModel(private val modelUser : UserDataModel): BaseKotlinViewMo
         smsClicked.set(false)
     }
 
-    fun findByEmail(){
+    fun clickFindByEmail(){
         emailClicked.set(true)
         smsClicked.set(false)
         email.set(null)
         phoneNumber.set(null)
     }
 
-    fun findBySMS(){
+    fun clickFindBySMS(){
         emailClicked.set(false)
         smsClicked.set(true)
         emailForSMS.set(null)
@@ -36,11 +37,19 @@ class PassFindViewModel(private val modelUser : UserDataModel): BaseKotlinViewMo
     fun findPasswordBtn(){
         when(emailClicked.get()){
             true->{ //이메일로 비번 찾기
-                Log.e(TAG,"${email.get()}")
+                findByEmail()
             }
             false->{ //SMS로 비번 찾기
-                Log.e(TAG,"${emailForSMS.get()} / ${phoneNumber.get()}")
+                findBySMS()
             }
         }
+    }
+
+    private fun findByEmail(){
+        Log.e(TAG,"${email.get()}")
+    }
+
+    private fun findBySMS(){
+        Log.e(TAG,"${emailForSMS.get()} / ${phoneNumber.get()}")
     }
 }

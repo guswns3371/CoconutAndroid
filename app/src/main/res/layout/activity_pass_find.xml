@@ -52,7 +52,7 @@
 
             <LinearLayout
                 android:id="@+id/findByEmail"
-                android:onClick="@{()->viewModel.findByEmail()}"
+                android:onClick="@{()->viewModel.clickFindByEmail()}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -113,7 +113,7 @@
 
             <LinearLayout
                 android:id="@+id/findBySMS"
-                android:onClick="@{()->viewModel.findBySMS()}"
+                android:onClick="@{()->viewModel.clickFindBySMS()}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -184,6 +184,6 @@
             android:fontFamily="@font/gotham_medium"
             android:textStyle="bold"
             android:onClick="@{()->viewModel.findPasswordBtn()}"
-            android:text="Find Password" />
+            android:text="@string/send_code" />
     </LinearLayout>
 </layout>

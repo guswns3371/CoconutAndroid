@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:background="@color/PrimaryColorDark"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.main.chat.inner.InnerChatActivity">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp">
+
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/chatToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:titleTextColor="@color/PrimaryColorText"
+                android:background="@color/PrimaryColorDark"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme" />
+
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chat_recycler_view"
+                android:overScrollMode="never"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:stackFromEnd="true"
+                />
+
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="45dp">
+
+            <ImageView
+                android:id="@+id/chat_add"
+                android:background="@color/PrimaryColorLight"
+                android:padding="12dp"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/add" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/chat_edit_textinput"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:boxStrokeColor="@color/transparent_00"
+                android:textColorHint="@color/PrimaryColorText">
+
+                <EditText
+                    android:imeOptions="actionDone"
+                    android:id="@+id/chat_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textColorHint="@color/PrimaryColorText"
+                    android:background="@color/PrimaryColorLight"
+                    android:inputType="text"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textColor="@color/PrimaryColorText" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/chat_send"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:background="@color/black"
+                android:padding="12dp"
+                app:srcCompat="@drawable/send" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</layout>
