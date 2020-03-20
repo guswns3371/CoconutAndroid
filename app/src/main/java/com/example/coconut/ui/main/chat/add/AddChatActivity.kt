@@ -58,7 +58,7 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding,AccountViewMod
             setHasFixedSize(true)
         }
 
-        myIdPref = pref.UserId!!
+        myIdPref = pref.userID!!
 
         viewModel.getAllAccounts()
     }

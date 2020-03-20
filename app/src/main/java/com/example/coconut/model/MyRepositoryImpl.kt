@@ -38,6 +38,14 @@ class MyRepositoryImpl(private val authService: AuthService,
         return authService.register(registerPostData)
     }
 
+    override fun sendFcmTokenToServer(fcmTokenPostData: FcmTokenPostData): Single<BaseResponse> {
+        return authService.fcmTokenToServer(fcmTokenPostData)
+    }
+
+    override fun deleteFcmTokenFromServer(id: String): Single<BaseResponse> {
+        return authService.deleteFcmTokenFromServer(id)
+    }
+
     /** mainService*/
     override fun getAccountDatas(myId: String)
             : Single<ArrayList<UserDataResponse>> {

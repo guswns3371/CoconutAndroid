@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -51,22 +50,23 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                 when(userInfos.size){
                     1->{
                         //1명
-                        chat_list_people_size.hide()
-                        if (userInfos[0].id == pref.UserId){
-                            chat_list_people_size.text = "ME"
-                            chat_list_people_size.show()
-                        }
-                        image_layout_for_one.show()
 
                         Glide.with(context)
                             .load(Constant.BASE_URL+userInfos[0].profile_image)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image11)
+
+                        chat_list_people_size.hide()
+                        if (userInfos[0].id == pref.userID){
+                            chat_list_people_size.text = "ME"
+                            chat_list_people_size.show()
+                        }
+                        image_layout_for_one.show()
+
                     }
                     2->{
                         //2명
                         chat_list_people_size.show()
-                        image_layout_for_two.show()
 
                         Glide.with(context)
                             .load(Constant.BASE_URL+userInfos[0].profile_image)
@@ -77,11 +77,13 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                             .load(Constant.BASE_URL+userInfos[1].profile_image)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image22)
+
+                        image_layout_for_two.show()
+
                     }
                     3->{
                         //3명
                         chat_list_people_size.show()
-                        image_layout_for_three.show()
 
                         Glide.with(context)
                             .load(Constant.BASE_URL+userInfos[0].profile_image)
@@ -95,11 +97,12 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                             .load(Constant.BASE_URL+userInfos[2].profile_image)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image33)
+
+                        image_layout_for_three.show()
                     }
                     else->{
                         //4명 이상 (자신 미포함)
                         chat_list_people_size.show()
-                        image_layout_for_four.show()
 
                         Glide.with(context)
                             .load(Constant.BASE_URL+userInfos[0].profile_image)
@@ -120,6 +123,9 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                             .load(Constant.BASE_URL+userInfos[3].profile_image)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image44)
+
+                        image_layout_for_four.show()
+
                     }
                 }
 

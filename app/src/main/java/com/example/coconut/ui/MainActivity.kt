@@ -2,6 +2,7 @@ package com.example.coconut.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -29,22 +30,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        //Log.e(TAG,"onStart")
         super.onStart()
+        //Log.e(TAG,"onStart")
     }
 
     override fun onStop() {
-        //Log.e(TAG,"onStop")
         super.onStop()
-
+        //Log.e(TAG,"onStop")
     }
 
     override fun onDestroy() {
-        //Log.e(TAG,"onDestroy")
-
+        super.onDestroy()
         //서비스 종료
         stopService(Intent(this@MainActivity,SocketService::class.java))
-        super.onDestroy()
+        Log.e(TAG,"onDestroy")
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

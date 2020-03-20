@@ -25,7 +25,6 @@ import com.example.coconut.ui.setting.SettingActivity
 import com.example.coconut.util.MyPreference
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
-import kotlinx.android.synthetic.main.fragment_chat.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,7 +38,8 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
     private lateinit var chatRoomList : ArrayList<ChatListResponse>
 
     private val pref : MyPreference by inject()
-    override val baseToolBar: Toolbar?  = activity?.findViewById(R.id.baseToolBar)
+    override val baseToolBar: Toolbar?
+            get() = activity?.findViewById(R.id.baseToolBar)
 
     lateinit var myIdPref: String
     override var isBind: Boolean =false
@@ -72,7 +72,8 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
 
         bindService(activity)
 
-        myIdPref = pref.UserId!!
+        myIdPref = pref.userID!!
+
         setToolbarTitle(getString(R.string.title_chat))
         viewDataBinding.root.findViewById<RecyclerView>(R.id.chat_recycler_view).apply {
             layoutManager = LinearLayoutManager(activity!!)

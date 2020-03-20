@@ -7,6 +7,7 @@ import android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
@@ -43,7 +44,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
     private val pref : MyPreference by inject()
     private var progressDialog : Dialog? = null
 
-    private val myIdPref = pref.UserId!!
+    private val myIdPref = pref.userID!!
     private var backImage : String? = null
     private var profileImage : String? = null
     private var Id : String? = null
@@ -93,7 +94,18 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         user_name_edit_icon.setOnClickListener { editUserData(USER_NAME) }
         user_desc_edit_icon.setOnClickListener { editUserData(USER_DESC) }
         user_img_edit_icon.setOnClickListener { selectImage(IntentID.PROFILE_IMAGE) }
-        back_img_edit_icon.setOnClickListener { selectImage(IntentID.BACKGROUND_IMAGE) }
+
+
+        back_img_edit_icon.setOnClickListener {
+            when((it as ImageView).drawable.constantState){
+                resources.getDrawable(R.drawable.x,null).constantState->{
+                    this@AccountInfoActivity.finish()
+                }
+                resources.getDrawable(R.drawable.ic_edit_location_black_24dp,null).constantState->{
+                    selectImage(IntentID.BACKGROUND_IMAGE)
+                }
+            }
+        }
 
         user_image.setOnClickListener {
             intent.getParcelableExtra<UserDataResponse>(IntentID.USER_RESPONSE)?.let{
@@ -172,11 +184,12 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
     private fun normalMode(){
         user_img_edit_icon.hide()
         user_id_edit_icon.hide()
-        back_img_edit_icon.hide()
         user_name_edit_icon.hide()
         user_desc_edit_icon.hide()
         edit_complete_text.hide()
         select_space.show()
+
+        back_img_edit_icon.setImageResource(R.drawable.x)
 
         if (user_msg.text.toString().isBlank())
             user_msg.hide()
@@ -193,12 +206,13 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
     private fun editMode(){
         user_img_edit_icon.show()
         user_id_edit_icon.show()
-        back_img_edit_icon.show()
         user_name_edit_icon.show()
         user_desc_edit_icon.show()
         edit_complete_text.show()
         user_msg.show()
         select_space.hide()
+
+        back_img_edit_icon.setImageResource(R.drawable.ic_edit_location_black_24dp)
 
         user_image.isClickable = false
         background_image.isClickable = false
@@ -333,6 +347,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
                         Log.e(TAG,"backImage : $backImage")
 
                     } catch (e : Exception){
+                        showToast("앨범에서 사진 가져오기 에러")
                         Log.e(TAG,"앨범에서 사진 가져오기 에러 : ${e.message}")
                     }
                 }
@@ -346,6 +361,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
                         Log.e(TAG,"profileImage : $profileImage")
 
                     } catch (e : Exception){
+                        showToast("앨범에서 사진 가져오기 에러")
                         Log.e(TAG,"앨범에서 사진 가져오기 에러 : ${e.message}")
                     }
                 }

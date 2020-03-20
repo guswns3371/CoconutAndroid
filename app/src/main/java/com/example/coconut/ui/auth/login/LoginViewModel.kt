@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.EmailVerifyPostData
+import com.example.coconut.model.request.FcmTokenPostData
 import com.example.coconut.model.request.LoginPostData
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.util.Event
@@ -61,8 +62,25 @@ class LoginViewModel(private val modelUser : MyRepository,
                 it?.run {
                     Log.e(TAG,"loginCheck :${toString()}")
                     //sharedpreference에 user id 값을 저장한다
-                    if (isConfirmed)
-                        pref.UserId = id
+                    if (isConfirmed){
+                        pref.userID = id
+
+                        /**서버에 fcm과 id를 보내어 저장한다
+                        앱이 처음 설치되었고, token이 compromised, 가입한 적이 없는 유저일 경우
+                        => emailVerify()를 통해 서버에 전달 (LoginViewModel)
+
+                        앱이 처음 설치되었고, token이 compromised, 가입한 적이 있는 유저일 경우
+                        => loginCheck()를 통해 서버에 전달 (LoginViewModel)
+
+                        앱이 다시 실행되고, token이 compromised, pref.userID 값이 저장되어있을경우
+                        => sendFcmTokenToServer()를 통해 서버에 전달 (MyFirebaseMessagingService)
+
+                        앱이 다시 실행되고, pref.token 값이 null 일경우
+                        => fcmToken()를 통해 서버에 전달 (LogoActivity)
+                         */
+                        sendFcmTokenToServer(id,pref.fcmToken)
+                    }
+
 
                     // MutableLiveData에ㅓ setValue, postValue 실행 하는 경우
 //                    _loginResponseLiveData.postValue(this)
@@ -86,8 +104,24 @@ class LoginViewModel(private val modelUser : MyRepository,
                 it?.run {
                     Log.e(TAG,"emailVerify :${toString()}")
                     //sharedpreference에 user id 값을 저장한다
-                    if (isConfirmed)
-                        pref.UserId = id
+                    if (isConfirmed){
+                        pref.userID = id
+
+                         /**서버에 fcm과 id를 보내어 저장한다
+                         앱이 처음 설치되었고, token이 compromised, 가입한 적이 없는 유저일 경우
+                          => emailVerify()를 통해 서버에 전달 (LoginViewModel)
+
+                         앱이 처음 설치되었고, token이 compromised, 가입한 적이 있는 유저일 경우
+                          => loginCheck()를 통해 서버에 전달 (LoginViewModel)
+
+                         앱이 다시 실행되고, token이 compromised, pref.userID 값이 저장되어있을경우
+                          => sendFcmTokenToServer()를 통해 서버에 전달 (MyFirebaseMessagingService)
+
+                          앱이 다시 실행되고, pref.token 값이 null 일경우
+                          => fcmToken()를 통해 서버에 전달 (LogoActivity)
+                         */
+                        sendFcmTokenToServer(id,pref.fcmToken)
+                    }
 
                     // MutableLiveData에ㅓ setValue, postValue 실행 하는 경우
 //                    _loginResponseLiveData.postValue(this)
@@ -101,6 +135,36 @@ class LoginViewModel(private val modelUser : MyRepository,
             }))
     }
 
+    /** MyFirebaseMessagingService sendRegistrationToServer() */
+    fun sendFcmTokenToServer(id : String, token : String?){
+        addDisposable(modelUser.sendFcmTokenToServer(
+                FcmTokenPostData(id,token)
+            )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                it?.run {
+                    Log.e(TAG, "sendFcmTokenToServer response : ${toString()}")
+                }
+            },{
+                Log.e(TAG, "sendFcmTokenToServer response error, message : ${it.message}")
+            }))
+    }
+
+    fun deleteFcmTokenFromServer(id : String){
+        addDisposable(modelUser.deleteFcmTokenFromServer(
+                id
+            )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                it?.run {
+                    Log.e(TAG, "sendFcmTokenToServer response : ${toString()}")
+                }
+            },{
+                Log.e(TAG, "sendFcmTokenToServer response error, message : ${it.message}")
+            }))
+    }
     private fun loginValidation() {
         val emailValidation = !TextUtils.isEmpty(email.get())
         val passwordValidation = !TextUtils.isEmpty(password.get())

@@ -2,7 +2,7 @@ package com.example.coconut
 
 class Constant {
     companion object{
-        const val BASE_URL = "http://15.164.129.248"
+        const val BASE_URL = "http://13.124.238.15"
         const val NODE_URL = "${BASE_URL}:9000"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE =1
@@ -33,6 +33,7 @@ class IntentID{
         const val CHAT_WITH_ONE_PARTNER = 1
         const val CHAT_WITH_PEOPLE_FROM_CHAT_FRAG = 2
         const val CHAT_WITH_PEOPLE_FROM_INVITING= 3
+        const val CHAT_FROM_NOTIFICATION= 4
 
         const val PROFILE_IMAGE = 0
         const val BACKGROUND_IMAGE = 1

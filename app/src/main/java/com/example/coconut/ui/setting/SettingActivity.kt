@@ -11,16 +11,19 @@ import com.example.coconut.*
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.service.SocketService
 import com.example.coconut.ui.auth.login.LoginActivity
+import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.util.MyPreference
 import io.socket.client.Socket
 import kotlinx.android.synthetic.main.activity_setting.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingActivity : AppCompatActivity(), SocketServiceManager {
 
     private val pref : MyPreference by inject()
+    private val loginViewModel : LoginViewModel by viewModel()
     private val TAG = "SettingActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +41,7 @@ class SettingActivity : AppCompatActivity(), SocketServiceManager {
             /**자동로그인 해제를 위해 UserId를 삭제한다*/
             socket?.run {
                 offline()
+                loginViewModel.deleteFcmTokenFromServer(pref.userID!!)
                 pref.resetUserId()
                 callActivity(Constant.LOGIN_PAGE)
             }
@@ -78,7 +82,7 @@ class SettingActivity : AppCompatActivity(), SocketServiceManager {
         Log.e(TAG,"offline")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.UserId)
+                put(SocketData.USER_ID,pref.userID)
                 socket?.emit(SocketSend.OFFLINE_USER,this)
             }
         }catch (e: JSONException){

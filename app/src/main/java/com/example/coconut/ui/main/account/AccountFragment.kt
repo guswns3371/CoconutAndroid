@@ -112,6 +112,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding,AccountViewMod
                     showToast(this)
                     Log.e(TAG,this)
                     pref.resetUserId()
+                    pref.resetFcmToken()
                     val intent = Intent(activity!!,LoginActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or
                             Intent.FLAG_ACTIVITY_CLEAR_TASK or //이걸 해줘야 fragment도 같이 pop

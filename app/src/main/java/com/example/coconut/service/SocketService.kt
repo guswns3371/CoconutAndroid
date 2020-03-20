@@ -47,7 +47,7 @@ class SocketService : Service() {
         Log.e(TAG,"onCreate")
         handler = Handler()
         context = applicationContext
-        sender = pref.UserId
+        sender = pref.userID
 
         try {
             socket = IO.socket(Constant.NODE_URL)
@@ -110,7 +110,7 @@ class SocketService : Service() {
         Log.e(TAG,"online")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.UserId)
+                put(SocketData.USER_ID,pref.userID)
                 socket.emit(SocketSend.ONLINE_USER,this)
             }
         }catch (e: JSONException){
@@ -122,7 +122,7 @@ class SocketService : Service() {
         Log.e(TAG,"offline")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.UserId)
+                put(SocketData.USER_ID,pref.userID)
                 socket.emit(SocketSend.OFFLINE_USER,this)
             }
         }catch (e: JSONException){
@@ -135,7 +135,7 @@ class SocketService : Service() {
             Runnable {
                 if (!isConnected) {
                     Log.e(TAG, "onConnect")
-                    showToast("연결됨")
+                    showToast("서버와 연결되었습니다")
                     isConnected = true
                     online()
                 }
@@ -148,7 +148,7 @@ class SocketService : Service() {
                 isConnected=false
                 Log.e(TAG,"Disconnected")
                 offline()
-                showToast("연결이 끊어짐")
+                showToast("서버와의 연결이 끊어졌습니다")
             }
         )
     }
@@ -158,7 +158,7 @@ class SocketService : Service() {
             Runnable {
                 isConnected=false
                 Log.e(TAG,"onConnectionError")
-                showToast("서버와의 연결이 불안정합니다")
+                //showToast("서버와의 연결이 불안정합니다")
             }
         )
     }

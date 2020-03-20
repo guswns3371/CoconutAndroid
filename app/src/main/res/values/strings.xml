@@ -6,6 +6,8 @@
     <string name="title_hashtag">해쉬태그</string>
     <string name="title_more">더보기</string>
 
+    <string name="default_notification_channel_id">com.example.coconut</string>
+
     <string name="cancel">취소</string>
     <string name="okay">확인</string>
 
@@ -54,4 +56,6 @@
     <string name="changing_user_name">이름 변경</string>
     <string name="changing_user_desc">상태메시지 변경</string>
     <string name="loading">로딩중</string>
+    <string name="default_notification_channel_name">coconut</string>
+    <string name="msg_token_fmt">InstanceID Token: %s</string>
 </resources>

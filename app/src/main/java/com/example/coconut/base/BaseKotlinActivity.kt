@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.example.coconut.util.MyPreference
 import com.google.android.material.snackbar.Snackbar
+import org.koin.android.ext.android.inject
 
 /**
  * BaseKotlinActivity<ActivitySbsMainBinding>
@@ -80,7 +82,7 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish() // close this activity and return to preview activity (if there is any)
         }
         return super.onOptionsItemSelected(item)
     }

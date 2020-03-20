@@ -38,6 +38,8 @@
     <color name="transparent_60">#99000000</color>
     <color name="grey">#8F8F8F</color>
     <color name="black">#000000</color>
+
+
     <color name="online">#00FF0A</color>
     <color name="offline">#FFFFFF</color>
 

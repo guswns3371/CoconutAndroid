@@ -23,6 +23,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
     private val TAG = "InnerChatRecyclerAdapter"
     private var itemList : ArrayList<ChatHistoryResponse> = arrayListOf()
     private var readPeopleList : ArrayList<String> = arrayListOf()
+    private var fixedPeopleList : ArrayList<String> = arrayListOf()
 
     inner class InnerChatHolder(parent: ViewGroup): RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_chat,parent,false)
@@ -31,15 +32,19 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
         fun onBind(item : ChatHistoryResponse){
             itemView.run {
                 val userInfo = item.user_info
-
-                when(userInfo.id == pref.UserId){
+                val count = fixedPeopleList.size - stringToArrayList(item.read_people).size
+                when(userInfo.id == pref.userID){
                     true->{
                         // 유저편 view (내가 보낸 메시지)
                         not_mine_linear.gone()
                         mine_linear.show()
 
                         //읽음표시
-                        chat_read_count_mine.text = item.read_people
+                        if (count != 0)
+                            chat_read_count_mine.text = "$count"
+                        else
+                            chat_read_count_mine.text = ""
+
                         chat_time_mine.text = item.time
 
                         // isFile로 chat_content_image_mine VISIBLE로
@@ -63,7 +68,11 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         chat_user_name_nm.text = userInfo.name
 
                         //읽음표시
-                        chat_read_count_nm.text = item.read_people
+                        if (count != 0)
+                            chat_read_count_nm.text = "$count"
+                        else
+                            chat_read_count_nm.text = ""
+
                         chat_time_nm.text = item.time
 
                         // isFile로 chat_content_image_nm를 VISIBLE 로
@@ -106,6 +115,18 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
         Log.e(TAG,"updateChatReadCount")
         this.readPeopleList = readPeopleList
         notifyDataSetChanged()
+    }
+
+    fun setFixedPeopleList(fixedPeopleList: ArrayList<String>){
+        this.fixedPeopleList = fixedPeopleList
+    }
+
+    private fun stringToArrayList(string : String) : ArrayList<String> {
+        string.split(",").toTypedArray().run{
+            val list = arrayListOf<String>()
+            forEach { list.add(it) }
+             return list
+        }
     }
 
 }

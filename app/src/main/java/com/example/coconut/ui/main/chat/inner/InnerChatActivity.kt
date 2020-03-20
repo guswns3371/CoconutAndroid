@@ -1,7 +1,9 @@
 package com.example.coconut.ui.main.chat.inner
 
 import android.app.Dialog
+import android.app.NotificationManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
@@ -37,18 +39,19 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     private val pref : MyPreference by inject()
     private val recyclerAdapter : InnerChatRecyclerAdapter by inject()
     private var progressDialog : Dialog? = null
+    private var isOkToSend  = false
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
     override val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e("serviceConn","onServiceDisconnected")
+            Log.e(TAG,"onServiceDisconnected")
             socket = null
             isBind = false
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.e("serviceConn","onServiceConnected")
+            Log.e(TAG,"onServiceConnected")
             val binder = service as SocketService.MyBinder
             socket = binder.getService().mySocket()
             isBind = true
@@ -75,17 +78,20 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
         intent.getStringExtra(IntentID.CHAT_ROOM_TITLE)?.let {
             setToolbarTitle(it)
         }
+
         chat_recycler_view.apply {
             layoutManager = LinearLayoutManager(this@InnerChatActivity).apply {
                 stackFromEnd = true
             }
             adapter = recyclerAdapter
             setHasFixedSize(true)
-
         }
 
-        myIdPref = pref.UserId!!
-        chatMode = intent.getIntExtra(IntentID.CHAT_MODE,-1)
+        bindService(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         // charRoomId와 fixedPeopleList 를 설정한다
         whereChatFrom()
@@ -95,8 +101,9 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
         viewModel.makeChatRoom(myIdPref,charRoomId,fixedPeopleList)
 
         // 채팅방 id를 얻기 전까지 채팅버튼 비활성화
-        chat_send.isClickable = false
-        bindService(this)
+        isOkToSend = false
+
+        Log.e(TAG,"onResume $charRoomId")
     }
 
     override fun initDataBinding() {
@@ -107,6 +114,9 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
                 Log.e(TAG,"채팅방 id : ${it.ChatRoomIdResponse}")
                 charRoomId = it.ChatRoomIdResponse
 
+                // notification을 cancel 시킨다
+                cancelNotification()
+
                 Log.e(TAG,"채팅방 이름 : ${it.ChatRoomNameResponse}")
                 setToolbarTitle(it.ChatRoomNameResponse)
 
@@ -114,66 +124,76 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
 
                 (it.ChatRoomPeopleResponse).split(",").toTypedArray().run {
                     fixedPeopleList = this.toCollection(ArrayList())
+                    recyclerAdapter.setFixedPeopleList(fixedPeopleList)
                 }
 
                 Log.e(TAG,"업데이트된 peopleListForSend : ${fixedPeopleList.showElements()}")
 
                 // 여기서 드디어 채팅 기록을 불러온다
-                if (!isHistoryLoaded){
-                    // 최초 한번만 로드한다
-                    // 채팅방 입장
-                    enterChatRoom()
+                enterChatRoom()
 
-                    // 실시간 로드는 소켓통신으로 구현
-                    viewModel.getChatHistory(charRoomId)
-                    isHistoryLoaded = true
+                // 실시간 로드는 소켓통신으로 구현
+                viewModel.getChatHistory(charRoomId)
+                isHistoryLoaded = true
 
-                    //이제 채팅버튼 활성화
-                    chat_send.isClickable = true
-                    progressDialog = Dialog(this@InnerChatActivity).apply {
-                        setContentView(R.layout.custom_loading_dialog)
-                        setCancelable(true)
-                        show()
-                    }
+                //이제 채팅버튼 활성화
+                isOkToSend = true
+                progressDialog = Dialog(this@InnerChatActivity).apply {
+                    setContentView(R.layout.custom_loading_dialog)
+                    setCancelable(true)
+                    show()
                 }
             }
         })
 
         // getChatHistory
         viewModel.chatHistoryResponseLiveData.observe(this, Observer {
-            Log.e(TAG,"getChatHistory observing")
+            Log.e(TAG,"getChatHistory observing $charRoomId")
 
             progressDialog!!.dismiss()
+
+            /** 다른 사람들이 채팅방에 입장할 때 읽음 표시갱신을 위해 chatHistoryList를 새로 초기화한다
+             * 안하면 같은 내용의 채팅이 여러번 반복되어 나타난다*/
+            chatHistoryList = arrayListOf()
 
             it.forEach { chat->
                 chatHistoryList.add(chat)
             }
             recyclerAdapter.addChatItem(chatHistoryList)
             recyclerAdapter.updateChatReadCount(fixedPeopleList)
+
+            scrollToBottom()
         })
     }
 
     override fun initAfterBinding() {
         //메시지 보내기
-        chat_send.setOnClickListener {
-            sendMessage()
-        }
-
+        chat_send.setOnClickListener { sendMessage() }
         // 키보드에서 완료버튼 누를때에도 메시지 보내기
-        chat_edit_text.onDone {
-            sendMessage()
-        }
+        chat_edit_text.onDone { sendMessage() }
     }
 
-    override fun onDestroy() {
+
+    override fun onPause() {
+        super.onPause()
         //채팅방 나감
         exitChatRoom()
+        Log.e(TAG, "onPause $charRoomId")
+    }
+
+    override fun onStop() {
+        super.onStop()
         offSocket()
         unbindService(this)
-        super.onDestroy()
+        Log.e(TAG,"onStop $charRoomId")
     }
 
     private fun whereChatFrom(){
+        myIdPref = pref.userID!!
+        chatMode = intent.getIntExtra(IntentID.CHAT_MODE,-1)
+
+        // onResume으로 중복 add되는걸 막기위함
+        fixedPeopleList = arrayListOf()
         //peopleListForSend 설정함
         when(chatMode){
             IntentID.CHAT_WITH_ME->{
@@ -212,7 +232,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
                         forEach { id->
                             // 이렇게 해줘야 "2 가 2로
                             // 3] 이 3으로 , [3 이 3으로 바뀐다
-                            fixedPeopleList.add(id.toCleanString())
+                            if (id.toCleanString() != "")
+                                fixedPeopleList.add(id.toCleanString())
                         }
                     }
                 }
@@ -229,6 +250,26 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
                     fixedPeopleList.add(myIdPref)
                 }
             }
+            IntentID.CHAT_FROM_NOTIFICATION->{
+                // notification으로 들어올때
+                intent.getStringExtra(IntentID.CHAT_ROOM_ID)?.let {
+                    Log.e(TAG,"CHAT_FROM_NOTIFICATION")
+                    charRoomId = it
+                }
+
+
+                intent.getStringExtra(IntentID.CHAT_ROOM_PEOPLE_LIST)?.let {
+                    it.split(",").toTypedArray().run {
+                        forEach { id->
+                            // 이렇게 해줘야 "2 가 2로
+                            // 3] 이 3으로 , [3 이 3으로 바뀐다
+                            if (id.toCleanString() != "")
+                                fixedPeopleList.add(id.toCleanString())
+                        }
+                    }
+                }
+
+            }
             -1->{
                 Log.e(TAG,"CHAT_MODE ERROR")
                 throw Exception()
@@ -243,8 +284,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     private fun socketForChat(){
         if (socket == null) Log.e(TAG,"socket is null")
         socket?.apply {
-            on(SocketReceive.CHATROOM_ENTER,onChatroomEnter)
-            on(SocketReceive.CHATROOM_EXIT,onChatroomExit)
+            on(SocketReceive.CHATROOM_ENTER+charRoomId,onChatroomEnter)
+            on(SocketReceive.CHATROOM_EXIT+charRoomId,onChatroomExit)
             on(SocketReceive.CHAT_MESSAGE,onChatMessageReceive)
 
             // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
@@ -256,8 +297,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     private fun offSocket(){
         if (socket == null) Log.e(TAG,"socket is null")
         socket?.apply {
-            off(SocketReceive.CHATROOM_ENTER,onChatroomEnter)
-            off(SocketReceive.CHATROOM_EXIT,onChatroomExit)
+            off(SocketReceive.CHATROOM_ENTER+charRoomId,onChatroomEnter)
+            off(SocketReceive.CHATROOM_EXIT+charRoomId,onChatroomExit)
             off(SocketReceive.CHAT_MESSAGE,onChatMessageReceive)
 
             // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
@@ -271,8 +312,11 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
                 this.split(",").toTypedArray().run {
                     currentOnlinePeopleList = this.toCollection(ArrayList())
                 }
-                Log.e(TAG,"[enter] current People ${currentOnlinePeopleList.showElements()}")
+                Log.e(TAG,"[enter $charRoomId] current People ${currentOnlinePeopleList.showElements()}")
             }
+
+            /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
+            viewModel.getChatHistory(charRoomId)
         }
     }
 
@@ -282,7 +326,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
                 this.split(",").toTypedArray().run {
                     currentOnlinePeopleList = this.toCollection(ArrayList())
                 }
-                Log.e(TAG,"[exit] current People ${currentOnlinePeopleList.showElements()}")
+                Log.e(TAG,"[exit $charRoomId] current People ${currentOnlinePeopleList.showElements()}")
             }
         }
     }
@@ -291,13 +335,13 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
         runOnUiThread {
             //exitChatRoom()
             enterChatRoom()
-            chat_send.isClickable = true
+            isOkToSend = true
         }
     }
 
     private val onDisconnect = Emitter.Listener {
         runOnUiThread{
-            chat_send.isClickable = false
+            isOkToSend = false
             exitChatRoom()
         }
     }
@@ -317,10 +361,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     }
 
     private fun enterChatRoom(){
-        Log.e(TAG,"enter")
+        Log.e(TAG,"enter $charRoomId")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.UserId)
+                put(SocketData.USER_ID,pref.userID)
                 put(SocketData.CHAT_ROOM_ID,charRoomId)
                 socket?.emit(SocketSend.CHATROOM_ENTER,this)
             }
@@ -330,10 +374,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     }
 
     private fun exitChatRoom(){
-        Log.e(TAG,"exit")
+        Log.e(TAG,"exit $charRoomId")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.UserId)
+                put(SocketData.USER_ID,pref.userID)
                 put(SocketData.CHAT_ROOM_ID,charRoomId)
                 socket?.emit(SocketSend.CHATROOM_EXIT,this)
             }
@@ -343,8 +387,15 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     }
 
     private fun sendMessage(){
+        if (!isOkToSend){
+            showToast("잠시만 기다려주세요")
+            return
+        }
+
+
         if (!chat_edit_text.text.toString().isBlank()){
-            ChatSocketData(charRoomId,myIdPref,chat_edit_text.text.toString(),fixedPeopleList,currentOnlinePeopleList,null)
+            ChatSocketData(charRoomId,myIdPref,chat_edit_text.text.toString(),
+                fixedPeopleList,currentOnlinePeopleList,null)
                 .toJSONObject()?.let {
                     socket?.emit(SocketSend.CHAT_MESSAGE,it)
                     chat_edit_text.text.clear()
@@ -356,5 +407,13 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
         chat_recycler_view.postDelayed({
             chat_recycler_view.scrollToPosition(chat_recycler_view.adapter!!.itemCount -1)
         },200)
+    }
+
+    private fun cancelNotification(){
+        (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).run {
+            charRoomId?.let {
+                cancel(it.toInt())
+            }
+        }
     }
 }

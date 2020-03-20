@@ -21,6 +21,10 @@ interface MyRepository {
 
     fun doRegister(registerPostData: RegisterPostData) : Single<RegisterResponse>
 
+    fun sendFcmTokenToServer(fcmTokenPostData: FcmTokenPostData) : Single<BaseResponse>
+
+    fun deleteFcmTokenFromServer(id : String) : Single<BaseResponse>
+
     /** main*/
 
     /** account*/
