@@ -28,7 +28,7 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
             .subscribe({
                 it?.run {
                     forEach {history ->
-                        Log.e(TAG,"getChatHistory response : [${history.user_info.name}] ${history.chat_content}\n")
+                        //Log.e(TAG,"getChatHistory response : [${history.user_info.name}] ${history.chat_content}\n")
                     }
                     _chatResponseLiveData.postValue(this)
                 }

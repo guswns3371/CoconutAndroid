@@ -46,6 +46,7 @@ var adapterPart = module {
     /** single로 할지 factory로 할지 나중에 결정*/
     factory { ChatListRecyclerAdpater(get()) }
     factory { AddChatRecyclerAdpater() }
+    factory { InnerDrawerAdapter() }
 }
 
 var modelPart = module {

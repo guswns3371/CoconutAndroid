@@ -71,11 +71,14 @@ class SocketService : Service() {
         return START_REDELIVER_INTENT
     }
 
+    /**
+     * 설정에서 배터리 사용량 최적화하면 서비스가 제대로 작동하지 않는다
+     * */
     override fun onDestroy() {
-        Log.e(TAG,"onDestroy")
         offline()
         socketDisconnect()
         super.onDestroy()
+        Log.e(TAG,"onDestroy")
     }
 
     override fun onBind(intent: Intent): IBinder? {

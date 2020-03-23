@@ -3,22 +3,35 @@ package com.example.coconut.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CenterInside
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.NotificationTarget
+import com.bumptech.glide.request.transition.Transition
+import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.FcmTokenPostData
-import com.example.coconut.ui.MainActivity
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import org.koin.android.ext.android.inject
 
 
@@ -143,24 +156,36 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
      *
      * @param message FCM message body received.
      */
-    private fun sendNotification(data : Map<String,String>) {
+    private fun sendNotification(data: Map<String,String>) {
         Log.e(TAG,"sendNotification")
         val intent = Intent(this, InnerChatActivity::class.java)
         intent.putExtra(IntentID.CHAT_MODE,IntentID.CHAT_FROM_NOTIFICATION)
         intent.putExtra(IntentID.CHAT_ROOM_ID,data["room_id"])
         intent.putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST,data["room_people"])
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        /**
+         * manifests 에서
+         * InnerChatActivity 속에  android:noHistory="true" 속성 추가하면
+         * 액티비티 스택에 쌓이지 않는다.
+         * */
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+
         val pendingIntent = PendingIntent.getActivity(
             this, 0 /* Request code */, intent,
             PendingIntent.FLAG_ONE_SHOT
         )
+
+        val bitmapImage = Glide.with(this).asBitmap()
+            .load(Constant.BASE_URL+data["user_image"])
+            .transform(CenterCrop(),RoundedCorners(25))
+            .submit().get()
 
         val channelId = getString(R.string.default_notification_channel_id)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher_coconut_round)
             .setContentTitle(data["title"])
-            .setContentText(data["body"])
+            .setContentText("${data["who"]} : ${data["body"]}")
+            .setLargeIcon(bitmapImage)
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -169,6 +194,7 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:background="@color/PrimaryColor"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_vertical"
+        app:cardBackgroundColor="@color/transparent_00"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/inner_drawer_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/ic_person_add_black_24dp" />
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/inner_drawer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="270dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:padding="2dp"
+            android:textSize="14sp"
+            android:textColor="@color/PrimaryColorText"
+            android:text="대화상대 초대하기"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+</LinearLayout>

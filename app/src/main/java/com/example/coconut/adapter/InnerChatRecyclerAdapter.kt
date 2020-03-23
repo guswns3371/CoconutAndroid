@@ -106,13 +106,13 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
     }
 
     fun addChatItem(itemList: ArrayList<ChatHistoryResponse>){
-        Log.e(TAG,"addChatItem")
+        //Log.e(TAG,"addChatItem")
         this.itemList = itemList
         notifyDataSetChanged()
     }
 
     fun updateChatReadCount(readPeopleList : ArrayList<String>){
-        Log.e(TAG,"updateChatReadCount")
+        //Log.e(TAG,"updateChatReadCount")
         this.readPeopleList = readPeopleList
         notifyDataSetChanged()
     }

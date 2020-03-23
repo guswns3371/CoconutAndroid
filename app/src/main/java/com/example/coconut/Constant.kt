@@ -26,6 +26,7 @@ class IntentID{
 
         const val CHAT_ROOM_ID = "CHAT_ROOM_ID"
         const val CHAT_ROOM_PEOPLE_LIST = "CHAT_ROOM_PEOPLE_LIST"
+        const val CHAT_ROOM_PEOPLE_INFOS = "CHAT_ROOM_PEOPLE_INFOS"
 
         const val CHAT_ROOM_TITLE = "CHAT_ROOM_TITLE"
         const val CHAT_MODE = "CHAT_MODE"

@@ -15,7 +15,7 @@
         android:textAlignment="center"
         android:textColor="@color/PrimaryColorText"
         android:textSize="50sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/gotham_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -26,13 +26,13 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_height="290dp"
         android:padding="100dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.69"
+        app:layout_constraintVertical_bias="0.669"
         app:srcCompat="@drawable/coconut_logo" />
 </androidx.constraintlayout.widget.ConstraintLayout>

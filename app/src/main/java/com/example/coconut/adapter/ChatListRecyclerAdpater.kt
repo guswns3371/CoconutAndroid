@@ -147,6 +147,7 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         putExtra(IntentID.CHAT_ROOM_TITLE,item.room_name)
                         putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST,roomInfo.people)
                         putExtra(IntentID.CHAT_ROOM_ID,roomInfo.id)
+                        putExtra(IntentID.CHAT_ROOM_PEOPLE_INFOS,userInfos)
                         ContextCompat.startActivity(context, this,null)
                     }
                 }

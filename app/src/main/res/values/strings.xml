@@ -58,4 +58,6 @@
     <string name="loading">로딩중</string>
     <string name="default_notification_channel_name">coconut</string>
     <string name="msg_token_fmt">InstanceID Token: %s</string>
+
+    <string name="drawer_people">대화상대</string>
 </resources>
