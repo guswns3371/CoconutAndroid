@@ -2,7 +2,8 @@ package com.example.coconut
 
 class Constant {
     companion object{
-        const val BASE_URL = "http://13.124.238.15"
+        const val BASE_URL = "http://127.0.0.1"
+        const val SPRING_BOOT_URL = "${BASE_URL}:8080"
         const val NODE_URL = "${BASE_URL}:9000"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE =1
