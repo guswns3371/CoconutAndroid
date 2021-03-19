@@ -8,9 +8,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.RegisterPostData
+import com.example.coconut.model.request.RegisterRequest
 import com.example.coconut.model.response.auth.RegisterResponse
-import com.example.coconut.model.response.auth.RegisterVaild
+import com.example.coconut.model.response.auth.RegisterValid
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -23,9 +23,9 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
     val registerResponseLiveData : LiveData<RegisterResponse>
         get() = _registerResponseLiveData
 
-    private val _registerVaildLiveData = MutableLiveData<RegisterVaild>()
-    val registerValidLiveData : LiveData<RegisterVaild>
-        get() = _registerVaildLiveData
+    private val _registerValidLiveData = MutableLiveData<RegisterValid>()
+    val registerValidLiveData : LiveData<RegisterValid>
+        get() = _registerValidLiveData
 
     //data binding한 edittext 들
     val email = ObservableField<String>()
@@ -82,7 +82,7 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
     }
     fun registerButton(){
         addDisposable(model.doRegister(
-            RegisterPostData(
+            RegisterRequest(
                 email.get().toString().trim(),
                 id.get().toString().trim(),
                 name.get().toString().trim(),
@@ -109,8 +109,8 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
         val passwordValid  = !TextUtils.isEmpty(password.get())
         val passwordConfirmValid  = !TextUtils.isEmpty(passwordConfirm.get()) && (password.get().toString() == passwordConfirm.get().toString())
 
-        _registerVaildLiveData.postValue(
-            RegisterVaild(
+        _registerValidLiveData.postValue(
+            RegisterValid(
                 idValid,
                 nameValid,
                 passwordValid,

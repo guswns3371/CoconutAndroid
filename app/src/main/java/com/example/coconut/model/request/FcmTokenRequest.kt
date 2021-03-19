@@ -2,7 +2,7 @@ package com.example.coconut.model.request
 
 import com.google.gson.annotations.SerializedName
 
-data class FcmTokenPostData (
+data class FcmTokenRequest (
     @SerializedName("id") var id : String,
-    @SerializedName("fcm_token") var fcm_token : String?
+    @SerializedName("fcmToken") var fcmToken : String?
 )

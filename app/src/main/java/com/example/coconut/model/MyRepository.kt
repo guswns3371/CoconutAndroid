@@ -13,15 +13,19 @@ import io.reactivex.Single
 interface MyRepository {
 
     /** auth */
-    fun doLogin(loginPostData: LoginPostData) : Single<LoginResponse>
+    fun googleLogin() : Single<LoginResponse>
+
+    fun naverLogin() : Single<LoginResponse>
+
+    fun doLogin(loginRequest: LoginRequest) : Single<LoginResponse>
 
     fun checkEmailValidation(email : String) : Single<RegisterResponse>
 
-    fun emailVerify(emailVerifyPostData: EmailVerifyPostData) : Single<LoginResponse>
+    fun emailVerify(emailVerifyRequest: EmailVerifyRequest) : Single<LoginResponse>
 
-    fun doRegister(registerPostData: RegisterPostData) : Single<RegisterResponse>
+    fun doRegister(registerRequest: RegisterRequest) : Single<RegisterResponse>
 
-    fun sendFcmTokenToServer(fcmTokenPostData: FcmTokenPostData) : Single<BaseResponse>
+    fun sendFcmTokenToServer(fcmTokenRequest: FcmTokenRequest) : Single<BaseResponse>
 
     fun deleteFcmTokenFromServer(id : String) : Single<BaseResponse>
 
@@ -30,7 +34,7 @@ interface MyRepository {
     /** account*/
     fun getAccountDatas(myId: String): Single<ArrayList<UserDataResponse>>
 
-    fun updateAccountData(accountEditPostData: AccountEditPostData) : Single<BaseResponse>
+    fun updateAccountData(accountEditRequest: AccountEditRequest) : Single<BaseResponse>
 
     /** chat*/
 
@@ -38,7 +42,7 @@ interface MyRepository {
 
     fun getChatHistory(chatRoomId : String?) : Single<ArrayList<ChatHistoryResponse>>
 
-    fun sendMessage(chatPostData: ChatPostData): Single<ChatBaseResponse>
+    fun sendMessage(chatRequest: ChatRequest): Single<ChatBaseResponse>
 
     fun getChatRoomLists(myId: String?) : Single<ArrayList<ChatListResponse>>
 }

@@ -2,7 +2,7 @@ package com.example.coconut.model.request
 
 import com.google.gson.annotations.SerializedName
 
-data class EmailVerifyPostData (
+data class EmailVerifyRequest (
     @SerializedName("email") val email : String,
     @SerializedName("secretToken") val secretToken : String
 )

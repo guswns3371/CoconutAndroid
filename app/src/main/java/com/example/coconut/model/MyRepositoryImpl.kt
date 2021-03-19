@@ -18,10 +18,20 @@ class MyRepositoryImpl(private val authService: AuthService,
                        private val chatService: ChatService
                        ) : MyRepository {
 
+
     /** authService*/
-    override fun doLogin(loginPostData: LoginPostData)
+
+    override fun googleLogin() : Single<LoginResponse> {
+        return authService.googleLogin()
+    }
+
+    override fun naverLogin() : Single<LoginResponse> {
+        return authService.naverLogin()
+    }
+
+    override fun doLogin(loginRequest: LoginRequest)
             : Single<LoginResponse> {
-        return authService.login(loginPostData)
+        return authService.login(loginRequest)
     }
 
     override fun checkEmailValidation(email: String)
@@ -29,17 +39,17 @@ class MyRepositoryImpl(private val authService: AuthService,
         return authService.checkEmailValidation(email)
     }
 
-    override fun emailVerify(emailVerifyPostData: EmailVerifyPostData): Single<LoginResponse> {
-        return authService.emailVerify(emailVerifyPostData)
+    override fun emailVerify(emailVerifyRequest: EmailVerifyRequest): Single<LoginResponse> {
+        return authService.emailVerify(emailVerifyRequest)
     }
 
-    override fun doRegister(registerPostData: RegisterPostData)
+    override fun doRegister(registerRequest: RegisterRequest)
             : Single<RegisterResponse> {
-        return authService.register(registerPostData)
+        return authService.register(registerRequest)
     }
 
-    override fun sendFcmTokenToServer(fcmTokenPostData: FcmTokenPostData): Single<BaseResponse> {
-        return authService.fcmTokenToServer(fcmTokenPostData)
+    override fun sendFcmTokenToServer(fcmTokenRequest: FcmTokenRequest): Single<BaseResponse> {
+        return authService.fcmTokenToServer(fcmTokenRequest)
     }
 
     override fun deleteFcmTokenFromServer(id: String): Single<BaseResponse> {
@@ -52,14 +62,14 @@ class MyRepositoryImpl(private val authService: AuthService,
         return accountService.getAllUserDatas(myId)
     }
 
-    override fun updateAccountData(accountEditPostData: AccountEditPostData)
+    override fun updateAccountData(accountEditRequest: AccountEditRequest)
             : Single<BaseResponse> {
         return accountService.updateAccount(
-            accountEditPostData.id,
-            accountEditPostData.user_id,
-            accountEditPostData.user_name,
-            accountEditPostData.user_msg,
-            arrayOf(accountEditPostData.user_img, accountEditPostData.back_img)
+            accountEditRequest.id,
+            accountEditRequest.userId,
+            accountEditRequest.userName,
+            accountEditRequest.userMsg,
+            arrayOf(accountEditRequest.userImg, accountEditRequest.backImg)
         )
     }
 
@@ -69,7 +79,7 @@ class MyRepositoryImpl(private val authService: AuthService,
         people: ArrayList<String>
     ): Single<ChatBaseResponse> {
         return chatService.makeChatRoom(
-            MakeChatRoomPostData(myId,chatRoomId,people)
+            MakeChatRoomRequest(myId,chatRoomId,people)
         )
     }
 
@@ -78,12 +88,12 @@ class MyRepositoryImpl(private val authService: AuthService,
        return chatService.getChatHistory(chatRoomId)
     }
 
-    override fun sendMessage(chatPostData: ChatPostData): Single<ChatBaseResponse> {
+    override fun sendMessage(chatRequest: ChatRequest): Single<ChatBaseResponse> {
         return chatService.sendMessage(
-            chatPostData.chat_room_id,
-            chatPostData.id,
-            chatPostData.chat_message,
-            chatPostData.chat_images
+            chatRequest.chatRoomId,
+            chatRequest.id,
+            chatRequest.chatMessage,
+            chatRequest.chatImages
         )
     }
 

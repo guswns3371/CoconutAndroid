@@ -10,7 +10,8 @@ data class RegisterResponse(
         return "RegisterResponse(isEmailOk=$isEmailOk, isRegistered=$isRegistered)"
     }
 }
-data class RegisterVaild(
+
+data class RegisterValid(
     var idOk :Boolean,
     var nameOk : Boolean,
     var passwordOk : Boolean,

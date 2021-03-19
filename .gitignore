@@ -12,3 +12,6 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# keep secret files out of git
+/secret.*

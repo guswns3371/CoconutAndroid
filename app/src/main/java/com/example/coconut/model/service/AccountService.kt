@@ -16,10 +16,10 @@ interface AccountService {
 
     @POST("/user/edit")
     @Multipart
-    //@Path 와 @Part동시에 사용 못하네
+    //@Path 와 @Part 동시에 사용 못하네
     fun updateAccount(
         @Part("id") id : RequestBody?,
-        @Part("user_id") user_id : RequestBody?,
+        @Part("userId") userId : RequestBody?,
         @Part("name") name : RequestBody?,
         @Part("message") message : RequestBody?,
         @Part images : Array<MultipartBody.Part?>?

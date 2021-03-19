@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.ChatPostData
+import com.example.coconut.model.request.ChatRequest
 import com.example.coconut.model.response.chat.ChatBaseResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -51,8 +51,8 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
             }))
     }
 
-    fun sendMessage(chatPostData: ChatPostData){
-        addDisposable(myRepository.sendMessage(chatPostData)
+    fun sendMessage(chatRequest: ChatRequest){
+        addDisposable(myRepository.sendMessage(chatRequest)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

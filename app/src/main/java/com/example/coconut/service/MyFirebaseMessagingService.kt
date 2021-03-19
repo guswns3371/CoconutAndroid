@@ -3,35 +3,25 @@ package com.example.coconut.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.NotificationTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.FcmTokenPostData
+import com.example.coconut.model.request.FcmTokenRequest
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import org.koin.android.ext.android.inject
 
 
@@ -225,7 +215,7 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
 
     private fun sendFcmTokenToServer(id : String, token : String?){
         CompositeDisposable().add((myRepository.sendFcmTokenToServer(
-                FcmTokenPostData(id,token)
+                FcmTokenRequest(id,token)
             )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

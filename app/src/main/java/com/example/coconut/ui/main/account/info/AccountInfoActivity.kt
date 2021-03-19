@@ -16,7 +16,7 @@ import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.databinding.ActivityAccountInfoBinding
-import com.example.coconut.model.request.AccountEditPostData
+import com.example.coconut.model.request.AccountEditRequest
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.util.*
 import com.gun0912.tedpermission.PermissionListener
@@ -76,7 +76,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         edit_complete_text.setOnClickListener {
             myIdPref.let {
                 Log.e(TAG,"$it / $userId / $profileImage / $backImage")
-                viewModel.edit(AccountEditPostData(
+                viewModel.edit(AccountEditRequest(
                     createPartFromString(it),
                     createPartFromString(userId),
                     createPartFromString(userName),

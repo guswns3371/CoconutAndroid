@@ -5,11 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.AccountEditPostData
+import com.example.coconut.model.request.AccountEditRequest
 import com.example.coconut.model.response.BaseResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import okhttp3.RequestBody
 
 class AccountInfoViewModel(private val myRepository: MyRepository) :BaseKotlinViewModel() {
 
@@ -18,8 +17,8 @@ class AccountInfoViewModel(private val myRepository: MyRepository) :BaseKotlinVi
     private val _baseResponseLiveData = MutableLiveData<BaseResponse>()
     val baseResponseLiveData: LiveData<BaseResponse> = _baseResponseLiveData
 
-    fun edit(accountEditPostData: AccountEditPostData){
-        addDisposable(myRepository.updateAccountData(accountEditPostData)
+    fun edit(accountEditRequest: AccountEditRequest){
+        addDisposable(myRepository.updateAccountData(accountEditRequest)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

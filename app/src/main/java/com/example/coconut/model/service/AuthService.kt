@@ -1,9 +1,9 @@
 package com.example.coconut.model.service
 
-import com.example.coconut.model.request.EmailVerifyPostData
-import com.example.coconut.model.request.FcmTokenPostData
-import com.example.coconut.model.request.LoginPostData
-import com.example.coconut.model.request.RegisterPostData
+import com.example.coconut.model.request.EmailVerifyRequest
+import com.example.coconut.model.request.FcmTokenRequest
+import com.example.coconut.model.request.LoginRequest
+import com.example.coconut.model.request.RegisterRequest
 import com.example.coconut.model.response.BaseResponse
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
@@ -15,14 +15,25 @@ import retrofit2.http.Path
 
 interface AuthService {
 
+    /**
+     *  <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
+     *  <a href="/oauth2/authorization/naver" class="btn btn-secondary active" role="button">Naver Login</a>
+     */
+
+    @POST("/oauth2/authorization/google")
+    fun googleLogin() : Single<LoginResponse>
+
+    @POST("/oauth2/authorization/naver")
+    fun naverLogin() : Single<LoginResponse>
+
     @POST("/login")
     fun login(
-        @Body loginPostData: LoginPostData
+        @Body loginRequest: LoginRequest
     ): Single<LoginResponse>
 
     @POST("/register")
     fun register(
-        @Body registerPostData: RegisterPostData
+        @Body registerRequest: RegisterRequest
     ): Single<RegisterResponse>
 
     @POST("/register/{email}")
@@ -32,13 +43,13 @@ interface AuthService {
 
     @POST("/login/verify")
     fun emailVerify(
-        @Body emailVerifyPostData: EmailVerifyPostData
+        @Body emailVerifyRequest: EmailVerifyRequest
     ) : Single<LoginResponse>
 
 
     @POST("/user/fcm")
     fun fcmTokenToServer(
-        @Body fcmTokenPostData: FcmTokenPostData
+        @Body fcmTokenRequest: FcmTokenRequest
     ) : Single<BaseResponse>
 
     @DELETE("/user/fcm/{id}")
