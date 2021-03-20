@@ -1,12 +1,14 @@
 package com.example.coconut.di
 
 import com.example.coconut.Constant
+import com.example.coconut.MyApplication
 import com.example.coconut.adapter.*
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.MyRepositoryImpl
 import com.example.coconut.model.service.AccountService
 import com.example.coconut.model.service.AuthService
 import com.example.coconut.model.service.ChatService
+import com.example.coconut.oauth2.AuthRepo
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.ui.auth.passfind.PassFindViewModel
 import com.example.coconut.ui.auth.register.RegisterViewModel
@@ -42,7 +44,7 @@ var socketPart = module {
 //    single { socket()!! }
 }
 var adapterPart = module {
-    //factory : inject 시정메 해당 객체를 샐성한다
+    //factory : inject 시점에 해당 객체를 샐성한다
     single { AccountRecyclerAdapter() }
     factory { InnerChatRecyclerAdapter(get()) }
 
@@ -58,8 +60,12 @@ var modelPart = module {
     //컴포넌트 내에서 생성된 객체를 참조한다
 }
 
+var authPart = module {
+    single { AuthRepo(androidApplication() as MyApplication) }
+}
+
 var viewModelPart = module {
-    viewModel { LoginViewModel(get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { RegisterViewModel(get()) }
     viewModel { PassFindViewModel(get()) }
 
@@ -85,7 +91,8 @@ var moduleList =
         viewModelPart,
         adapterPart,
         modelPart,
-        sharedPreferencePart
+        sharedPreferencePart,
+        authPart
     )
 
 var gson: Gson = GsonBuilder()
@@ -97,19 +104,11 @@ private fun okHttpClient() = OkHttpClient.Builder()
     .build()
 
 private fun retrofit() = Retrofit.Builder()
-//    .callFactory(OkHttpClient.Builder().build())
     .client(okHttpClient())
     .baseUrl(Constant.SPRING_BOOT_URL)
     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
     .addConverterFactory(GsonConverterFactory.create(gson))
     .build()
-
-//httpClient = new OkHttpClient.Builder();
-//HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//httpClient.interceptors().add(interceptor);
-//Retrofit retrofit = createAdapter().build();
-//service = retrofit.create(IService.class);
 
 //private fun socket(): Socket? {
 //    return try {

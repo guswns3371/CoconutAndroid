@@ -125,7 +125,7 @@
             android:onClick="@{()-> viewModel.naverLogin()}"
             android:layout_margin="5dp"
             app:cornerRadius="20dp"
-
+            android:visibility="gone"
             android:text="Login With Naver"
             android:textColor="@color/SecondaryColorDarkText"
             android:textStyle="bold" />

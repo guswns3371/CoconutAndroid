@@ -14,6 +14,8 @@ class Constant {
         const val LOGIN_PAGE=4
         const val CHAT_PAGE=5
         const val CALL_PAGE=6
+        const val RC_FAIL = 0
+        const val RC_AUTH = 100
     }
 }
 

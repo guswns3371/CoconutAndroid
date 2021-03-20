@@ -182,7 +182,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gotham_medium"
                         android:textColor="@color/color_error"
-                        android:textSize="15sp"
+                        android:textSize="13sp"
                         android:textStyle="bold"
                         android:padding="5dp"/>
                 </LinearLayout>

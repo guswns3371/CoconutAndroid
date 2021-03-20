@@ -2,9 +2,11 @@ package com.example.coconut.model.service
 
 import com.example.coconut.model.response.BaseResponse
 import com.example.coconut.model.response.account.UserDataResponse
+import com.example.coconut.oauth2.UserInfoResult
 import io.reactivex.Single
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.http.*
 
 interface AccountService {
@@ -24,4 +26,7 @@ interface AccountService {
         @Part("message") message : RequestBody?,
         @Part images : Array<MultipartBody.Part?>?
     ) : Single<BaseResponse>
+
+    @GET("/oauth2/v3/userinfo")
+    fun getUserInfo()  : Call<UserInfoResult>
 }

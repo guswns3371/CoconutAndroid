@@ -1,32 +1,20 @@
 package com.example.coconut
 
-import android.Manifest
-import android.app.ActivityManager
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.Signature
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
-import androidx.core.content.getSystemService
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.annotation.ColorRes
 import com.example.coconut.di.moduleList
-import com.example.coconut.service.SocketService
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
-import com.gun0912.tedpermission.PermissionListener
-import com.gun0912.tedpermission.TedPermission
+import com.google.common.io.BaseEncoding
 import org.koin.android.ext.android.startKoin
-import java.security.AccessControlContext
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 class MyApplication : Application(){
 
-    private val TAG = "MyApplication"
     override fun onCreate() {
         super.onCreate()
         startKoin(applicationContext, moduleList)
@@ -40,9 +28,44 @@ class MyApplication : Application(){
             val channelName = getString(R.string.default_notification_channel_name)
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(
-                NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(
+                    channelId,
+                    channelName, NotificationManager.IMPORTANCE_HIGH
+                )
             )
+        }
+    }
+
+    fun getSignature(): String? {
+        val pm = packageManager
+        val packageName = packageName
+        return try {
+            val packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            if (packageInfo?.signatures == null || packageInfo.signatures.isEmpty() || packageInfo.signatures[0] == null
+            ) {
+                null
+            } else signatureDigest(packageInfo.signatures[0])
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
+        }
+    }
+
+    private fun signatureDigest(sig: Signature): String? {
+        val signature = sig.toByteArray()
+        return try {
+            val md = MessageDigest.getInstance("SHA1")
+            val digest = md.digest(signature)
+            BaseEncoding.base16().lowerCase().encode(digest)
+        } catch (e: NoSuchAlgorithmException) {
+            null
+        }
+    }
+
+    fun getColorValue(@ColorRes color: Int): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getColor(color)
+        } else {
+            resources.getColor(color)
         }
     }
 }

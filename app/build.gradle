@@ -10,7 +10,18 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
 
 // secret.gradle for oauth2
+def secretFile = file("${rootDir}/secret.gradle")
+if (!secretFile.exists()) {
+    logger.lifecycle("secret.gradle file not found!")
+    throw new GradleException("secret.gradle file not found!")
+}
 apply from: "${rootDir}/secret.gradle"
+
+def keystoreFile = file("${rootDir}/${keystore}")
+if (!keystoreFile.exists()) {
+    logger.lifecycle("${keystore} file not found!")
+    throw new GradleException("${keystore} file not found!")
+}
 
 android {
     compileSdkVersion 29
@@ -23,7 +34,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Android build error “AndroidManifest.xml requires a placeholder substitution”
-        manifestPlaceholders = [appAuthRedirectScheme: "com.redirectScheme.coconut.${clientPrefix}"]
+        manifestPlaceholders = [appAuthRedirectScheme: "com.googleusercontent.apps.${clientPrefix}"]
     }
 
     signingConfigs {
@@ -36,10 +47,6 @@ android {
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
 
         debug {
             signingConfig signingConfigs.secret
@@ -74,6 +81,10 @@ android {
             resValue "string", "redirect_uri", "${redirectUri}"
 
             resValue "string", "authorization_scope", "${authorizationScope}"
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
         }
     }
     dataBinding {
@@ -169,4 +180,9 @@ dependencies {
 
     // appauth for oauth2
     implementation 'net.openid:appauth:0.8.1'
+    implementation  group: 'com.google.guava', name: 'guava', version: '23.2-android'
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+
 }

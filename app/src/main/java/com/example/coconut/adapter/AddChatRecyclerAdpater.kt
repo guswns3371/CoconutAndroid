@@ -21,7 +21,7 @@ class AddChatRecyclerAdpater : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var itemList : ArrayList<UserDataResponse> = arrayListOf()
     fun getInvitingList() : ArrayList<String>{
-        var list = arrayListOf<String>()
+        val list = arrayListOf<String>()
         this.invitingList.forEach {
             list.add(it.id)
         }

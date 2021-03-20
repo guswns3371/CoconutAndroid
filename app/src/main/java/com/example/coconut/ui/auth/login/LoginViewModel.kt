@@ -1,17 +1,21 @@
 package com.example.coconut.ui.auth.login
 
+import android.content.Intent
 import android.text.TextUtils
 import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.coconut.Constant.Companion.RC_AUTH
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.EmailVerifyRequest
 import com.example.coconut.model.request.FcmTokenRequest
 import com.example.coconut.model.request.LoginRequest
 import com.example.coconut.model.response.auth.LoginResponse
+import com.example.coconut.oauth2.*
+import com.example.coconut.ui.auth.login.verify.ProgressState
 import com.example.coconut.util.Event
 import com.example.coconut.util.MyPreference
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,7 +24,8 @@ import io.reactivex.schedulers.Schedulers
 // koin으로 model 과 viewmodel을 연결해준다 => private val modelUser : UserDataModel
 class LoginViewModel(
     private val modelUser: MyRepository,
-    private val pref: MyPreference
+    private val pref: MyPreference,
+    private val authRepo: AuthRepo
 ) : BaseKotlinViewModel() {
     private val TAG = "LoginViewModel"
 
@@ -35,6 +40,14 @@ class LoginViewModel(
     val loginResponseLiveData: LiveData<Event<LoginResponse>>
         get() = _loginResponseLiveData
 
+    private val _progressObservable = MutableLiveData<Event<ProgressState>>()
+    val progressObservable: LiveData<Event<ProgressState>>
+        get() = _progressObservable
+
+    private val _activityObservable = MutableLiveData<Event<ActivityRequest>>()
+    val activityObservable : LiveData<Event<ActivityRequest>>
+        get() = _activityObservable
+
     /**Login*/
     val email = ObservableField<String>()
     val password = ObservableField<String>()
@@ -42,6 +55,80 @@ class LoginViewModel(
 
     /**Verify Email*/
     val secretToken = ObservableField<String>()
+
+    private val loginListener: AuthLoginListener = object : AuthLoginListener {
+        override fun onStart(repo: AuthRepo, event: AuthEvent) {
+            val description: String = event.getDescription()
+            Log.i(TAG, description)
+        }
+
+        override fun onEvent(repo: AuthRepo, event: AuthEvent) {
+            val description: String = event.getDescription()
+            when (event) {
+                AuthEvent.AUTH_SERVICE_DISCOVERY_START -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(true, description))
+                }
+                AuthEvent.AUTH_SERVICE_DISCOVERY_FINISH -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(false, description))
+
+                }
+                AuthEvent.AUTH_USER_AUTH_START -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(true, description))
+
+                }
+                AuthEvent.AUTH_USER_AUTH_FINISH -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(false, description))
+
+                }
+                AuthEvent.AUTH_CODE_EXCHANGE_START -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(true, description))
+
+                }
+                AuthEvent.AUTH_CODE_EXCHANGE_FINISH -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(false, description))
+
+                }
+                AuthEvent.AUTH_USER_INFO_START -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(true, description))
+
+                }
+                AuthEvent.AUTH_USER_INFO_FINISH -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(false, description))
+
+                }
+                else -> {
+                    Log.i(TAG, description)
+                    _progressObservable.value = Event(ProgressState(false, description))
+
+                }
+            }
+        }
+
+        override fun onUserAgentRequest(repo: AuthRepo, intent: Intent) {
+            Log.i(TAG, "User Agent Request!")
+            _activityObservable.value = Event(ActivityRequest(intent, RC_AUTH))
+        }
+
+        override fun onSuccess(repo: AuthRepo, event: AuthEvent) {
+            val description: String = event.getDescription()
+            Log.i(TAG, description)
+        }
+
+        override fun onFailure(repo: AuthRepo, event: AuthEvent, ex: AuthException) {
+            val description: String = event.getDescription() + ": " + ex.message
+            Log.i(TAG, description)
+
+        }
+
+    }
 
     override fun onCreate() {
         val callback = object : Observable.OnPropertyChangedCallback() {
@@ -100,26 +187,32 @@ class LoginViewModel(
     }
 
     /**oauth2*/
+    fun notifyActivityResponse(data: Intent?, resultCode: Int) {
+        authRepo.notifyUserAgentResponse(data, resultCode)
+    }
+
     fun googleLogin() {
-        addDisposable(
-            modelUser.googleLogin()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it.run {
-                        Log.e(TAG, "loginCheck :${toString()}")
-                        //sharedpreference에 user id 값을 저장한다
-                        if (isConfirmed) {
-                            pref.userID = id
-                            sendFcmTokenToServer(id, pref.fcmToken)
-                        }
-                        _loginResponseLiveData.value = Event(this)
-                    }
-                }, {
-                    Log.d(TAG, "response error, message : ${it.message}")
-                    showSnackbar("${it.message}")
-                })
-        )
+        authRepo.login(loginListener)
+
+//        addDisposable(
+//            modelUser.googleLogin()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({
+//                    it.run {
+//                        Log.e(TAG, "loginCheck :${toString()}")
+//                        //sharedpreference에 user id 값을 저장한다
+//                        if (isConfirmed) {
+//                            pref.userID = id
+//                            sendFcmTokenToServer(id, pref.fcmToken)
+//                        }
+//                        _loginResponseLiveData.value = Event(this)
+//                    }
+//                }, {
+//                    Log.d(TAG, "response error, message : ${it.message}")
+//                    showSnackbar("${it.message}")
+//                })
+//        )
     }
 
     fun naverLogin() {
