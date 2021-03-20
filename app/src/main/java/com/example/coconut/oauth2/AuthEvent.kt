@@ -1,6 +1,6 @@
-package com.example.coconut.ui.auth
+package com.example.coconut.oauth2
 
-enum class AuthEvent(description : String) {
+enum class AuthEvent(private val description: String) {
     AUTH_LOGIN_START("Starting login"),
     AUTH_SERVICE_DISCOVERY_START("Discovering service configuration"),
     AUTH_SERVICE_DISCOVERY_FINISH("Service discovery finished"),
@@ -16,4 +16,5 @@ enum class AuthEvent(description : String) {
     AUTH_LOGOUT_SUCCESS("Logout succeeded"),
     AUTH_LOGOUT_FAILURE("Logout failed");
 
+    fun getDescription() = description
 }
