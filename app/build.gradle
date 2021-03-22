@@ -28,13 +28,16 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.example.coconut"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Android build error “AndroidManifest.xml requires a placeholder substitution”
         manifestPlaceholders = [appAuthRedirectScheme: "com.googleusercontent.apps.${clientPrefix}"]
+
+        // Enabling multidex support.
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -92,6 +95,10 @@ android {
     }
     androidExtensions {
         experimental = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -186,3 +193,4 @@ dependencies {
 
 
 }
+

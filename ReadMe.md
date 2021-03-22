@@ -37,6 +37,8 @@ Ex)
 
 - secret.gradle 파일과 secret.keystore 파일이 있어야 build 가능.
 
+1. secret.gradle 파일 양식
+
 ```gradle
 ext {
 
@@ -69,4 +71,8 @@ ext {
     keystore = "${secret}.keystore"
 }
 ```
+2. secret.keystore 생성 방법
 
+`keytool -genkey -keystore secret.keystore -alias secret -keyalg RSA -keysize 2048 -validity 10000 -keypass secret -storepass secret -dname 'CN=secret'`
+
+- `keytool -list -v -keystore secret.keystore -storepass secret |  grep SHA1` 명령어로 SHA1값을 [Google Credentials](https://console.cloud.google.com/apis/credentials) 에 입력한다.
