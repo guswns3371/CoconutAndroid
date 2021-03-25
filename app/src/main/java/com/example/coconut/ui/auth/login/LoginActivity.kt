@@ -1,5 +1,6 @@
 package com.example.coconut.ui.auth.login
 
+import android.app.Dialog
 import android.content.Intent
 import android.util.Log
 import androidx.appcompat.widget.Toolbar
@@ -61,9 +62,7 @@ class LoginActivity : BaseKotlinActivity<ActivityLoginBinding, LoginViewModel>()
 
         viewModel.progressObservable.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let {
-                if (it.msg != null) {
-                    showToast(it.msg!!)
-                }
+                Log.i(TAG, "initDataBinding: ${it.msg}")
             }
         })
 

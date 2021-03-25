@@ -31,14 +31,17 @@ class LogoActivity : AppCompatActivity() {
         fcmToken()
 
         Handler().postDelayed({
-            Log.e(TAG,"userID : ${pref.userIdx}")
-            Log.e(TAG,"fcmToken : ${pref.fcmToken}")
+            Log.e(TAG, "userIdx : ${pref.userIdx}")
+            Log.e(TAG, "fcmToken : ${pref.fcmToken}")
+            Log.e(TAG, "accessToken: ${pref.accessToken}")
 
-            when(pref.userIdx == null){
-                true->{ startActivity(Intent(applicationContext, LoginActivity::class.java)) }
-                false->{
+            when (pref.userIdx == null) {
+                true -> {
+                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+                }
+                false -> {
                     pref.fcmToken?.let {
-                        viewModel.sendFcmTokenToServer(pref.userIdx!!,it)
+                        viewModel.sendFcmTokenToServer(pref.userIdx!!, it)
                     }
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                 }
@@ -46,7 +49,7 @@ class LogoActivity : AppCompatActivity() {
 
             finish()
 
-        },SPLASH_TIME_OUT)
+        }, SPLASH_TIME_OUT)
     }
 
     private fun fcmToken(){

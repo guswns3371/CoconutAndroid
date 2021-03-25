@@ -325,6 +325,7 @@ class LoginViewModel(
                 .subscribe({
                     it?.run {
                         Log.e(TAG, "sendUserInfoToServer response : ${toString()}")
+                        pref.userIdx = userId
                         _loginSuccessObservable.value = Event(true)
                     }
                 }, {
