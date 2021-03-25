@@ -2,7 +2,6 @@ package com.example.coconut.ui.auth.register
 
 import android.content.Intent
 import android.graphics.Color
-import android.util.Log
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import com.example.coconut.R
@@ -49,7 +48,7 @@ class RegisterActivity : BaseKotlinActivity<ActivityRegisterBinding,RegisterView
             }
         })
 
-        viewModel.registerValidLiveData.observe(this, Observer {
+        viewModel.registerValidDataLiveData.observe(this, Observer {
             when(it.idOk){
                 true->{ idErrorText.text = "" }
                 false->{ idErrorText.text = resources.getString(R.string.invalid_userid) }

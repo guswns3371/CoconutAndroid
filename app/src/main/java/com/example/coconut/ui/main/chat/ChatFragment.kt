@@ -72,7 +72,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
 
         bindService(activity)
 
-        myIdPref = pref.userID!!
+        myIdPref = pref.userIdx!!
 
         setToolbarTitle(getString(R.string.title_chat))
         viewDataBinding.root.findViewById<RecyclerView>(R.id.chat_recycler_view).apply {

@@ -9,7 +9,6 @@ import com.example.coconut.R
 import com.example.coconut.ui.auth.login.LoginActivity
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.util.MyPreference
-import com.example.coconut.util.log
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import org.koin.android.ext.android.inject
@@ -32,14 +31,14 @@ class LogoActivity : AppCompatActivity() {
         fcmToken()
 
         Handler().postDelayed({
-            Log.e(TAG,"userID : ${pref.userID}")
+            Log.e(TAG,"userID : ${pref.userIdx}")
             Log.e(TAG,"fcmToken : ${pref.fcmToken}")
 
-            when(pref.userID == null){
+            when(pref.userIdx == null){
                 true->{ startActivity(Intent(applicationContext, LoginActivity::class.java)) }
                 false->{
                     pref.fcmToken?.let {
-                        viewModel.sendFcmTokenToServer(pref.userID!!,it)
+                        viewModel.sendFcmTokenToServer(pref.userIdx!!,it)
                     }
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                 }

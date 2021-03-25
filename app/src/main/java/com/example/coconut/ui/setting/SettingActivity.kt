@@ -41,7 +41,7 @@ class SettingActivity : AppCompatActivity(), SocketServiceManager {
             /**자동로그인 해제를 위해 UserId를 삭제한다*/
             socket?.run {
                 offline()
-                loginViewModel.deleteFcmTokenFromServer(pref.userID!!)
+                loginViewModel.deleteFcmTokenFromServer(pref.userIdx!!)
                 pref.resetUserId()
                 callActivity(Constant.LOGIN_PAGE)
             }
@@ -82,7 +82,7 @@ class SettingActivity : AppCompatActivity(), SocketServiceManager {
         Log.e(TAG,"offline")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.userID)
+                put(SocketData.USER_ID,pref.userIdx)
                 socket?.emit(SocketSend.OFFLINE_USER,this)
             }
         }catch (e: JSONException){

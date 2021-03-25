@@ -1,4 +1,4 @@
-package com.example.coconut.model.request
+package com.example.coconut.model.request.account
 
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

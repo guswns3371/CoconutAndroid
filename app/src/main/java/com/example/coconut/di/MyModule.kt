@@ -5,9 +5,9 @@ import com.example.coconut.MyApplication
 import com.example.coconut.adapter.*
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.MyRepositoryImpl
-import com.example.coconut.model.service.AccountService
-import com.example.coconut.model.service.AuthService
-import com.example.coconut.model.service.ChatService
+import com.example.coconut.model.api.AccountAPI
+import com.example.coconut.model.api.AuthAPI
+import com.example.coconut.model.api.ChatAPI
 import com.example.coconut.oauth2.AuthRepo
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.ui.auth.passfind.PassFindViewModel
@@ -36,9 +36,9 @@ var retrofitPart = module {
     //singleton 인스턴스 제공
     single { okHttpClient() }
     single { retrofit() }
-    single { get<Retrofit>().create(AuthService::class.java) }
-    single { get<Retrofit>().create(AccountService::class.java) }
-    single { get<Retrofit>().create(ChatService::class.java) }
+    single { get<Retrofit>().create(AuthAPI::class.java) }
+    single { get<Retrofit>().create(AccountAPI::class.java) }
+    single { get<Retrofit>().create(ChatAPI::class.java) }
 }
 var socketPart = module {
 //    single { socket()!! }
@@ -61,7 +61,7 @@ var modelPart = module {
 }
 
 var authPart = module {
-    single { AuthRepo(androidApplication() as MyApplication) }
+    single { AuthRepo(androidApplication() as MyApplication, get() ) }
 }
 
 var viewModelPart = module {

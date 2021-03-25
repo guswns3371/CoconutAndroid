@@ -1,6 +1,6 @@
-package com.example.coconut.model.model
+package com.example.coconut.model.data
 
-data class BaseItem(
+data class BaseData(
     var id : String,
     val image : String,
     val name : String

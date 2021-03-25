@@ -16,7 +16,7 @@ import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.databinding.ActivityAccountInfoBinding
-import com.example.coconut.model.request.AccountEditRequest
+import com.example.coconut.model.request.account.AccountEditRequest
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.util.*
 import com.gun0912.tedpermission.PermissionListener
@@ -44,7 +44,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
     private val pref : MyPreference by inject()
     private var progressDialog : Dialog? = null
 
-    private val myIdPref = pref.userID!!
+    private val myIdPref = pref.userIdx!!
     private var backImage : String? = null
     private var profileImage : String? = null
     private var Id : String? = null
@@ -76,13 +76,15 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         edit_complete_text.setOnClickListener {
             myIdPref.let {
                 Log.e(TAG,"$it / $userId / $profileImage / $backImage")
-                viewModel.edit(AccountEditRequest(
+                viewModel.edit(
+                    AccountEditRequest(
                     createPartFromString(it),
                     createPartFromString(userId),
                     createPartFromString(userName),
                     createPartFromString(userMsg),
                     prepareFilePart("user_img",profileImage),
-                    prepareFilePart("back_img",backImage)))
+                    prepareFilePart("back_img",backImage))
+                )
             }
             progressDialog = Dialog(this@AccountInfoActivity).apply {
                 setContentView(R.layout.custom_loading_dialog)
@@ -110,7 +112,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         user_image.setOnClickListener {
             intent.getParcelableExtra<UserDataResponse>(IntentID.USER_RESPONSE)?.let{
                 Intent(this@AccountInfoActivity,ZoomableImageActivity::class.java).run {
-                    putExtra(IntentID.USER_IMAGE,it.profile_image)
+                    putExtra(IntentID.USER_IMAGE,it.profile_picture)
                     startActivity(this)
                 }
             }
@@ -118,7 +120,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         background_image.setOnClickListener {
             intent.getParcelableExtra<UserDataResponse>(IntentID.USER_RESPONSE)?.let{
                 Intent(this@AccountInfoActivity,ZoomableImageActivity::class.java).run {
-                    putExtra(IntentID.USER_IMAGE,it.back_image)
+                    putExtra(IntentID.USER_IMAGE,it.background_picture)
                     startActivity(this)
                 }
             }
@@ -152,16 +154,16 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
             user_name.text = it.name
             userNameForIntent = it.name
             user_id_.text = it.user_id
-            user_msg.text = it.message
+            user_msg.text = it.state_message
 
             //picasso 는 path 변수가 null 이면 오류발생하므로 null-safe걸어준다
-            it.profile_image?.run {
+            it.profile_picture?.run {
                 Glide.with(this@AccountInfoActivity)
                     .load(Constant.BASE_URL+this)
                     .placeholder(R.drawable.account)
                     .into(user_image)
             }
-            it.back_image?.run {
+            it.background_picture?.run {
                 Glide.with(this@AccountInfoActivity)
                     .load(Constant.BASE_URL+this)
                     .placeholder(R.drawable.black)

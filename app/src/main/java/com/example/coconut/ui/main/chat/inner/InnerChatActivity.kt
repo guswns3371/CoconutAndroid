@@ -242,7 +242,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
     }
 
     private fun whereChatFrom(){
-        myID = pref.userID!!
+        myID = pref.userIdx!!
         chatMode = intent.getIntExtra(IntentID.CHAT_MODE,-1)
 
         // onResume으로 중복 add되는걸 막기위함
@@ -436,7 +436,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
             Log.e(TAG,"enter $it 번방")
             try {
                 JSONObject().apply {
-                    put(SocketData.USER_ID,pref.userID)
+                    put(SocketData.USER_ID,pref.userIdx)
                     put(SocketData.CHAT_ROOM_ID,it)
                     socket?.emit(SocketSend.CHATROOM_ENTER,this)
                 }
@@ -452,7 +452,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
             Log.e(TAG,"exit $it 번방")
             try {
                 JSONObject().apply {
-                    put(SocketData.USER_ID,pref.userID)
+                    put(SocketData.USER_ID,pref.userIdx)
                     put(SocketData.CHAT_ROOM_ID,it)
                     socket?.emit(SocketSend.CHATROOM_EXIT,this)
                 }

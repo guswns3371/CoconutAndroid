@@ -1,6 +1,6 @@
-package com.example.coconut.model.service
+package com.example.coconut.model.api
 
-import com.example.coconut.model.request.MakeChatRoomRequest
+import com.example.coconut.model.request.chat.MakeChatRoomRequest
 import com.example.coconut.model.response.chat.ChatBaseResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatListResponse
@@ -9,9 +9,9 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
 
-interface ChatService {
+interface ChatAPI {
 
-    @POST("/chat")
+    @POST("/api/chat")
     @Multipart
     fun sendMessage(
         @Part("chatRoomId") chatRoomId : RequestBody?,
@@ -20,17 +20,17 @@ interface ChatService {
         @Part images : ArrayList<MultipartBody.Part?>?
     ) : Single<ChatBaseResponse>
 
-    @POST("/chat/room/make")
+    @POST("/api/chat/room/make")
     fun makeChatRoom(
         @Body makeChatRoomRequest: MakeChatRoomRequest
     ): Single<ChatBaseResponse>
 
-    @GET("/chat/{id}")
+    @GET("/api/chat/{id}")
     fun getChatHistory(
         @Path("id") chatRoomId : String?
     ): Single<ArrayList<ChatHistoryResponse>>
 
-    @GET("/chat/list/{id}")
+    @GET("/api/chat/list/{id}")
     fun getChatRoomLists(
         @Path("id") myId : String?
     ) : Single<ArrayList<ChatListResponse>>

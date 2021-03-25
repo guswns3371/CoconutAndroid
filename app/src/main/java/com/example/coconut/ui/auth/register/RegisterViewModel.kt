@@ -8,9 +8,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.RegisterRequest
+import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.response.auth.RegisterResponse
-import com.example.coconut.model.response.auth.RegisterValid
+import com.example.coconut.model.data.RegisterValidData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -23,8 +23,8 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
     val registerResponseLiveData : LiveData<RegisterResponse>
         get() = _registerResponseLiveData
 
-    private val _registerValidLiveData = MutableLiveData<RegisterValid>()
-    val registerValidLiveData : LiveData<RegisterValid>
+    private val _registerValidLiveData = MutableLiveData<RegisterValidData>()
+    val registerValidDataLiveData : LiveData<RegisterValidData>
         get() = _registerValidLiveData
 
     //data binding한 edittext 들
@@ -86,7 +86,8 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
                 email.get().toString().trim(),
                 id.get().toString().trim(),
                 name.get().toString().trim(),
-                password.get().toString().trim()))
+                password.get().toString().trim())
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -110,7 +111,7 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
         val passwordConfirmValid  = !TextUtils.isEmpty(passwordConfirm.get()) && (password.get().toString() == passwordConfirm.get().toString())
 
         _registerValidLiveData.postValue(
-            RegisterValid(
+            RegisterValidData(
                 idValid,
                 nameValid,
                 passwordValid,

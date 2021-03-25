@@ -1,6 +1,6 @@
 package com.example.coconut.oauth2
 
-import android.app.Application
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.AsyncTask
@@ -24,9 +24,14 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import com.example.coconut.R
+import com.example.coconut.model.api.UserInfoAPI
+import com.example.coconut.util.MyPreference
 
 
-class AuthRepo(private var app: MyApplication) {
+class AuthRepo(
+    private var app: MyApplication,
+    private var pref: MyPreference
+) {
 
     private val TAG = AuthRepo::class.simpleName
     private var authService: AuthorizationService? =
@@ -130,8 +135,14 @@ class AuthRepo(private var app: MyApplication) {
             userInfoUrl = null
         }
         Log.i(TAG, "Finishing service config")
-        Log.i(TAG, "  authorization endpoint: " + authState!!.authorizationServiceConfiguration!!.authorizationEndpoint)
-        Log.i(TAG, "  token endpoint: " + authState!!.authorizationServiceConfiguration!!.tokenEndpoint)
+        Log.i(
+            TAG,
+            "  authorization endpoint: " + authState!!.authorizationServiceConfiguration!!.authorizationEndpoint
+        )
+        Log.i(
+            TAG,
+            "  token endpoint: " + authState!!.authorizationServiceConfiguration!!.tokenEndpoint
+        )
         Log.i(TAG, "  user info endpoint: $userInfoUrl")
         startClientConfig()
     }
@@ -174,7 +185,7 @@ class AuthRepo(private var app: MyApplication) {
     }
 
     fun notifyUserAgentResponse(data: Intent?, returnCode: Int) {
-        Log.i(TAG,"notifyUserAgentResponse returnCode : ${returnCode==Constant.RC_AUTH}")
+        Log.i(TAG, "notifyUserAgentResponse returnCode : ${returnCode == Constant.RC_AUTH}")
         if (returnCode != Constant.RC_AUTH) {
             failLogin(AuthException("User authorization was cancelled"))
             return
@@ -216,6 +227,11 @@ class AuthRepo(private var app: MyApplication) {
             failLogin(AuthException(ex!!.message!!))
             return
         }
+        Log.i(TAG, "onTokenRequestCompleted > accessToken=${resp.accessToken}")
+        Log.i(TAG, "onTokenRequestCompleted > refreshToken=${resp.refreshToken}")
+
+        saveTokens(resp)
+
         authState!!.update(resp, ex)
         finishCodeExchange()
     }
@@ -259,7 +275,13 @@ class AuthRepo(private var app: MyApplication) {
 
     private fun finishLogin() {
         Log.i(TAG, "Finishing login")
-        loginListener!!.onSuccess(this@AuthRepo, AuthEvent.AUTH_LOGIN_SUCCESS)
+
+        // onSuccess에서 화면 넘기기
+        Log.i(TAG, "finishLogin> getUserInfo: ${getUserInfo()?.toString()}")
+        loginListener!!.onSuccess(this@AuthRepo, AuthEvent.AUTH_LOGIN_SUCCESS, getUserInfo())
+
+        // 유저 정보 서버에 전달하기
+
         unlockLogins()
     }
 
@@ -270,6 +292,7 @@ class AuthRepo(private var app: MyApplication) {
         logger.level = HttpLoggingInterceptor.Level.BODY
         val authClient = OkHttpClient().newBuilder()
             .addInterceptor(getAccessTokenInterceptor())
+            .addInterceptor(getApiKeyInterceptor())
             .addInterceptor(logger)
             .build()
         val gson = GsonBuilder().setLenient().create()
@@ -281,6 +304,7 @@ class AuthRepo(private var app: MyApplication) {
         return retrofit.create(UserInfoAPI::class.java)
     }
 
+    @SuppressLint("StaticFieldLeak")
     inner class UserInfoTask(private val callback: UserInfoCallback) :
         AsyncTask<Void?, Void?, UserInfo?>() {
 
@@ -294,7 +318,7 @@ class AuthRepo(private var app: MyApplication) {
                     val result = response.body()
                     userInfo = UserInfo(
                         result?.mFamilyName, result?.mGivenName,
-                        result?.mPicture
+                        result?.mPicture, result?.mEmail
                     )
                     Log.i(TAG, "UserInfoTask doInBackground : " + userInfo.toString())
                 } else {
@@ -326,7 +350,7 @@ class AuthRepo(private var app: MyApplication) {
         UserInfoTask(callback).execute()
     }
 
-    fun getUserInfo(): UserInfo? {
+    private fun getUserInfo(): UserInfo? {
         if (!isAuthorized()) return null
         if (userInfo != null) return userInfo
         val fetchComplete = CountDownLatch(1)
@@ -366,7 +390,7 @@ class AuthRepo(private var app: MyApplication) {
         unlockLogins()
     }
 
-    fun getApiKeyInterceptor(): Interceptor? {
+    fun getApiKeyInterceptor(): Interceptor {
         return Interceptor { chain ->
             var request = chain.request()
             val url = request.url().newBuilder()
@@ -374,7 +398,7 @@ class AuthRepo(private var app: MyApplication) {
             request = request.newBuilder()
                 .url(url)
                 .header("X-Android-Package", app.packageName)
-                .header("X-Android-Cert", app.getSignature())
+                .header("X-Android-Cert", app.getSignature()!!)
                 .build()
             chain.proceed(request)
         }
@@ -408,11 +432,17 @@ class AuthRepo(private var app: MyApplication) {
             var request = chain.request()
             request = request.newBuilder()
                 .header("X-Android-Package", app.packageName)
-                .header("X-Android-Cert", app.getSignature())
+                .header("X-Android-Cert", app.getSignature()!!)
                 .header("Authorization", "Bearer " + getAccessToken())
                 .build()
-            Log.i(TAG, "token: " + getAccessToken())
+            Log.i(TAG, "AccessToken: " + getAccessToken())
             chain.proceed(request)
         }
     }
+
+    private fun saveTokens(resp: TokenResponse) {
+        pref.accessToken = resp.accessToken
+        pref.refreshToken = resp.refreshToken
+    }
+
 }

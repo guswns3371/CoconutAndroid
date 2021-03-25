@@ -19,7 +19,7 @@ class AccountViewModel(private val myRepository: MyRepository,
     val userDataResponseLiveData: LiveData<ArrayList<UserDataResponse>> = _userDataResponseLiveData
 
     fun getAllAccounts(){
-        pref.userID?.let { id->
+        pref.userIdx?.let { id->
             addDisposable(
                 myRepository.getAccountDatas(id)
                 .subscribeOn(Schedulers.io())

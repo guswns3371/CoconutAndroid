@@ -1,4 +1,4 @@
-package com.example.coconut.model.request
+package com.example.coconut.model.request.chat
 
 import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody

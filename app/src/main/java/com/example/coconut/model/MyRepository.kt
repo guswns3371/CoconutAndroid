@@ -1,9 +1,16 @@
 package com.example.coconut.model
 
-import com.example.coconut.model.request.*
+import com.example.coconut.model.request.account.AccountEditRequest
+import com.example.coconut.model.request.auth.EmailVerifyRequest
+import com.example.coconut.model.request.auth.LoginRequest
+import com.example.coconut.model.request.auth.OAuth2LoginRequest
+import com.example.coconut.model.request.auth.RegisterRequest
+import com.example.coconut.model.request.chat.ChatRequest
+import com.example.coconut.model.request.chat.FcmTokenRequest
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
+import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
 import com.example.coconut.model.response.chat.ChatBaseResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
@@ -12,7 +19,7 @@ import io.reactivex.Single
 
 interface MyRepository {
 
-    /** auth */
+    /** @AuthAPI */
     fun googleLogin() : Single<LoginResponse>
 
     fun naverLogin() : Single<LoginResponse>
@@ -29,15 +36,16 @@ interface MyRepository {
 
     fun deleteFcmTokenFromServer(id : String) : Single<BaseResponse>
 
-    /** main*/
+    fun sendUserInfoToServer(oAuth2LoginRequest: OAuth2LoginRequest) : Single<OAuth2LoginResponse>
 
-    /** account*/
+    /** main */
+
+    /** @AccountAPI */
     fun getAccountDatas(myId: String): Single<ArrayList<UserDataResponse>>
 
     fun updateAccountData(accountEditRequest: AccountEditRequest) : Single<BaseResponse>
 
-    /** chat*/
-
+    /** @ChatAPI */
     fun makeChatRoom(myId : String,chatRoomId : String?,people : ArrayList<String>) : Single<ChatBaseResponse>
 
     fun getChatHistory(chatRoomId : String?) : Single<ArrayList<ChatHistoryResponse>>

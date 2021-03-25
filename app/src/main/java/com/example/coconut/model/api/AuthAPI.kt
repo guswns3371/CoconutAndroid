@@ -1,11 +1,13 @@
-package com.example.coconut.model.service
+package com.example.coconut.model.api
 
-import com.example.coconut.model.request.EmailVerifyRequest
-import com.example.coconut.model.request.FcmTokenRequest
-import com.example.coconut.model.request.LoginRequest
-import com.example.coconut.model.request.RegisterRequest
+import com.example.coconut.model.request.auth.EmailVerifyRequest
+import com.example.coconut.model.request.chat.FcmTokenRequest
+import com.example.coconut.model.request.auth.LoginRequest
+import com.example.coconut.model.request.auth.OAuth2LoginRequest
+import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.response.BaseResponse
 import com.example.coconut.model.response.auth.LoginResponse
+import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
 import io.reactivex.Single
 import retrofit2.http.Body
@@ -13,7 +15,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface AuthService {
+interface AuthAPI {
 
     /**
      *  <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
@@ -26,34 +28,39 @@ interface AuthService {
     @POST("/oauth2/authorization/naver")
     fun naverLogin() : Single<LoginResponse>
 
-    @POST("/login")
+    @POST("/api/login")
     fun login(
         @Body loginRequest: LoginRequest
     ): Single<LoginResponse>
 
-    @POST("/register")
+    @POST("/api/register")
     fun register(
         @Body registerRequest: RegisterRequest
     ): Single<RegisterResponse>
 
-    @POST("/register/{email}")
+    @POST("/api/register/{email}")
     fun checkEmailValidation(
         @Path("email") email : String
     ) : Single<RegisterResponse>
 
-    @POST("/login/verify")
+    @POST("/api/login/verify")
     fun emailVerify(
         @Body emailVerifyRequest: EmailVerifyRequest
     ) : Single<LoginResponse>
 
 
-    @POST("/user/fcm")
+    @POST("/api/user/fcm")
     fun fcmTokenToServer(
         @Body fcmTokenRequest: FcmTokenRequest
     ) : Single<BaseResponse>
 
-    @DELETE("/user/fcm/{id}")
+    @DELETE("/api/user/fcm/{id}")
     fun deleteFcmTokenFromServer(
         @Path("id") id : String
     ) : Single<BaseResponse>
+
+    @POST("/api/user/auth/info")
+    fun sendUserInfoToServer(
+        @Body oAuth2LoginRequest: OAuth2LoginRequest
+    ) : Single<OAuth2LoginResponse>
 }

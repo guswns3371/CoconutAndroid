@@ -1,11 +1,12 @@
 package com.example.coconut.oauth2
 
 class UserInfo(
-    private var lastName : String?,
-    private var firstName : String?,
-    private var imageLink : String?
+    var lastName : String?,
+    var firstName : String?,
+    var imageLink : String?,
+    var email : String?
 ) {
     override fun toString(): String {
-        return "UserInfo(lastName='$lastName', firstName='$firstName', imageLink='$imageLink')"
+        return "UserInfo(lastName=$lastName, firstName=$firstName, imageLink=$imageLink, email=$email)"
     }
 }

@@ -1,5 +1,6 @@
-package com.example.coconut.oauth2
+package com.example.coconut.model.api
 
+import com.example.coconut.oauth2.UserInfoResult
 import retrofit2.Call
 import retrofit2.http.GET
 

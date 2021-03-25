@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.AccountEditRequest
+import com.example.coconut.model.request.account.AccountEditRequest
 import com.example.coconut.model.response.BaseResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

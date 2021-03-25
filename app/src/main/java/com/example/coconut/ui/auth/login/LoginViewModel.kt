@@ -10,9 +10,10 @@ import androidx.lifecycle.MutableLiveData
 import com.example.coconut.Constant.Companion.RC_AUTH
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.EmailVerifyRequest
-import com.example.coconut.model.request.FcmTokenRequest
-import com.example.coconut.model.request.LoginRequest
+import com.example.coconut.model.request.auth.EmailVerifyRequest
+import com.example.coconut.model.request.chat.FcmTokenRequest
+import com.example.coconut.model.request.auth.LoginRequest
+import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.oauth2.*
 import com.example.coconut.ui.auth.login.verify.ProgressState
@@ -23,7 +24,7 @@ import io.reactivex.schedulers.Schedulers
 
 // koin으로 model 과 viewmodel을 연결해준다 => private val modelUser : UserDataModel
 class LoginViewModel(
-    private val modelUser: MyRepository,
+    private val repository: MyRepository,
     private val pref: MyPreference,
     private val authRepo: AuthRepo
 ) : BaseKotlinViewModel() {
@@ -47,6 +48,10 @@ class LoginViewModel(
     private val _activityObservable = MutableLiveData<Event<ActivityRequest>>()
     val activityObservable : LiveData<Event<ActivityRequest>>
         get() = _activityObservable
+
+    private val _loginSuccessObservable = MutableLiveData<Event<Boolean>>()
+    val loginSuccessObservable : LiveData<Event<Boolean>>
+        get() = _loginSuccessObservable
 
     /**Login*/
     val email = ObservableField<String>()
@@ -117,15 +122,18 @@ class LoginViewModel(
             _activityObservable.value = Event(ActivityRequest(intent, RC_AUTH))
         }
 
-        override fun onSuccess(repo: AuthRepo, event: AuthEvent) {
+        override fun onSuccess(repo: AuthRepo, event: AuthEvent, userInfo: UserInfo?) {
             val description: String = event.getDescription()
             Log.i(TAG, description)
+            if (userInfo != null) {
+                sendUserInfoToServer(userInfo)
+            }
         }
 
         override fun onFailure(repo: AuthRepo, event: AuthEvent, ex: AuthException) {
             val description: String = event.getDescription() + ": " + ex.message
             Log.i(TAG, description)
-
+            _loginSuccessObservable.value = Event(false)
         }
 
     }
@@ -144,7 +152,7 @@ class LoginViewModel(
      * email 과 password 값을 매개변수 없이 바로 넘기기위해 data binding을 사용하여 viewmodel속에 놓은것*/
     fun loginCheck() {
         addDisposable(
-            modelUser.doLogin(
+            repository.doLogin(
                 LoginRequest(email.get().toString(), password.get().toString())
             )
                 .subscribeOn(Schedulers.io())
@@ -154,7 +162,7 @@ class LoginViewModel(
                         Log.e(TAG, "loginCheck :${toString()}")
                         //sharedpreference에 user id 값을 저장한다
                         if (isConfirmed) {
-                            pref.userID = id
+                            pref.userIdx = user_idx
 
                             /**서버에 fcm과 id를 보내어 저장한다
                             앱이 처음 설치되었고, token이 compromised, 가입한 적이 없는 유저일 경우
@@ -169,7 +177,7 @@ class LoginViewModel(
                             앱이 다시 실행되고, pref.token 값이 null 일경우
                             => fcmToken()를 통해 서버에 전달 (LogoActivity)
                              */
-                            sendFcmTokenToServer(id, pref.fcmToken)
+                            sendFcmTokenToServer(user_idx, pref.fcmToken)
                         }
 
 
@@ -193,31 +201,11 @@ class LoginViewModel(
 
     fun googleLogin() {
         authRepo.login(loginListener)
-
-//        addDisposable(
-//            modelUser.googleLogin()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({
-//                    it.run {
-//                        Log.e(TAG, "loginCheck :${toString()}")
-//                        //sharedpreference에 user id 값을 저장한다
-//                        if (isConfirmed) {
-//                            pref.userID = id
-//                            sendFcmTokenToServer(id, pref.fcmToken)
-//                        }
-//                        _loginResponseLiveData.value = Event(this)
-//                    }
-//                }, {
-//                    Log.d(TAG, "response error, message : ${it.message}")
-//                    showSnackbar("${it.message}")
-//                })
-//        )
     }
 
     fun naverLogin() {
         addDisposable(
-            modelUser.naverLogin()
+            repository.naverLogin()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -225,8 +213,8 @@ class LoginViewModel(
                         Log.e(TAG, "loginCheck :${toString()}")
                         //sharedpreference에 user id 값을 저장한다
                         if (isConfirmed) {
-                            pref.userID = id
-                            sendFcmTokenToServer(id, pref.fcmToken)
+                            pref.userIdx = user_idx
+                            sendFcmTokenToServer(user_idx, pref.fcmToken)
                         }
                         _loginResponseLiveData.value = Event(this)
                     }
@@ -241,7 +229,7 @@ class LoginViewModel(
     /**Verify Email*/
     fun emailVerify() {
         addDisposable(
-            modelUser.emailVerify(
+            repository.emailVerify(
                 EmailVerifyRequest(email.get().toString(), secretToken.get().toString())
             )
                 .subscribeOn(Schedulers.io())
@@ -251,7 +239,7 @@ class LoginViewModel(
                         Log.e(TAG, "emailVerify :${toString()}")
                         //sharedpreference에 user id 값을 저장한다
                         if (isConfirmed) {
-                            pref.userID = id
+                            pref.userIdx = user_idx
 
                             /**서버에 fcm과 id를 보내어 저장한다
                             앱이 처음 설치되었고, token이 compromised, 가입한 적이 없는 유저일 경우
@@ -266,7 +254,7 @@ class LoginViewModel(
                             앱이 다시 실행되고, pref.token 값이 null 일경우
                             => fcmToken()를 통해 서버에 전달 (LogoActivity)
                              */
-                            sendFcmTokenToServer(id, pref.fcmToken)
+                            sendFcmTokenToServer(user_idx, pref.fcmToken)
                         }
 
                         // MutableLiveData에ㅓ setValue, postValue 실행 하는 경우
@@ -285,7 +273,7 @@ class LoginViewModel(
     /** MyFirebaseMessagingService sendRegistrationToServer() */
     fun sendFcmTokenToServer(id: String, token: String?) {
         addDisposable(
-            modelUser.sendFcmTokenToServer(
+            repository.sendFcmTokenToServer(
                 FcmTokenRequest(id, token)
             )
                 .subscribeOn(Schedulers.io())
@@ -302,7 +290,7 @@ class LoginViewModel(
 
     fun deleteFcmTokenFromServer(id: String) {
         addDisposable(
-            modelUser.deleteFcmTokenFromServer(
+            repository.deleteFcmTokenFromServer(
                 id
             )
                 .subscribeOn(Schedulers.io())
@@ -321,5 +309,27 @@ class LoginViewModel(
         val emailValidation = !TextUtils.isEmpty(email.get())
         val passwordValidation = !TextUtils.isEmpty(password.get())
         isValid.set((emailValidation && passwordValidation))
+    }
+
+    private fun sendUserInfoToServer(userInfo: UserInfo) {
+        Log.i(TAG, "sendUserInfoToServer: ${userInfo.toString()}")
+        addDisposable(
+            repository.sendUserInfoToServer(OAuth2LoginRequest(
+                userInfo.lastName + userInfo.firstName,
+                userInfo.email,
+                userInfo.imageLink
+
+            ))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.run {
+                        Log.e(TAG, "sendUserInfoToServer response : ${toString()}")
+                        _loginSuccessObservable.value = Event(true)
+                    }
+                }, {
+                    Log.e(TAG, "sendUserInfoToServer response error, message : ${it.message}")
+                })
+        )
     }
 }

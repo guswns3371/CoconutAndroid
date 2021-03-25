@@ -31,13 +31,15 @@ class SocketService : Service() {
     private val pref : MyPreference by inject()
     private var isConnected : Boolean = false
 
-    //  https://bitsoul.tistory.com/149
     /**
+     * https://bitsoul.tistory.com/149
      * 서비스는 클라이언트-서버 와 같이 동작 ( 서비스 = 서버, 서비스를 사용하는 context = 클라이언트)
      * 하나의 서비스 : 다수의 액티비티 연결 가능
      * onBind() 는 IBinder를 반환 : 서비스와 클라이언트사이의 인터페이스 역할하는 IBinder
      * IBinder로 액티비티(프래그먼트)에서 서비스속 변수를 사용할수있게된다
-     * 클라이언트-서비스 연결을 끊기 위해서 unbindService()를 호출한다다     * */
+     * 클라이언트-서비스 연결을 끊기 위해서 unbindService()를 호출한다다
+     **/
+
     inner class MyBinder : Binder() {
         fun getService() =  this@SocketService
     }
@@ -47,7 +49,7 @@ class SocketService : Service() {
         Log.e(TAG,"onCreate")
         handler = Handler()
         context = applicationContext
-        sender = pref.userID
+        sender = pref.userIdx
 
         try {
             socket = IO.socket(Constant.NODE_URL)
@@ -113,7 +115,7 @@ class SocketService : Service() {
         Log.e(TAG,"online")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.userID)
+                put(SocketData.USER_ID,pref.userIdx)
                 socket.emit(SocketSend.ONLINE_USER,this)
             }
         }catch (e: JSONException){
@@ -125,7 +127,7 @@ class SocketService : Service() {
         Log.e(TAG,"offline")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.userID)
+                put(SocketData.USER_ID,pref.userIdx)
                 socket.emit(SocketSend.OFFLINE_USER,this)
             }
         }catch (e: JSONException){

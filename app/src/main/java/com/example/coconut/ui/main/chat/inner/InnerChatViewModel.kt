@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.ChatRequest
+import com.example.coconut.model.request.chat.ChatRequest
 import com.example.coconut.model.response.chat.ChatBaseResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import io.reactivex.android.schedulers.AndroidSchedulers

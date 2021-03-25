@@ -1,4 +1,4 @@
-package com.example.coconut.model.request
+package com.example.coconut.model.request.auth
 
 import com.google.gson.annotations.SerializedName
 

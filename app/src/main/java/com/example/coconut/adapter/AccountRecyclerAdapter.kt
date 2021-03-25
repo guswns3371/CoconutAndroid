@@ -36,12 +36,12 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             itemView.run {
                 //Log.e(TAG,Constant.BASE_URL+item.profile_image)
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profile_image)
+                    .load(Constant.BASE_URL+item.profile_picture)
                     .placeholder(R.drawable.account)
                     .into(account_image)
 
                 account_name.text = item.name
-                account_msg.text = item.message
+                account_msg.text = item.state_message
 
                 if (item.status){
                     account_user_status.background = context.getDrawable(R.drawable.online_sign)
@@ -50,7 +50,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
 
-                item.message?.run {
+                item.state_message?.run {
                     when (this.isBlank()){
                         true->{ account_msg.gone() }
                         false->{ account_msg.show() }
@@ -76,14 +76,14 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             itemView.run {
                 //Log.e(TAG,Constant.BASE_URL+item.profile_image)
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profile_image)
+                    .load(Constant.BASE_URL+item.profile_picture)
                     .placeholder(R.drawable.account)
                     .into(account_image_large)
 
                 account_text_large.text = item.name
-                account_msg_large.text = item.message
+                account_msg_large.text = item.state_message
 
-                item.message?.run {
+                item.state_message?.run {
                     when (this.isBlank() ||  this.isEmpty()){
                         true->{ account_msg_large.gone() }
                         false->{ account_msg_large.show() }

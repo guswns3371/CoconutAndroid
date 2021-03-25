@@ -14,7 +14,7 @@ import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.MyRepository
-import com.example.coconut.model.request.FcmTokenRequest
+import com.example.coconut.model.request.chat.FcmTokenRequest
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -29,7 +29,7 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
 
     private val pref : MyPreference by inject()
     private val myRepository : MyRepository by inject()
-
+    private val TAG = MyFirebaseMessagingService::class.java.simpleName
     /**
      * Called when message is received.
      *
@@ -135,7 +135,7 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         앱이 다시 실행되고, pref.token 값이 null 일경우
         => fcmToken()를 통해 서버에 전달 (LogoActivity)
          */
-        pref.userID?.let {
+        pref.userIdx?.let {
             sendFcmTokenToServer(it,pref.fcmToken)
         }
 
@@ -227,9 +227,5 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
                 Log.e(TAG, "response error, message : ${it.message}")
             })))
 
-    }
-    companion object {
-
-        private const val TAG = "MyFirebaseMessagingService"
     }
 }

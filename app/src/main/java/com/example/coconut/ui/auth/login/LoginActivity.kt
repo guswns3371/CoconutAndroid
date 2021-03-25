@@ -70,9 +70,22 @@ class LoginActivity : BaseKotlinActivity<ActivityLoginBinding, LoginViewModel>()
         viewModel.activityObservable.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let {
                 Log.i(TAG, "Activity request change observed")
-                Log.i(TAG,"ActivituRequest intent : ${it.intent}, ${it.rc}")
-                if (it.intent != null) {
-                    startActivityForResult(it.intent, it.rc)
+                it.intent?.run {
+                    startActivityForResult(this,it.rc)
+                }
+            }
+        })
+
+        viewModel.loginSuccessObservable.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.let {
+                Log.i(TAG, "loginSuccessObservable : $it")
+                when(it) {
+                    true ->{
+                        callActivity(Constant.HOME_PAGE)
+                    }
+                    false ->{
+                        showToast("연동 로그인 실패")
+                    }
                 }
             }
         })

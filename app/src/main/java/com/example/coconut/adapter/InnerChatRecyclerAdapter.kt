@@ -33,7 +33,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
             itemView.run {
                 val userInfo = item.user_info
                 val count = fixedPeopleList.size - stringToArrayList(item.read_people).size
-                when(userInfo.id == pref.userID){
+                when(userInfo.id == pref.userIdx){
                     true->{
                         // 유저편 view (내가 보낸 메시지)
                         not_mine_linear.gone()
@@ -61,7 +61,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         not_mine_linear.show()
                         mine_linear.gone()
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfo.profile_image)
+                            .load(Constant.BASE_URL+userInfo.profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_user_image_nm)
 

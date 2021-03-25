@@ -6,6 +6,6 @@ interface AuthLoginListener {
     fun onStart(repo : AuthRepo, event: AuthEvent) {}
     fun onEvent(repo: AuthRepo, event: AuthEvent) {}
     fun onUserAgentRequest(repo: AuthRepo, intent: Intent) {}
-    fun onSuccess(repo: AuthRepo, event: AuthEvent) {}
+    fun onSuccess(repo: AuthRepo, event: AuthEvent, userInfo: UserInfo?) {}
     fun onFailure(repo: AuthRepo, event: AuthEvent, ex: AuthException) {}
 }

@@ -52,12 +52,12 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         //1명
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profile_image)
+                            .load(Constant.BASE_URL+userInfos[0].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image11)
 
                         chat_list_people_size.hide()
-                        if (userInfos[0].id == pref.userID){
+                        if (userInfos[0].id == pref.userIdx){
                             chat_list_people_size.text = "ME"
                             chat_list_people_size.show()
                         }
@@ -69,12 +69,12 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profile_image)
+                            .load(Constant.BASE_URL+userInfos[0].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image21)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profile_image)
+                            .load(Constant.BASE_URL+userInfos[1].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image22)
 
@@ -86,15 +86,15 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profile_image)
+                            .load(Constant.BASE_URL+userInfos[0].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image31)
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profile_image)
+                            .load(Constant.BASE_URL+userInfos[1].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image32)
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[2].profile_image)
+                            .load(Constant.BASE_URL+userInfos[2].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image33)
 
@@ -105,22 +105,22 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profile_image)
+                            .load(Constant.BASE_URL+userInfos[0].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image41)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profile_image)
+                            .load(Constant.BASE_URL+userInfos[1].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image42)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[2].profile_image)
+                            .load(Constant.BASE_URL+userInfos[2].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image43)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[3].profile_image)
+                            .load(Constant.BASE_URL+userInfos[3].profile_picture)
                             .placeholder(R.drawable.account)
                             .into(chat_list_image44)
 

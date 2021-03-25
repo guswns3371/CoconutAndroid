@@ -1,12 +1,9 @@
 package com.example.coconut.adapter
 
-import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,10 +12,8 @@ import com.bumptech.glide.Glide
 import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.R
-import com.example.coconut.model.model.BaseItem
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.ui.main.account.info.AccountInfoActivity
-import com.example.coconut.util.showToast
 
 class InnerDrawerAdapter: BaseAdapter(){
 
@@ -52,7 +47,7 @@ class InnerDrawerAdapter: BaseAdapter(){
 
         holder.userImageView?.let {
             Glide.with(parent!!.context)
-                .load(Constant.BASE_URL+item.profile_image)
+                .load(Constant.BASE_URL+item.profile_picture)
                 .placeholder(R.drawable.account)
                 .into(it)
         }
