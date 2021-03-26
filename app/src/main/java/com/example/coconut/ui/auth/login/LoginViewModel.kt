@@ -63,8 +63,7 @@ class LoginViewModel(
 
     private val loginListener: AuthLoginListener = object : AuthLoginListener {
         override fun onStart(repo: AuthRepo, event: AuthEvent) {
-            val description: String = event.getDescription()
-            Log.i(TAG, description)
+            Log.i(TAG, event.getDescription())
         }
 
         override fun onEvent(repo: AuthRepo, event: AuthEvent) {
@@ -123,16 +122,14 @@ class LoginViewModel(
         }
 
         override fun onSuccess(repo: AuthRepo, event: AuthEvent, userInfo: UserInfo?) {
-            val description: String = event.getDescription()
-            Log.i(TAG, description)
+            Log.i(TAG, event.getDescription())
             if (userInfo != null) {
                 sendUserInfoToServer(userInfo)
             }
         }
 
         override fun onFailure(repo: AuthRepo, event: AuthEvent, ex: AuthException) {
-            val description: String = event.getDescription() + ": " + ex.message
-            Log.i(TAG, description)
+            Log.i(TAG, event.getDescription() + ": " + ex.message)
             _loginSuccessObservable.value = Event(false)
         }
 
@@ -313,9 +310,13 @@ class LoginViewModel(
 
     private fun sendUserInfoToServer(userInfo: UserInfo) {
         Log.i(TAG, "sendUserInfoToServer: ${userInfo.toString()}")
+        val userName =
+            if (userInfo.lastName == null) userInfo.firstName
+            else userInfo.lastName + userInfo.firstName
+
         addDisposable(
             repository.sendUserInfoToServer(OAuth2LoginRequest(
-                userInfo.lastName + userInfo.firstName,
+                userName,
                 userInfo.email,
                 userInfo.imageLink
 

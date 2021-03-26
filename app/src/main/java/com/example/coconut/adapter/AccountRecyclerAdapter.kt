@@ -34,14 +34,17 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val TAG = "AccountHolder"
         fun onBind(item : UserDataResponse){
             itemView.run {
-                //Log.e(TAG,Constant.BASE_URL+item.profile_image)
+                val profilePicturePath =
+                    if (item.profilePicture!!.startsWith("http")) item.profilePicture
+                    else Constant.BASE_URL+item.profilePicture
+
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profile_picture)
+                    .load(profilePicturePath)
                     .placeholder(R.drawable.account)
                     .into(account_image)
 
                 account_name.text = item.name
-                account_msg.text = item.state_message
+                account_msg.text = item.stateMessage
 
                 if (item.status){
                     account_user_status.background = context.getDrawable(R.drawable.online_sign)
@@ -50,7 +53,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
 
-                item.state_message?.run {
+                item.stateMessage?.run {
                     when (this.isBlank()){
                         true->{ account_msg.gone() }
                         false->{ account_msg.show() }
@@ -74,16 +77,19 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val TAG = "AccountLargeHolder"
         fun onBind(item : UserDataResponse){
             itemView.run {
-                //Log.e(TAG,Constant.BASE_URL+item.profile_image)
+                val profilePicturePath =
+                    if (item.profilePicture!!.startsWith("http")) item.profilePicture
+                    else Constant.BASE_URL+item.profilePicture
+
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profile_picture)
+                    .load(profilePicturePath)
                     .placeholder(R.drawable.account)
                     .into(account_image_large)
 
                 account_text_large.text = item.name
-                account_msg_large.text = item.state_message
+                account_msg_large.text = item.stateMessage
 
-                item.state_message?.run {
+                item.stateMessage?.run {
                     when (this.isBlank() ||  this.isEmpty()){
                         true->{ account_msg_large.gone() }
                         false->{ account_msg_large.show() }

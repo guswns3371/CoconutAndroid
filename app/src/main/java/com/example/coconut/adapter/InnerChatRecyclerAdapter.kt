@@ -61,7 +61,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         not_mine_linear.show()
                         mine_linear.gone()
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfo.profile_picture)
+                            .load(Constant.BASE_URL+userInfo.profilePicture)
                             .placeholder(R.drawable.account)
                             .into(chat_user_image_nm)
 

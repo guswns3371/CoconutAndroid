@@ -69,9 +69,9 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
     }
 
     /** mainService*/
-    override fun getAccountDatas(myId: String)
+    override fun getAccountData(myId: String)
             : Single<ArrayList<UserDataResponse>> {
-        return accountAPI.getAllUserDatas(myId)
+        return accountAPI.getAllUserData(myId)
     }
 
     override fun updateAccountData(accountEditRequest: AccountEditRequest)

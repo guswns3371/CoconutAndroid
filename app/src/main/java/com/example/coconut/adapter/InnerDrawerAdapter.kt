@@ -47,7 +47,7 @@ class InnerDrawerAdapter: BaseAdapter(){
 
         holder.userImageView?.let {
             Glide.with(parent!!.context)
-                .load(Constant.BASE_URL+item.profile_picture)
+                .load(Constant.BASE_URL+item.profilePicture)
                 .placeholder(R.drawable.account)
                 .into(it)
         }

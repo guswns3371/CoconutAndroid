@@ -28,38 +28,38 @@ interface AuthAPI {
     @POST("/oauth2/authorization/naver")
     fun naverLogin() : Single<LoginResponse>
 
-    @POST("/api/login")
+    @POST("/api/auth/login")
     fun login(
         @Body loginRequest: LoginRequest
     ): Single<LoginResponse>
 
-    @POST("/api/register")
+    @POST("/api/auth/register")
     fun register(
         @Body registerRequest: RegisterRequest
     ): Single<RegisterResponse>
 
-    @POST("/api/register/{email}")
+    @POST("/api/auth/register/{email}")
     fun checkEmailValidation(
         @Path("email") email : String
     ) : Single<RegisterResponse>
 
-    @POST("/api/login/verify")
+    @POST("/api/auth/login/verify")
     fun emailVerify(
         @Body emailVerifyRequest: EmailVerifyRequest
     ) : Single<LoginResponse>
 
 
-    @POST("/api/user/fcm")
+    @POST("/api/auth/user/fcm")
     fun fcmTokenToServer(
         @Body fcmTokenRequest: FcmTokenRequest
     ) : Single<BaseResponse>
 
-    @DELETE("/api/user/fcm/{id}")
+    @DELETE("/api/auth/user/fcm/{id}")
     fun deleteFcmTokenFromServer(
         @Path("id") id : String
     ) : Single<BaseResponse>
 
-    @POST("/api/user/auth/info")
+    @POST("/api/auth/user/info")
     fun sendUserInfoToServer(
         @Body oAuth2LoginRequest: OAuth2LoginRequest
     ) : Single<OAuth2LoginResponse>

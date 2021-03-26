@@ -112,7 +112,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         user_image.setOnClickListener {
             intent.getParcelableExtra<UserDataResponse>(IntentID.USER_RESPONSE)?.let{
                 Intent(this@AccountInfoActivity,ZoomableImageActivity::class.java).run {
-                    putExtra(IntentID.USER_IMAGE,it.profile_picture)
+                    putExtra(IntentID.USER_IMAGE,it.profilePicture)
                     startActivity(this)
                 }
             }
@@ -120,7 +120,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         background_image.setOnClickListener {
             intent.getParcelableExtra<UserDataResponse>(IntentID.USER_RESPONSE)?.let{
                 Intent(this@AccountInfoActivity,ZoomableImageActivity::class.java).run {
-                    putExtra(IntentID.USER_IMAGE,it.background_picture)
+                    putExtra(IntentID.USER_IMAGE,it.backgroundPicture)
                     startActivity(this)
                 }
             }
@@ -153,17 +153,17 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
             Id = it.id
             user_name.text = it.name
             userNameForIntent = it.name
-            user_id_.text = it.user_id
-            user_msg.text = it.state_message
+            user_id_.text = it.userId
+            user_msg.text = it.stateMessage
 
             //picasso 는 path 변수가 null 이면 오류발생하므로 null-safe걸어준다
-            it.profile_picture?.run {
+            it.profilePicture?.run {
                 Glide.with(this@AccountInfoActivity)
                     .load(Constant.BASE_URL+this)
                     .placeholder(R.drawable.account)
                     .into(user_image)
             }
-            it.background_picture?.run {
+            it.backgroundPicture?.run {
                 Glide.with(this@AccountInfoActivity)
                     .load(Constant.BASE_URL+this)
                     .placeholder(R.drawable.black)

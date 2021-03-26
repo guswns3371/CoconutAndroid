@@ -41,7 +41,7 @@ interface MyRepository {
     /** main */
 
     /** @AccountAPI */
-    fun getAccountDatas(myId: String): Single<ArrayList<UserDataResponse>>
+    fun getAccountData(myId: String): Single<ArrayList<UserDataResponse>>
 
     fun updateAccountData(accountEditRequest: AccountEditRequest) : Single<BaseResponse>
 

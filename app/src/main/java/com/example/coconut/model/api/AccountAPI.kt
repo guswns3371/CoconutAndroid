@@ -12,7 +12,7 @@ import retrofit2.http.*
 interface AccountAPI {
 
     @GET("/api/user/{id}")
-    fun getAllUserDatas(
+    fun getAllUserData(
         @Path("id") myId: String
     ): Single<ArrayList<UserDataResponse>>
 

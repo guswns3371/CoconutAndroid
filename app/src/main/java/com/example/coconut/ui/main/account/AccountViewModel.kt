@@ -21,13 +21,13 @@ class AccountViewModel(private val myRepository: MyRepository,
     fun getAllAccounts(){
         pref.userIdx?.let { id->
             addDisposable(
-                myRepository.getAccountDatas(id)
+                myRepository.getAccountData(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     it.run {
                         if (it.size>0){
-                            //Log.e(TAG, "response : \n${toString()}")
+                            Log.e(TAG, "response : \n${toString()}")
                             _userDataResponseLiveData.postValue(this)
                         }
                     }

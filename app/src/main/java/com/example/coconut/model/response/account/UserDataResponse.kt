@@ -7,17 +7,17 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class UserDataResponse(
     @SerializedName("id") var id : String,
-    @SerializedName("profile_picture") var profile_picture : String ?,
-    @SerializedName("background_picture") var background_picture : String ?,
+    @SerializedName("userId") var userId : String,
     @SerializedName("name") var name : String,
     @SerializedName("email") var email : String,
-    @SerializedName("user_id") var user_id : String,
-    @SerializedName("state_message") var state_message : String ?,
+    @SerializedName("stateMessage") var stateMessage : String ?,
+    @SerializedName("profilePicture") var profilePicture : String ?,
+    @SerializedName("backgroundPicture") var backgroundPicture : String ?,
     @SerializedName("err") var err : String ?,
     var status : Boolean
 ) : Parcelable {
 
     override fun toString(): String {
-        return "UserDataResponse(id='$id', profile_picture=$profile_picture, background_picture=$background_picture, name='$name', email='$email', user_id='$user_id', state_message=$state_message, err=$err, status=$status)"
+        return "UserDataResponse(id='$id', userId='$userId', name='$name', email='$email', stateMessage=$stateMessage, profilePicture=$profilePicture, backgroundPicture=$backgroundPicture, err=$err, status=$status)"
     }
 }

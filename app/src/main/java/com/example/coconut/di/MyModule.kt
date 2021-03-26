@@ -18,6 +18,7 @@ import com.example.coconut.ui.main.chat.ChatViewModel
 import com.example.coconut.ui.main.chat.inner.InnerChatViewModel
 import com.example.coconut.ui.main.hashtag.HashTagViewModel
 import com.example.coconut.ui.main.more.MoreViewModel
+import com.example.coconut.ui.setting.SettingViewModel
 import com.example.coconut.util.MyPreference
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -65,11 +66,13 @@ var authPart = module {
 }
 
 var viewModelPart = module {
+    /** Activity ViewModels*/
     viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { RegisterViewModel(get()) }
     viewModel { PassFindViewModel(get()) }
+    viewModel { SettingViewModel(get()) }
 
-    /** fragment viewModels */
+    /** Fragment ViewModels */
     viewModel { MoreViewModel(get()) }
     viewModel { AccountViewModel(get(), get()) }
     viewModel { AccountInfoViewModel(get()) }

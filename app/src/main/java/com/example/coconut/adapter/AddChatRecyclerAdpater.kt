@@ -41,7 +41,7 @@ class AddChatRecyclerAdpater : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         ){
             itemView.run {
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profile_picture)
+                    .load(Constant.BASE_URL+item.profilePicture)
                     .placeholder(R.drawable.account)
                     .into(account_image)
 
@@ -102,7 +102,7 @@ class AddChatRecyclerAdpater : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 itemView.run {
                     Log.e(TAG,item.name)
                     Glide.with(context)
-                        .load(Constant.BASE_URL+item.profile_picture)
+                        .load(Constant.BASE_URL+item.profilePicture)
                         .placeholder(R.drawable.account)
                         .into(chat_add_horiz_image)
 
