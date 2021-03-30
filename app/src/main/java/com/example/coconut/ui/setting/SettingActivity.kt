@@ -32,7 +32,10 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
 
     override val layoutResourceId: Int
         get() = R.layout.activity_setting
+
     override val viewModel: SettingViewModel by viewModel()
+
+    override var toolbar: Toolbar? = null
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
@@ -60,20 +63,22 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
     }
 
     override fun initDataBinding() {
-        viewModel.logoutObservable.observe(this, Observer {
-            it.getContentIfNotHandled()?.let { b ->
-                when(b) {
-                    true ->{
-                        socket?.run {
+        viewModel.logoutObservable.observe(this, Observer { event->
+            event.getContentIfNotHandled()?.let {
+                when (it) {
+                    true -> {
+                        socket?.run { // 소켓부분이 개발되면 주석 꼭 풀것!
+                            Log.i(TAG, "initDataBinding: logout start")
                             offline()
                             loginViewModel.deleteFcmTokenFromServer(pref.userIdx!!)
                             pref.resetAccessToken()
                             pref.resetRefreshToken()
-                            pref.resetUserId() /**자동로그인 해제를 위해 UserId를 삭제한다*/
+                            pref.resetUserId()
+                            /**자동로그인 해제를 위해 UserId를 삭제한다*/
                             callActivity(Constant.LOGIN_PAGE)
                         }
                     }
-                    false ->{
+                    false -> {
 
                     }
                 }
@@ -85,7 +90,6 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
 
     }
 
-    override var toolbar: Toolbar? = null
 
     override fun onDestroy() {
         unbindService(this)

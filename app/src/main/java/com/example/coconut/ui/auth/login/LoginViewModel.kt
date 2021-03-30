@@ -227,7 +227,10 @@ class LoginViewModel(
     fun emailVerify() {
         addDisposable(
             repository.emailVerify(
-                EmailVerifyRequest(email.get().toString(), secretToken.get().toString())
+                EmailVerifyRequest(
+                    email.get().toString(),
+                    secretToken.get().toString()
+                )
             )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -14,7 +14,8 @@ enum class AuthEvent(private val description: String) {
     AUTH_LOGIN_FAILURE("Login failed"),
     AUTH_LOGOUT_START("Logout succeeded"),
     AUTH_LOGOUT_SUCCESS("Logout succeeded"),
-    AUTH_LOGOUT_FAILURE("Logout failed");
+    AUTH_LOGOUT_FAILURE("Logout failed"),
+    AUTH_LOGOUT_AUTO_LOGIN_START("Auto Login User Logout start");
 
     fun getDescription() = description
 }

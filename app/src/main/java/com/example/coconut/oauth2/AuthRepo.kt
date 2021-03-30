@@ -373,6 +373,7 @@ class AuthRepo(
         lockLogins()
         if (!isAuthorized()) {
             unlockLogins()
+            logoutListener.onEvent(this@AuthRepo, AuthEvent.AUTH_LOGOUT_AUTO_LOGIN_START)
             return
         }
         logoutListener.onStart(this@AuthRepo, AuthEvent.AUTH_LOGOUT_START)

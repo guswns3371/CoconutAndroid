@@ -35,7 +35,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun onBind(item : UserDataResponse){
             itemView.run {
                 val profilePicturePath =
-                    if (item.profilePicture!!.startsWith("http")) item.profilePicture
+                    if (item.profilePicture?.startsWith("http") == true) item.profilePicture
                     else Constant.BASE_URL+item.profilePicture
 
                 Glide.with(context)
@@ -78,7 +78,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun onBind(item : UserDataResponse){
             itemView.run {
                 val profilePicturePath =
-                    if (item.profilePicture!!.startsWith("http")) item.profilePicture
+                    if (item.profilePicture?.startsWith("http") == true) item.profilePicture
                     else Constant.BASE_URL+item.profilePicture
 
                 Glide.with(context)

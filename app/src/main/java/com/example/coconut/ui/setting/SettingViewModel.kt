@@ -28,6 +28,16 @@ class SettingViewModel(
             Log.i(TAG, event.getDescription())
         }
 
+        override fun onEvent(repo: AuthRepo, event: AuthEvent) {
+            when (event) {
+                AuthEvent.AUTH_LOGOUT_AUTO_LOGIN_START ->{
+                    Log.i(TAG, event.getDescription())
+                     _logoutObservable.value = Event(true)
+                }
+                else -> {}
+            }
+        }
+
         override fun onSuccess(repo: AuthRepo, event: AuthEvent) {
             Log.i(TAG, event.getDescription())
             _logoutObservable.value = Event(true)
