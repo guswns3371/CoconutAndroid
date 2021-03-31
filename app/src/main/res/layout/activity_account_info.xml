@@ -200,8 +200,8 @@
 
             <ImageView
                 android:id="@+id/back_img_edit_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="52dp"
                 android:visibility="visible"

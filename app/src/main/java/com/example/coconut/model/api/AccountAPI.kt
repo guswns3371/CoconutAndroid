@@ -11,12 +11,12 @@ import retrofit2.http.*
 
 interface AccountAPI {
 
-    @GET("/api/user/{id}")
+    @GET("/api/account/{id}")
     fun getAllUserData(
         @Path("id") myId: String
     ): Single<ArrayList<UserDataResponse>>
 
-    @POST("/api/user/edit")
+    @POST("/api/account/edit")
     @Multipart
     //@Path 와 @Part 동시에 사용 못하네
     fun updateAccount(

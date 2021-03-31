@@ -16,6 +16,7 @@ import com.example.coconut.ui.MainActivity
 import com.example.coconut.ui.auth.login.verify.EmailVerifyActivity
 import com.example.coconut.ui.auth.passfind.PassFindActivity
 import com.example.coconut.ui.auth.register.RegisterActivity
+import com.example.coconut.util.disable
 import com.example.coconut.util.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -80,6 +81,9 @@ class LoginActivity : BaseKotlinActivity<ActivityLoginBinding, LoginViewModel>()
                 Log.i(TAG, "loginSuccessObservable : $it")
                 when(it) {
                     true ->{
+                        loginBtn.disable()
+                        googleLoginBtn.disable()
+                        registerBtn.disable()
                         callActivity(Constant.HOME_PAGE)
                     }
                     false ->{

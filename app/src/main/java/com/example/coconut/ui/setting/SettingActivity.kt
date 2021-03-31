@@ -67,7 +67,7 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
             event.getContentIfNotHandled()?.let {
                 when (it) {
                     true -> {
-                        socket?.run { // 소켓부분이 개발되면 주석 꼭 풀것!
+                        socket?.run {
                             Log.i(TAG, "initDataBinding: logout start")
                             offline()
                             loginViewModel.deleteFcmTokenFromServer(pref.userIdx!!)

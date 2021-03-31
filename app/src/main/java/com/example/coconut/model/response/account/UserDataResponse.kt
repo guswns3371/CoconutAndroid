@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class UserDataResponse(
     @SerializedName("id") var id : String,
-    @SerializedName("userId") var userId : String,
+    @SerializedName("userId") var userId : String?,
     @SerializedName("name") var name : String,
     @SerializedName("email") var email : String,
     @SerializedName("stateMessage") var stateMessage : String ?,

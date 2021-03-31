@@ -75,6 +75,7 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
         edit.setOnClickListener { editMode() }
         edit_complete_text.setOnClickListener {
             myIdPref.let {
+                val userIdString =
                 Log.e(TAG,"$it / $userId / $profileImage / $backImage")
                 viewModel.edit(
                     AccountEditRequest(
@@ -82,8 +83,8 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
                     createPartFromString(userId),
                     createPartFromString(userName),
                     createPartFromString(userMsg),
-                    prepareFilePart("user_img",profileImage),
-                    prepareFilePart("back_img",backImage))
+                    prepareFilePart("profileImage",profileImage),
+                    prepareFilePart("backImage",backImage))
                 )
             }
             progressDialog = Dialog(this@AccountInfoActivity).apply {
@@ -159,13 +160,13 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
             //picasso 는 path 변수가 null 이면 오류발생하므로 null-safe걸어준다
             it.profilePicture?.run {
                 Glide.with(this@AccountInfoActivity)
-                    .load(Constant.BASE_URL+this)
+                    .load(this.toHTTPString())
                     .placeholder(R.drawable.account)
                     .into(user_image)
             }
             it.backgroundPicture?.run {
                 Glide.with(this@AccountInfoActivity)
-                    .load(Constant.BASE_URL+this)
+                    .load(this.toHTTPString())
                     .placeholder(R.drawable.black)
                     .into(background_image)
             }
@@ -195,6 +196,8 @@ class AccountInfoActivity : BaseKotlinActivity<ActivityAccountInfoBinding,Accoun
 
         if (user_msg.text.toString().isBlank())
             user_msg.hide()
+        if (user_id_.text.toString().isBlank())
+            user_id_.hide()
 
         user_image.isClickable = true
         background_image.isClickable = true

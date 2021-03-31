@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.databinding.ObservableField
+import com.example.coconut.Constant
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import okhttp3.MediaType
@@ -46,6 +47,10 @@ fun String.toCleanString() : String = this
     .replace("\"","")
     .replace("[","")
     .replace("]","")
+
+fun String.toHTTPString() : String =
+    if (this.startsWith("http")) this
+    else Constant.SPRING_BOOT_IMAGE_URL+this
 
 fun ArrayList<String>.addIfNotInclude(string: String) {
     if (!this.contains(string))

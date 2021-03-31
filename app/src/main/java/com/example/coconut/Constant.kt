@@ -5,7 +5,8 @@ class Constant {
         // 127.0.0.1은 안드로이드 VM 자체의 주소를 의미한다.
         // pc로컬 주소로 연결하기 위해선 10.0.2.2 를 사용할 것
         const val BASE_URL = "http://172.18.0.1"
-        const val SPRING_BOOT_URL = "${BASE_URL}:8080"
+        const val SPRING_BOOT_URL = "${BASE_URL}:8080/"
+        const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:8080/uploads/"
         const val NODE_URL = "${BASE_URL}:9000"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE =1

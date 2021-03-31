@@ -79,9 +79,9 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
         return accountAPI.updateAccount(
             accountEditRequest.id,
             accountEditRequest.userId,
-            accountEditRequest.userName,
-            accountEditRequest.userMsg,
-            arrayOf(accountEditRequest.userImg, accountEditRequest.backImg)
+            accountEditRequest.name,
+            accountEditRequest.message,
+            arrayOf(accountEditRequest.profileImage, accountEditRequest.backImage)
         )
     }
 

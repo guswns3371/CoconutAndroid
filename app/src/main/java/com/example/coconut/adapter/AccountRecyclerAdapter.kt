@@ -14,6 +14,7 @@ import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.ui.main.account.info.AccountInfoActivity
 import com.example.coconut.util.gone
 import com.example.coconut.util.show
+import com.example.coconut.util.toHTTPString
 import kotlinx.android.synthetic.main.item_account_fragment.view.*
 import kotlinx.android.synthetic.main.item_account_fragment_large.view.*
 import kotlin.collections.ArrayList
@@ -34,12 +35,8 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val TAG = "AccountHolder"
         fun onBind(item : UserDataResponse){
             itemView.run {
-                val profilePicturePath =
-                    if (item.profilePicture?.startsWith("http") == true) item.profilePicture
-                    else Constant.BASE_URL+item.profilePicture
-
                 Glide.with(context)
-                    .load(profilePicturePath)
+                    .load(item.profilePicture?.toHTTPString())
                     .placeholder(R.drawable.account)
                     .into(account_image)
 
@@ -77,12 +74,8 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val TAG = "AccountLargeHolder"
         fun onBind(item : UserDataResponse){
             itemView.run {
-                val profilePicturePath =
-                    if (item.profilePicture?.startsWith("http") == true) item.profilePicture
-                    else Constant.BASE_URL+item.profilePicture
-
                 Glide.with(context)
-                    .load(profilePicturePath)
+                    .load(item.profilePicture?.toHTTPString())
                     .placeholder(R.drawable.account)
                     .into(account_image_large)
 
