@@ -59,7 +59,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.e(TAG,"onServiceConnected")
             val binder = service as SocketService.MyBinder
-            socket = binder.getService().mySocket()
+            socket = binder.getService().getSocket()
             isBind = true
 
         }

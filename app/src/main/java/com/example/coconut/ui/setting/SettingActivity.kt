@@ -3,8 +3,6 @@ package com.example.coconut.ui.setting
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.appcompat.widget.Toolbar
@@ -18,7 +16,6 @@ import com.example.coconut.ui.auth.login.LoginActivity
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.util.MyPreference
 import io.socket.client.Socket
-import kotlinx.android.synthetic.main.activity_setting.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
@@ -48,7 +45,7 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.e("serviceConn","onServiceConnected")
             val binder = service as SocketService.MyBinder
-            socket = binder.getService().mySocket()
+            socket = binder.getService().getSocket()
             isBind = true
         }
 

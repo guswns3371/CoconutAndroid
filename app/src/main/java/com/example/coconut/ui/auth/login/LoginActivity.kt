@@ -30,6 +30,7 @@ class LoginActivity : BaseKotlinActivity<ActivityLoginBinding, LoginViewModel>()
         get() = R.layout.activity_login
 
     override val viewModel: LoginViewModel by viewModel()
+    private var progressDialog : Dialog? = null
 
     override fun initStartView() {
         //viewModel 에서 button click을 하기 위함
@@ -59,6 +60,23 @@ class LoginActivity : BaseKotlinActivity<ActivityLoginBinding, LoginViewModel>()
                 }
             }
 
+        })
+
+        viewModel.loginProgressObservable.observe(this, Observer { event ->
+            event.getContentIfNotHandled()?.let {
+                when(it) {
+                    true->{
+                        progressDialog = Dialog(this@LoginActivity).apply {
+                            setContentView(R.layout.custom_loading_dialog)
+                            setCancelable(true)
+                            show()
+                        }
+                    }
+                    false ->{
+                        progressDialog!!.dismiss()
+                    }
+                }
+            }
         })
 
         viewModel.progressObservable.observe(this, Observer { event ->

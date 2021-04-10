@@ -6,7 +6,6 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
@@ -52,7 +51,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding,AccountViewMod
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.e("serviceConn","onServiceConnected")
             val binder = service as SocketService.MyBinder
-            socket = binder.getService().mySocket()
+            socket = binder.getService().getSocket()
             isBind = true
 
             // 여기서 socket on을 해줘야 됨

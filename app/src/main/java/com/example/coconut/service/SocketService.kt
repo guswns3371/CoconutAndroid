@@ -1,5 +1,6 @@
 package com.example.coconut.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -12,24 +13,43 @@ import com.example.coconut.SocketData
 import com.example.coconut.SocketSend
 import com.example.coconut.util.MyPreference
 import com.example.coconut.util.showToast
-import io.socket.client.IO
+import com.example.coconut.util.toast
+import com.gmail.bishoybasily.stomp.lib.Event
+import com.gmail.bishoybasily.stomp.lib.StompClient
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import okhttp3.OkHttpClient
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
-import java.lang.RuntimeException
+import ua.naiksoftware.stomp.Stomp
+//import ua.naiksoftware.stomp.StompClient
+import ua.naiksoftware.stomp.dto.StompHeader
+import java.util.concurrent.TimeUnit
+import ua.naiksoftware.stomp.dto.LifecycleEvent.Type.*
+
 
 class SocketService : Service() {
 
     private val TAG = "SocketService"
-    lateinit var handler : Handler
+    private val intervalMillis = 4000L
+    private var sender: String? = null
+    private val pref: MyPreference by inject()
+    private var isConnected: Boolean = false
 
-    lateinit var socket : Socket
-    lateinit var context : Context
-    private var sender : String? = null
-    private val pref : MyPreference by inject()
-    private var isConnected : Boolean = false
+    lateinit var handler: Handler
+    lateinit var context: Context
+
+    //    lateinit var socket: Socket
+    private var socket: Socket? = null
+    lateinit var stompClient: StompClient
+    lateinit var stompConnection: Disposable
+    lateinit var topic: Disposable
+    private var compositeDisposable: CompositeDisposable? = null
 
     /**
      * https://bitsoul.tistory.com/149
@@ -41,35 +61,48 @@ class SocketService : Service() {
      **/
 
     inner class MyBinder : Binder() {
-        fun getService() =  this@SocketService
+        fun getService() = this@SocketService
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.e(TAG,"onCreate")
+        Log.e(TAG, "onCreate")
         handler = Handler()
         context = applicationContext
         sender = pref.userIdx
 
+        val client = OkHttpClient.Builder()
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .build()
         try {
-            socket = IO.socket(Constant.NODE_URL)
-        }catch (e : Exception){
+//            socket = IO.socket(Constant.SOCKET_SERVER) // Spring Boot WebSocket으로 연결
+            stompClient = StompClient(client, intervalMillis)
+                .apply { this@apply.url = Constant.STOMP_URL }
+        } catch (e: Exception) {
             throw RuntimeException(e)
         }
 
-        socketConnect()
+//        socketConnect()
+        stompConnect()
     }
 
-    fun mySocket() : Socket {
+    fun getSocket(): Socket? {
         return socket
     }
 
-    private fun runOnUiThread(runnable: Runnable){
+    @JvmName("getStompClient1")
+    fun getStompClient(): StompClient {
+        return stompClient
+    }
+
+    private fun runOnUiThread(runnable: Runnable) {
         handler.post(runnable)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.e(TAG,"onStartCommand")
+        Log.e(TAG, "onStartCommand")
         return START_REDELIVER_INTENT
     }
 
@@ -80,63 +113,104 @@ class SocketService : Service() {
         offline()
         socketDisconnect()
         super.onDestroy()
-        Log.e(TAG,"onDestroy")
+        Log.e(TAG, "onDestroy")
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Log.e(TAG,"onBind")
+        Log.e(TAG, "onBind")
         return MyBinder()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.e(TAG,"onUnbind")
+        Log.e(TAG, "onUnbind")
         return super.onUnbind(intent)
     }
 
 
-    private fun socketConnect(){
-        Log.e(TAG,"socketConnect")
-        socket.connect()
-        socket.on(Socket.EVENT_CONNECT,onConnect)
-        socket.on(Socket.EVENT_DISCONNECT,onDisconnect)
-        socket.on(Socket.EVENT_CONNECT_ERROR,onConnectionError)
-        socket.on(Socket.EVENT_CONNECT_TIMEOUT,onConnectionError)
+    @SuppressLint("CheckResult")
+    private fun stompConnect() {
+        stompConnection = stompClient.connect()
+            .subscribe { event ->
+                when (event.type) {
+                    Event.Type.OPENED -> {
+                        toast("socket opened")
+                        topic = stompClient.join("/topic/greetings")
+                            .doOnError { error ->
+                                Log.e(TAG, "stompConnect: $error")
+                            }
+                            .subscribe { message ->
+                                Log.e(TAG, "stompConnect: $message")
+                            }
+
+                        stompClient.send(
+                            "/topic/hello-msg-mapping",
+                            "My first STOMP message!"
+                        ).subscribe { it ->
+                            if (it) {
+                                toast("메시지 보내기 성공")
+                            }
+                        }
+                    }
+                    Event.Type.CLOSED -> {
+                        toast("socket closed")
+                    }
+                    Event.Type.ERROR -> {
+                        toast("socket error")
+                    }
+                }
+            }
+
     }
 
-    private fun socketDisconnect(){
-        Log.e(TAG,"socketDisconnect")
-        socket.off(Socket.EVENT_CONNECT,onConnect)
-        socket.off(Socket.EVENT_DISCONNECT,onDisconnect)
-        socket.off(Socket.EVENT_CONNECT_ERROR,onConnectionError)
-        socket.off(Socket.EVENT_CONNECT_TIMEOUT,onConnectionError)
+    private fun socketConnect() {
+        Log.e(TAG, "socketConnect")
+        socket?.run {
+            connect()
+            on(Socket.EVENT_CONNECT, onConnect)
+            on(Socket.EVENT_DISCONNECT, onDisconnect)
+            on(Socket.EVENT_CONNECT_ERROR, onConnectionError)
+            on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
+        }
+
     }
 
-    private fun online(){
-        Log.e(TAG,"online")
+    private fun socketDisconnect() {
+        Log.e(TAG, "socketDisconnect")
+        socket?.run {
+            off(Socket.EVENT_CONNECT, onConnect)
+            off(Socket.EVENT_DISCONNECT, onDisconnect)
+            off(Socket.EVENT_CONNECT_ERROR, onConnectionError)
+            off(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
+        }
+
+    }
+
+    private fun online() {
+        Log.e(TAG, "online")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.userIdx)
-                socket.emit(SocketSend.ONLINE_USER,this)
+                put(SocketData.USER_ID, pref.userIdx)
+                socket?.emit(SocketSend.ONLINE_USER, this)
             }
-        }catch (e: JSONException){
-            Log.e(TAG,"${e.message}")
+        } catch (e: JSONException) {
+            Log.e(TAG, "${e.message}")
         }
     }
 
-    private fun offline(){
-        Log.e(TAG,"offline")
+    private fun offline() {
+        Log.e(TAG, "offline")
         try {
             JSONObject().apply {
-                put(SocketData.USER_ID,pref.userIdx)
-                socket.emit(SocketSend.OFFLINE_USER,this)
+                put(SocketData.USER_ID, pref.userIdx)
+                socket?.emit(SocketSend.OFFLINE_USER, this)
             }
-        }catch (e: JSONException){
-            Log.e(TAG,"${e.message}")
+        } catch (e: JSONException) {
+            Log.e(TAG, "${e.message}")
         }
     }
 
     private val onConnect = Emitter.Listener {
-        runOnUiThread (
+        runOnUiThread(
             Runnable {
                 if (!isConnected) {
                     Log.e(TAG, "onConnect")
@@ -150,8 +224,8 @@ class SocketService : Service() {
     private val onDisconnect = Emitter.Listener {
         runOnUiThread(
             Runnable {
-                isConnected=false
-                Log.e(TAG,"Disconnected")
+                isConnected = false
+                Log.e(TAG, "Disconnected")
                 offline()
                 showToast("서버와의 연결이 끊어졌습니다")
             }
@@ -161,9 +235,18 @@ class SocketService : Service() {
     private val onConnectionError = Emitter.Listener {
         runOnUiThread(
             Runnable {
-                isConnected=false
-                Log.e(TAG,"onConnectionError")
-                //showToast("서버와의 연결이 불안정합니다")
+                isConnected = false
+                Log.e(TAG, "onConnectionError")
+                showToast("서버와의 연결이 불안정합니다")
+            }
+        )
+    }
+
+    private val onConnectionTimeout = Emitter.Listener {
+        runOnUiThread(
+            Runnable {
+                isConnected = false
+                Log.e(TAG, "onConnectionTimeout")
             }
         )
     }

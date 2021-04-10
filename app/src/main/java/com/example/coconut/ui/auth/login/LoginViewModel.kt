@@ -41,6 +41,10 @@ class LoginViewModel(
     val loginResponseLiveData: LiveData<Event<LoginResponse>>
         get() = _loginResponseLiveData
 
+    private val _loginProgressObservable = MutableLiveData<Event<Boolean>>()
+    val loginProgressObservable: LiveData<Event<Boolean>>
+        get() = _loginProgressObservable
+
     private val _progressObservable = MutableLiveData<Event<ProgressState>>()
     val progressObservable: LiveData<Event<ProgressState>>
         get() = _progressObservable
@@ -148,6 +152,7 @@ class LoginViewModel(
     /**원래는 activity에 클릭리스너속에 들어가야할 메소드지만
      * email 과 password 값을 매개변수 없이 바로 넘기기위해 data binding을 사용하여 viewmodel속에 놓은것*/
     fun loginCheck() {
+        _loginProgressObservable.value = Event(true)
         addDisposable(
             repository.doLogin(
                 LoginRequest(email.get().toString(), password.get().toString())
@@ -178,6 +183,7 @@ class LoginViewModel(
                         }
 
 
+                        _loginProgressObservable.value = Event(false)
                         // MutableLiveData에ㅓ setValue, postValue 실행 하는 경우
 //                    _loginResponseLiveData.postValue(this)
                         _loginResponseLiveData.value = Event(this)
@@ -186,6 +192,7 @@ class LoginViewModel(
                     }
                 }, {
                     Log.d(TAG, "response error, message : ${it.message}")
+                    _loginProgressObservable.value = Event(false)
                     showSnackbar("${it.message}")
                 })
         )
