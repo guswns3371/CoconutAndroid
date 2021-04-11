@@ -27,7 +27,7 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
+import com.gmail.bishoybasily.stomp.lib.StompClient
 class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , SocketServiceManager{
 
     private val TAG = "ChatFragment"
@@ -44,6 +44,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
     lateinit var myIdPref: String
     override var isBind: Boolean =false
     override var socket: Socket?=null
+    override var stompClient: StompClient? = null
     override val serviceConnection: ServiceConnection = object : ServiceConnection{
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e("serviceConn","onServiceDisconnected")

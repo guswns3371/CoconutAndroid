@@ -150,4 +150,22 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
         notifyDataSetChanged()
     }
+
+    fun updateUserStateArrayList(statusList : ArrayList<String>?){
+        Log.e(TAG,"updateUserState")
+        if (statusList == null) {
+            this.statusList = arrayOf()
+            this.itemList.forEach {
+                it.status = false
+            }
+            notifyDataSetChanged()
+            return
+        }
+        this.statusList = statusList.toArray(arrayOfNulls<String>(statusList.size))
+        // list에 유저 상태정보만 입력
+        this.itemList.forEach {
+            it.status = statusList.contains(it.id)
+        }
+        notifyDataSetChanged()
+    }
 }

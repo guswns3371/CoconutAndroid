@@ -147,6 +147,7 @@ class LoginViewModel(
         }
         email.addOnPropertyChangedCallback(callback)
         password.addOnPropertyChangedCallback(callback)
+
     }
 
     /**원래는 activity에 클릭리스너속에 들어가야할 메소드지만

@@ -5,12 +5,14 @@ import android.content.Intent
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coconut.service.SocketService
+import com.gmail.bishoybasily.stomp.lib.StompClient
 import io.socket.client.Socket
 
 interface SocketServiceManager {
 
      var isBind : Boolean
      var socket : Socket?
+     var stompClient: StompClient?
 
      val serviceConnection: ServiceConnection
 

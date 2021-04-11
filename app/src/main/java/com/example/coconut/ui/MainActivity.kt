@@ -29,16 +29,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        //Log.e(TAG,"onStart")
+    override fun onResume() {
+        super.onResume()
+//        registerSocketReceiver()
     }
 
-    override fun onStop() {
-        super.onStop()
-        //Log.e(TAG,"onStop")
+    override fun onPause() {
+//        unregisterSocketReceiver()
+        super.onPause()
     }
-
     override fun onDestroy() {
         super.onDestroy()
         //서비스 종료

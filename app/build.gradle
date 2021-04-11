@@ -6,6 +6,9 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+// json 직렬화
+apply plugin: "org.jetbrains.kotlin.plugin.serialization"
+
 //fcm
 apply plugin: 'com.google.gms.google-services'
 
@@ -107,6 +110,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0' // NavigationView
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
@@ -195,5 +199,9 @@ dependencies {
     implementation('io.socket:socket.io-client:1.0.0') {
         exclude group: 'org.json', module: 'json'
     }
+
+    // json 직렬화
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0"
+
 }
 

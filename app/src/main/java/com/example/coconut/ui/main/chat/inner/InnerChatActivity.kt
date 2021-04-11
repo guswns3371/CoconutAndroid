@@ -31,6 +31,7 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import org.json.JSONException
 import org.json.JSONObject
+import com.gmail.bishoybasily.stomp.lib.StompClient
 import java.lang.Exception
 
 class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatViewModel>(),SocketServiceManager{
@@ -49,6 +50,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding,InnerChatV
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
+    override var stompClient: StompClient? = null
     override val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(TAG,"onServiceDisconnected")

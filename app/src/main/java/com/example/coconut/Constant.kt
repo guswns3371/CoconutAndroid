@@ -21,7 +21,12 @@ class Constant {
         const val RC_AUTH = 100
     }
 }
-
+class BroadCastIntentID {
+    companion object{
+        const val SEND_USER_LIST = "SEND_USER_LIST"
+        const val SEND_LOGOUT = "SEND_LOGOUT"
+    }
+}
 class IntentID{
     companion object{
         const val EMAIL = "EMAIL"
@@ -46,6 +51,9 @@ class IntentID{
 
         const val PROFILE_IMAGE = 0
         const val BACKGROUND_IMAGE = 1
+
+        const val RECEIVE_USER_LIST = "RECEIVE_USER_LIST"
+        const val RECEIVE_LOGOUT = "RECEIVE_LOGOUT"
     }
 }
 

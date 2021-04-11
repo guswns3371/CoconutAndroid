@@ -41,12 +41,16 @@ fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(
 
 fun ObservableField<String>.makeString() : String = this.get().toString()
 
-fun String.JsonToArray() : Array<Any> = this.split(",").toTypedArray()
+fun String.toArray() : Array<String> = this.split(",").toTypedArray()
 
 fun String.toCleanString() : String = this
     .replace("\"","")
+    .replace("\\n\\n","")
+    .replace("\\r\\n|\\r|\\n|\\n\\r".toRegex(),"")
     .replace("[","")
     .replace("]","")
+
+fun String.toArrayList() : List<String> = this.split(",").toList()
 
 fun String.toHTTPString() : String =
     if (this.startsWith("http")) this

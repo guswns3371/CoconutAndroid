@@ -370,6 +370,7 @@ class AuthRepo(
     }
 
     fun logout(logoutListener: AuthLogoutListener) {
+        Log.e(TAG, "logout")
         lockLogins()
         if (!isAuthorized()) {
             unlockLogins()

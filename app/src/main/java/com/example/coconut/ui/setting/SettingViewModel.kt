@@ -50,6 +50,7 @@ class SettingViewModel(
     }
 
     fun logout(){
+        Log.e(TAG, "logout")
         authRepo.logout(logoutListener)
     }
 }

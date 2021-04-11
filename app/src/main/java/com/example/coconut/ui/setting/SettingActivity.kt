@@ -2,6 +2,7 @@ package com.example.coconut.ui.setting
 
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
@@ -11,6 +12,7 @@ import com.example.coconut.*
 import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.ActivitySettingBinding
+import com.example.coconut.receiver.SocketBroadcastReceiver
 import com.example.coconut.service.SocketService
 import com.example.coconut.ui.auth.login.LoginActivity
 import com.example.coconut.ui.auth.login.LoginViewModel
@@ -20,12 +22,14 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.gmail.bishoybasily.stomp.lib.StompClient
 
 class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewModel>(), SocketServiceManager {
 
     private val pref : MyPreference by inject()
     private val loginViewModel : LoginViewModel by viewModel()
     private val TAG = "SettingActivity"
+    lateinit var mReceiver: SocketBroadcastReceiver
 
     override val layoutResourceId: Int
         get() = R.layout.activity_setting
@@ -36,20 +40,28 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
+    lateinit var socketService: SocketService
+    override var stompClient: StompClient? = null
     override val serviceConnection: ServiceConnection = object :ServiceConnection{
         override fun onServiceDisconnected(name: ComponentName?) {
+            // onServiceDisconnected 는 서비스가 비정상종료 될 때에만 호출된다.
+            Log.e(TAG, "onServiceDisconnected")
             socket = null
             isBind = false
         }
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.e("serviceConn","onServiceConnected")
+            Log.e(TAG,"onServiceConnected")
             val binder = service as SocketService.MyBinder
             socket = binder.getService().getSocket()
             isBind = true
+            socketService = binder.getService()
+
         }
 
     }
+
+
 
     override fun initStartView() {
         bindService(this)
@@ -64,16 +76,13 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
             event.getContentIfNotHandled()?.let {
                 when (it) {
                     true -> {
-                        socket?.run {
-                            Log.i(TAG, "initDataBinding: logout start")
-                            offline()
-                            loginViewModel.deleteFcmTokenFromServer(pref.userIdx!!)
-                            pref.resetAccessToken()
-                            pref.resetRefreshToken()
-                            pref.resetUserId()
-                            /**자동로그인 해제를 위해 UserId를 삭제한다*/
-                            callActivity(Constant.LOGIN_PAGE)
-                        }
+                        Log.i(TAG, "initDataBinding: logout start")
+                        // offline()
+                        loginViewModel.deleteFcmTokenFromServer(pref.userIdx!!)
+                        pref.resetAccessToken()
+                        pref.resetRefreshToken()
+                        socketService.logout()
+                        callActivity(Constant.LOGIN_PAGE)
                     }
                     false -> {
 
@@ -89,8 +98,9 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
 
 
     override fun onDestroy() {
-        unbindService(this)
+        Log.e(TAG, "onDestroy")
         super.onDestroy()
+        unbindService(this)
     }
 
     private fun callActivity(where : Int){
@@ -118,5 +128,19 @@ class SettingActivity : BaseKotlinActivity<ActivitySettingBinding,SettingViewMod
         }
     }
 
+//    private fun registerReceiver() {
+//        mReceiver = SocketBroadcastReceiver()
+//        registerReceiver(mReceiver, IntentFilter(BroadCastIntentID.SEND_LOGOUT))
+//    }
+//
+//    private fun unregisterReceiver() {
+//        unregisterReceiver(mReceiver)
+//    }
+//
+//    private fun sendLogoutBroadcast() {
+//        val intent = Intent()
+//        intent.action = BroadCastIntentID.SEND_LOGOUT
+//        sendBroadcast(intent)
+//    }
 
 }
