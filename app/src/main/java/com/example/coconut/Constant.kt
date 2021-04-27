@@ -4,12 +4,13 @@ class Constant {
     companion object{
         // 127.0.0.1은 안드로이드 VM 자체의 주소를 의미한다.
         // pc로컬 주소로 연결하기 위해선 10.0.2.2 를 사용할 것
-        // 192.168.0.8 주소를 사용하면 외부에서 연결 가능하다
-        const val BASE_URL = "http://10.0.2.2"
+        // public 주소를 사용하면 외부에서 연결 가능하다
+        private const val BASE_HOST = "10.0.2.2"
+        const val BASE_URL = "http://${BASE_HOST}"
         const val SPRING_BOOT_URL = "${BASE_URL}:8080/"
         const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:8080/uploads/"
         const val SOCKET_SERVER = SPRING_BOOT_URL
-        const val STOMP_URL = "ws://10.0.2.2:8080/socket-endpoint/websocket"
+        const val STOMP_URL = "ws://${BASE_HOST}:8080/socket-endpoint/websocket"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE =1
         const val HOME_PAGE=2

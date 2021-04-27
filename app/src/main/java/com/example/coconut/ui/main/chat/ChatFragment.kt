@@ -18,7 +18,7 @@ import com.example.coconut.adapter.ChatListRecyclerAdpater
 import com.example.coconut.base.BaseKotlinFragment
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.FragmentChatBinding
-import com.example.coconut.model.response.chat.ChatListResponse
+import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.service.SocketService
 import com.example.coconut.ui.main.chat.add.AddChatActivity
 import com.example.coconut.ui.setting.SettingActivity
@@ -35,7 +35,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
         get() = R.layout.fragment_chat
     override val viewModel: ChatViewModel by viewModel()
     private val recyclerAdapter : ChatListRecyclerAdpater by inject()
-    private lateinit var chatRoomList : ArrayList<ChatListResponse>
+    private lateinit var chatRoomRoomList : ArrayList<ChatRoomListResponse>
 
     private val pref : MyPreference by inject()
     override val baseToolBar: Toolbar?
@@ -84,12 +84,12 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
     }
 
     override fun initDataBinding() {
-        viewModel.chatListResponseLiveData.observe(this, Observer {
-            chatRoomList = arrayListOf()
+        viewModel.chatRoomListResponseLiveData.observe(this, Observer {
+            chatRoomRoomList = arrayListOf()
             it.forEach {chatList->
-                chatRoomList.add(chatList)
+                chatRoomRoomList.add(chatList)
             }
-            recyclerAdapter.addChatList(chatRoomList)
+            recyclerAdapter.addChatList(chatRoomRoomList)
         })
     }
 

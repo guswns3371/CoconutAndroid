@@ -14,6 +14,7 @@ import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.ui.main.account.info.AccountInfoActivity
+import com.example.coconut.util.toHTTPString
 
 class InnerDrawerAdapter: BaseAdapter(){
 
@@ -47,7 +48,7 @@ class InnerDrawerAdapter: BaseAdapter(){
 
         holder.userImageView?.let {
             Glide.with(parent!!.context)
-                .load(Constant.BASE_URL+item.profilePicture)
+                .load(item.profilePicture?.toHTTPString())
                 .placeholder(R.drawable.account)
                 .into(it)
         }

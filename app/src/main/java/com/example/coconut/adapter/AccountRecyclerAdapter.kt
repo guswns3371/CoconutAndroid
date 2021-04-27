@@ -42,6 +42,14 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                 account_name.text = item.name
                 account_msg.text = item.stateMessage
+                account_msg.gone()
+
+                item.stateMessage?.run {
+                    when (this.isBlank() || this.isEmpty()){
+                        true->{ account_msg.gone() }
+                        false->{ account_msg.show() }
+                    }
+                }
 
                 if (item.status){
                     account_user_status.background = context.getDrawable(R.drawable.online_sign)
@@ -50,12 +58,6 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
 
-                item.stateMessage?.run {
-                    when (this.isBlank()){
-                        true->{ account_msg.gone() }
-                        false->{ account_msg.show() }
-                    }
-                }
 
                 setOnClickListener {
                     Log.e(TAG,item.toString())
@@ -81,6 +83,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
                 account_text_large.text = item.name
                 account_msg_large.text = item.stateMessage
+                account_msg_large.gone()
 
                 item.stateMessage?.run {
                     when (this.isBlank() ||  this.isEmpty()){

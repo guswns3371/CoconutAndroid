@@ -31,8 +31,8 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
         private val TAG = "InnerChatHolder"
         fun onBind(item : ChatHistoryResponse){
             itemView.run {
-                val userInfo = item.user_info
-                val count = fixedPeopleList.size - stringToArrayList(item.read_people).size
+                val userInfo = item.userInfo
+                val count = fixedPeopleList.size - stringToArrayList(item.readMembers).size
                 when(userInfo.id == pref.userIdx){
                     true->{
                         // 유저편 view (내가 보낸 메시지)
@@ -48,7 +48,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         chat_time_mine.text = item.time
 
                         // isFile로 chat_content_image_mine VISIBLE로
-                        chat_content_text_mine.text = item.chat_content
+                        chat_content_text_mine.text = item.history
                         chat_content_image_mine.gone()
 
                         chat_content_text_mine.setOnLongClickListener {
@@ -76,7 +76,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         chat_time_nm.text = item.time
 
                         // isFile로 chat_content_image_nm를 VISIBLE 로
-                        chat_content_text_nm.text = item.chat_content
+                        chat_content_text_nm.text = item.history
                         chat_content_image_nm.gone()
 
                         chat_user_image_nm.setOnClickListener {

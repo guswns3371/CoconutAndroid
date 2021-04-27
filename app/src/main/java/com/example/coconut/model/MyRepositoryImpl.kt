@@ -4,20 +4,21 @@ import com.example.coconut.model.request.account.AccountEditRequest
 import com.example.coconut.model.request.auth.EmailVerifyRequest
 import com.example.coconut.model.request.auth.LoginRequest
 import com.example.coconut.model.request.auth.RegisterRequest
-import com.example.coconut.model.request.chat.ChatRequest
+import com.example.coconut.model.request.chat.ChatMessageRequest
 import com.example.coconut.model.request.chat.FcmTokenRequest
-import com.example.coconut.model.request.chat.MakeChatRoomRequest
+import com.example.coconut.model.request.chat.ChatRoomSaveRequest
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
-import com.example.coconut.model.response.chat.ChatBaseResponse
+import com.example.coconut.model.response.chat.ChatRoomSaveResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
-import com.example.coconut.model.response.chat.ChatListResponse
+import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.ChatAPI
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
+import com.example.coconut.model.request.chat.ChatRoomInfoRequest
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import io.reactivex.Single
 
@@ -87,11 +88,20 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
 
     override fun makeChatRoom(
         myId : String,
-        chatRoomId: String?,
-        people: ArrayList<String>
-    ): Single<ChatBaseResponse> {
+       people: ArrayList<String>
+    ): Single<ChatRoomSaveResponse> {
         return chatAPI.makeChatRoom(
-            MakeChatRoomRequest(myId,chatRoomId,people)
+            ChatRoomSaveRequest(myId,people)
+        )
+    }
+
+    override fun getChatRoomInfo(
+        myId: String,
+        chatRoomId: String?,
+        people: java.util.ArrayList<String>
+    ): Single<ChatRoomSaveResponse> {
+        return chatAPI.getChatRoomInfo(
+            ChatRoomInfoRequest(myId,chatRoomId,people)
         )
     }
 
@@ -100,17 +110,17 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
        return chatAPI.getChatHistory(chatRoomId)
     }
 
-    override fun sendMessage(chatRequest: ChatRequest): Single<ChatBaseResponse> {
+    override fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomSaveResponse> {
         return chatAPI.sendMessage(
-            chatRequest.chatRoomId,
-            chatRequest.id,
-            chatRequest.chatMessage,
-            chatRequest.chatImages
+            chatMessageRequest.chatRoomId,
+            chatMessageRequest.id,
+            chatMessageRequest.chatMessage,
+            chatMessageRequest.chatImages
         )
     }
 
     override fun getChatRoomLists(myId: String?)
-            : Single<ArrayList<ChatListResponse>> {
+            : Single<ArrayList<ChatRoomListResponse>> {
         return chatAPI.getChatRoomLists(myId)
     }
 }

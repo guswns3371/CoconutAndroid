@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-data class ChatRequest(
+data class ChatMessageRequest(
     var chatRoomId : RequestBody?,
     var id : RequestBody?,
     var chatMessage : RequestBody?,
