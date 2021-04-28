@@ -213,7 +213,7 @@ class SocketService : Service() {
     }
 
     private fun joinToTopic() {
-        addDisposable(stompClient.join("/topic/service")
+        addDisposable(stompClient.join("/sub/users/service")
             .doOnError { error -> Log.e(TAG, "onlineUserList error: $error") }
             .subscribe { userListJsonString ->
                 val userList = userListJsonString.toCleanString().toArrayList()
@@ -235,7 +235,7 @@ class SocketService : Service() {
         Log.e(TAG, "online")
 
         addDisposable(stompClient.send(
-            "/topic/online",
+            "/pub/users/online",
             "${pref.userIdx}"
         )
             .doOnError { error -> Log.e(TAG, "online error : $error") }
@@ -246,7 +246,7 @@ class SocketService : Service() {
         Log.e(TAG, "offline")
 
         addDisposable(stompClient.send(
-            "/topic/offline",
+            "/pub/users/offline",
             "${pref.userIdx}"
         )
             .doOnError { error -> Log.e(TAG, "offline error : $error") }
@@ -256,7 +256,7 @@ class SocketService : Service() {
     fun logout() {
         Log.e(TAG, "logout")
         addDisposable(stompClient.send(
-            "/topic/offline",
+            "/users/offline",
             "${pref.userIdx}"
         )
             .doOnError { error -> Log.e(TAG, "offline error : $error") }

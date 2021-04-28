@@ -1,9 +1,13 @@
 package com.example.coconut.model.response.account
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
+@Keep
+@Serializable
 @Parcelize
 data class UserDataResponse(
     @SerializedName("id") var id : String,
@@ -14,7 +18,7 @@ data class UserDataResponse(
     @SerializedName("profilePicture") var profilePicture : String ?,
     @SerializedName("backgroundPicture") var backgroundPicture : String ?,
     @SerializedName("err") var err : String ?,
-    var status : Boolean
+    @SerializedName("status") var status : Boolean?
 ) : Parcelable {
 
     override fun toString(): String {

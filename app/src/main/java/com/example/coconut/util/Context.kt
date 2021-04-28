@@ -20,8 +20,8 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.File
 
-fun Context.showToast(msg:String, length: Int = Toast.LENGTH_SHORT){
-    toast(msg,length)
+fun Context.showToast(msg: String, length: Int = Toast.LENGTH_SHORT) {
+    toast(msg, length)
 }
 
 fun Context.toast(id: Int, length: Int = Toast.LENGTH_SHORT) {
@@ -37,54 +37,63 @@ fun Context.toast(msg: String, length: Int = Toast.LENGTH_SHORT) {
     }
 }
 
-fun String.toEditable(): Editable =  Editable.Factory.getInstance().newEditable(this)
+fun String.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
 
-fun ObservableField<String>.makeString() : String = this.get().toString()
+fun ObservableField<String>.makeString(): String = this.get().toString()
 
-fun String.toArray() : Array<String> = this.split(",").toTypedArray()
+fun String.toArray(): Array<String> = this.split(",").toTypedArray()
 
-fun String.toCleanString() : String = this
-    .replace("\"","")
-    .replace("\\n\\n","")
-    .replace("\\r\\n|\\r|\\n|\\n\\r".toRegex(),"")
-    .replace("[","")
-    .replace("]","")
+fun String.toCleanString(): String = this
+    .replace("\"", "")
+    .replace("\\n\\n", "")
+    .replace("\\r\\n|\\r|\\n|\\n\\r".toRegex(), "")
+    .replace("[", "")
+    .replace("]", "")
 
-fun String.toArrayList() : List<String> = this.split(",").toList()
+fun String.toArrayList(): List<String> = this.split(",").toList()
 
-fun String.toHTTPString() : String =
+fun String.toHTTPString(): String =
     if (this.startsWith("http")) this
-    else Constant.SPRING_BOOT_IMAGE_URL+this
+    else Constant.SPRING_BOOT_IMAGE_URL + this
 
 fun ArrayList<String>.addIfNotInclude(string: String) {
     if (!this.contains(string))
         this.add(string)
 }
 
-fun ArrayList<String>.showElements() : String{
-    var str =""
-    for (a : String in this)
+fun ArrayList<String>.showElements(): String {
+    var str = ""
+    for (a: String in this)
         str += "$a "
     return str
 }
 
-fun Array<String>.showElements() : String{
-    var str =""
-    for (a : String in this)
+fun Array<String>.showElements(): String {
+    var str = ""
+    for (a: String in this)
         str += "$a "
     return str
 }
 
-fun Any.toJSONObject() : JSONObject? {
+fun Any.toJSONObject(): JSONObject? {
     return try {
         JSONObject(Gson().toJson(this))
-    }catch (e : Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
         null
     }
 }
 
-fun <T:Any> JSONObject.toObject(obj : Class<T>) : T {
+fun Any.toJSONString(): String? {
+    return try {
+        Gson().toJson(this)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return null
+    }
+}
+
+fun <T : Any> JSONObject.toObject(obj: Class<T>): T {
     return Gson().fromJson("$this", obj) as T
 }
 
@@ -108,18 +117,19 @@ private fun doToast(context: Context, message: String, length: Int) {
     }
 }
 
-fun Context.log(log :Any){
-    Log.e(this::class.java.simpleName,"$log")
+fun Context.log(log: Any) {
+    Log.e(this::class.java.simpleName, "$log")
 }
 
 @NonNull
-fun Context.prepareFilePart(fieldName : String ,fileName: String?)
+fun Context.prepareFilePart(fieldName: String, fileName: String?)
         : MultipartBody.Part? {
 
     return fileName?.let {
         val file = File(it)
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data; boundary=$it"),file)
-        MultipartBody.Part.createFormData(fieldName,file.name,requestFile)
+        val requestFile =
+            RequestBody.create(MediaType.parse("multipart/form-data; boundary=$it"), file)
+        MultipartBody.Part.createFormData(fieldName, file.name, requestFile)
     }
 }
 

@@ -113,7 +113,7 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
     override fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomSaveResponse> {
         return chatAPI.sendMessage(
             chatMessageRequest.chatRoomId,
-            chatMessageRequest.id,
+            chatMessageRequest.userId,
             chatMessageRequest.chatMessage,
             chatMessageRequest.chatImages
         )

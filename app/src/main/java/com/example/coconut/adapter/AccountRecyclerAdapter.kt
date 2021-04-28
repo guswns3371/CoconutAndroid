@@ -51,7 +51,7 @@ class AccountRecyclerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     }
                 }
 
-                if (item.status){
+                if (item.status!!){
                     account_user_status.background = context.getDrawable(R.drawable.online_sign)
                 }else{
                     account_user_status.background = context.getDrawable(R.drawable.offline_sign)

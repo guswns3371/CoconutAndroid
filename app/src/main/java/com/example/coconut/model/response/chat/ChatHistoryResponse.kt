@@ -1,8 +1,12 @@
 package com.example.coconut.model.response.chat
 
+import androidx.annotation.Keep
 import com.example.coconut.model.response.account.UserDataResponse
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Keep
+@Serializable
 data class ChatHistoryResponse(
     @SerializedName("userInfo") var userInfo : UserDataResponse,
     @SerializedName("chatRoomId") var chatRoomId : String,
@@ -10,11 +14,9 @@ data class ChatHistoryResponse(
     @SerializedName("readMembers") var readMembers : String,
     @SerializedName("time") var time : String,
     @SerializedName("history") var history : String,
-    @SerializedName("isFile") var isFile : Boolean?,
-    var readPeopleCount : Int?
+    @SerializedName("messageType") var messageType : String?
 ) {
-
     override fun toString(): String {
-        return "ChatHistoryResponse(user_info=$userInfo, chat_room_id='$chatRoomId', chat_user_id='$chatUserId', read_people='$readMembers', time='$time', chat_content='$history', isFile=$isFile, readPeopleCount=$readPeopleCount)"
+        return "ChatHistoryResponse(userInfo=$userInfo, chatRoomId='$chatRoomId', chatUserId='$chatUserId', readMembers='$readMembers', time='$time', history='$history', messageType=$messageType)"
     }
 }

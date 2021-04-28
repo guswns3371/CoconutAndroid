@@ -12,10 +12,7 @@ import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.ui.main.account.info.AccountInfoActivity
-import com.example.coconut.util.MyPreference
-import com.example.coconut.util.gone
-import com.example.coconut.util.show
-import com.example.coconut.util.showToast
+import com.example.coconut.util.*
 import kotlinx.android.synthetic.main.item_chat.view.*
 
 class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -61,7 +58,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
                         not_mine_linear.show()
                         mine_linear.gone()
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfo.profilePicture)
+                            .load(userInfo.profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_user_image_nm)
 

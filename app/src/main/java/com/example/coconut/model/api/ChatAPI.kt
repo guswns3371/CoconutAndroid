@@ -7,7 +7,6 @@ import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import io.reactivex.Single
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface ChatAPI {
@@ -15,9 +14,9 @@ interface ChatAPI {
     @POST("/api/chat")
     @Multipart
     fun sendMessage(
-        @Part("chatRoomId") chatRoomId : RequestBody?,
-        @Part("chatUserId") chatUserId : RequestBody?,
-        @Part("content") content : RequestBody?,
+        @Part("chatRoomId") chatRoomId : String?,
+        @Part("chatUserId") chatUserId : String?,
+        @Part("content") content : String?,
         @Part images : ArrayList<MultipartBody.Part?>?
     ) : Single<ChatRoomSaveResponse>
 
