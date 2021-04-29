@@ -21,20 +21,34 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
     private val _chatResponseLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
     val chatHistoryResponseLiveData : LiveData<ArrayList<ChatHistoryResponse>> = _chatResponseLiveData
 
+    private val _chatUpdateReadMembersLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
+    val chatUpdateReadMembersLiveData : LiveData<ArrayList<ChatHistoryResponse>> = _chatUpdateReadMembersLiveData
+
     fun getChatHistory(chatRoomId : String?){
         addDisposable(myRepository.getChatHistory(chatRoomId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it?.run {
-                    forEach {history ->
-                        Log.e(TAG,"getChatHistory response : [${history.userInfo.name}] ${history.history}\n")
-                    }
                     _chatResponseLiveData.postValue(this)
                 }
             },{
                 Log.d(TAG, "getChatHistory response error, message : ${it.message}")
                 _chatResponseLiveData.postValue(null)
+            }))
+    }
+
+    fun updateReadMembers(chatRoomId : String?) {
+        addDisposable(myRepository.getChatHistory(chatRoomId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                it?.run {
+                    _chatUpdateReadMembersLiveData.postValue(this)
+                }
+            },{
+                Log.d(TAG, "updateReadMembers response error, message : ${it.message}")
+                _chatUpdateReadMembersLiveData.postValue(null)
             }))
     }
 

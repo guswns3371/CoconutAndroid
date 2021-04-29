@@ -19,7 +19,6 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
 
     private val TAG = "InnerChatRecyclerAdapter"
     private var itemList : ArrayList<ChatHistoryResponse> = arrayListOf()
-    private var readPeopleList : ArrayList<String> = arrayListOf()
     private var fixedPeopleList : ArrayList<String> = arrayListOf()
 
     inner class InnerChatHolder(parent: ViewGroup): RecyclerView.ViewHolder(
@@ -103,14 +102,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
     }
 
     fun addChatItem(itemList: ArrayList<ChatHistoryResponse>){
-        //Log.e(TAG,"addChatItem")
         this.itemList = itemList
-        notifyDataSetChanged()
-    }
-
-    fun updateChatReadCount(readPeopleList : ArrayList<String>){
-        //Log.e(TAG,"updateChatReadCount")
-        this.readPeopleList = readPeopleList
         notifyDataSetChanged()
     }
 

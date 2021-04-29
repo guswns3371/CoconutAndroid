@@ -167,19 +167,28 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             progressDialog!!.dismiss()
 
             it?.let { chatList ->
-                /** 다른 사람들이 채팅방에 입장할 때 읽음 표시갱신을 위해 chatHistoryList를 새로 초기화한다
-                 * 안하면 같은 내용의 채팅이 여러번 반복되어 나타난다*/
+
                 chatHistoryList = arrayListOf()
 
                 //채팅기록을 뿌려준다
                 chatList.forEach { chat -> chatHistoryList.add(chat) }
                 recyclerAdapter.addChatItem(chatHistoryList)
-                recyclerAdapter.updateChatReadCount(chatRoomMembers)
 
                 //맨 밑으로 스크롤
                 scrollToBottom()
             }
+        })
 
+        viewModel.chatUpdateReadMembersLiveData.observe(this, {
+            Log.e(TAG, "updateReadMembers observing $roomID 번방")
+
+            /** 다른 사람들이 채팅방에 입장할 때 읽음 표시갱신을 위해 chatHistoryList 를 새로 초기화한다
+             * 안하면 같은 내용의 채팅이 여러번 반복되어 나타난다*/
+            chatHistoryList = arrayListOf()
+
+            //채팅기록을 뿌려준다
+            it?.forEach { chat -> chatHistoryList.add(chat) }
+            recyclerAdapter.addChatItem(chatHistoryList)
         })
     }
 
@@ -205,29 +214,116 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         disableSendButton()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.inner_chat_menu, menu)
-        return true
+    override fun onResume() {
+        super.onResume()
+        // 채팅방 입장
+        enterChatRoom()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_info -> {
-                drawer_layout.openDrawer(GravityCompat.END)
-                return true
-            }
+    override fun onPause() {
+        super.onPause()
+        //채팅방 나감
+        exitChatRoom()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(this)
+    }
+
+
+    // https://velog.io/@dnjscksdn98/Chatting-Server-Stomp%EB%A1%9C-%EC%B1%84%ED%8C%85-%EA%B8%B0%EB%8A%A5-%ED%99%95%EC%9E%A5
+    private fun onStompSubscribe() {
+        if (stompClient == null) Log.e(TAG, "onStompClient is null")
+        stompClient?.apply {
+
+            // 채팅방 입장,퇴장할 때
+            addDisposable(this.join("/sub/chat/room/$roomID")
+                .doOnError { error ->
+                    Log.e(TAG, "onStompSubscribe error: $error")
+                }
+                .subscribe { message ->
+                    runOnUiThread {
+                        readMembers = ArrayList(message.toCleanString().toArrayList())
+                        Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
+
+                        Thread.sleep(100)
+                        /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
+                        viewModel.updateReadMembers(roomID)
+                    }
+                })
+
+
+            // 채팅 메시지 보낼 때
+            addDisposable(this.join("/sub/chat/message/$roomID")
+                .doOnError { error -> Log.e(TAG, "onStompSubscribe error: $error") }
+                .subscribe { message ->
+                    Log.e(TAG, "/sub/chat/message/ : $message")
+
+                    runOnUiThread {
+                        val chatHistory = Json {
+                            isLenient = true
+                        }.decodeFromString<ChatHistoryResponse>(message)
+
+                        chatHistoryList.add(chatHistory)
+                        recyclerAdapter.addChatItem(chatHistoryList)
+
+                        scrollToBottom()
+                    }
+                })
+
         }
-        return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
-        // drawer 가 열렸을경우 닫고 닫혔을 경우 뒤로가기
-        when (drawer_layout.isDrawerOpen(GravityCompat.END)) {
-            true -> {
-                drawer_layout.closeDrawer(GravityCompat.END)
-            }
-            false -> {
-                super.onBackPressed()
+    private fun enterChatRoom() {
+        roomID?.let {
+
+            Log.e(TAG, "enter $it 번방")
+            addDisposable(stompClient!!.send(
+                "/pub/chat/enter",
+                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
+            )
+                .doOnError { error -> Log.e(TAG, "enter error : $error") }
+                .subscribe { })
+        }
+    }
+
+    private fun exitChatRoom() {
+        roomID?.let {
+
+            Log.e(TAG, "exit $it 번방")
+            addDisposable(stompClient!!.send(
+                "/pub/chat/exit",
+                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
+            )
+                .doOnError { error -> Log.e(TAG, "exit error : $error") }
+                .subscribe { })
+        }
+    }
+
+    private fun sendMessage() {
+        if (!isOkToSend) {
+            showToast("잠시만 기다려주세요")
+            return
+        }
+
+        if (chat_edit_text.text.toString().isNotBlank()) {
+            roomID?.let { roomID ->
+
+                ChatMessageSocketData(
+                    roomID, myID, chat_edit_text.text.toString(),
+                    chatRoomMembers, readMembers, null
+                )
+                    .toJSONString()?.let {
+
+                        addDisposable(stompClient!!.send("/pub/chat/message", it)
+                            .doOnError { error -> Log.e(TAG, "message error : $error") }
+                            .subscribe { })
+
+                        chat_edit_text.text.clear()
+                    }
+
+                scrollToBottom()
             }
         }
     }
@@ -324,126 +420,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         return fixedList
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        // 채팅방 입장
-        enterChatRoom()
-
-        Log.e(TAG, "onResume $roomID 번방")
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        //채팅방 나감
-        exitChatRoom()
-
-        Log.e(TAG, "onPause $roomID 번방")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.e(TAG, "onStop $roomID 번방")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unbindService(this)
-        Log.e(TAG, "onDestroy $roomID 번방")
-    }
-
-    // https://velog.io/@dnjscksdn98/Chatting-Server-Stomp%EB%A1%9C-%EC%B1%84%ED%8C%85-%EA%B8%B0%EB%8A%A5-%ED%99%95%EC%9E%A5
-    private fun onStompSubscribe() {
-        if (stompClient == null) Log.e(TAG, "onStompClient is null")
-        stompClient?.apply {
-
-            // 채팅방 입장,퇴장할 때
-            addDisposable(this.join("/sub/chat/room/$roomID")
-                .doOnError { error ->
-                    Log.e(TAG, "onStompSubscribe error: $error")
-                }
-                .subscribe { message ->
-                    Log.e(TAG, "onStompSubscribe /sub/chat/room/: ${message.toCleanString()}")
-
-                    readMembers = ArrayList(message.toCleanString().toArrayList())
-                })
-
-
-            // 채팅 메시지 보낼 때
-            addDisposable(this.join("/sub/chat/message/$roomID")
-                .doOnError { error -> Log.e(TAG, "onStompSubscribe error: $error") }
-                .subscribe { message ->
-                    Log.e(TAG, "/sub/chat/message/ : $message")
-
-                    runOnUiThread {
-                        val chatHistory = Json {
-                            isLenient = true
-                        }.decodeFromString<ChatHistoryResponse>(message)
-
-                        chatHistoryList.add(chatHistory)
-                        recyclerAdapter.addChatItem(chatHistoryList)
-
-                        scrollToBottom()
-                    }
-                })
-
-        }
-    }
-
-    private fun enterChatRoom() {
-        roomID?.let {
-
-            Log.e(TAG, "enter $it 번방")
-            addDisposable(stompClient!!.send(
-                "/pub/chat/enter",
-                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
-            )
-                .doOnError { error -> Log.e(TAG, "enter error : $error") }
-                .subscribe { })
-        }
-    }
-
-    private fun exitChatRoom() {
-        roomID?.let {
-
-            Log.e(TAG, "exit $it 번방")
-            addDisposable(stompClient!!.send(
-                "/pub/chat/exit",
-                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
-            )
-                .doOnError { error -> Log.e(TAG, "exit error : $error") }
-                .subscribe { })
-        }
-    }
-
-    private fun sendMessage() {
-        if (!isOkToSend) {
-            showToast("잠시만 기다려주세요")
-            return
-        }
-
-        if (chat_edit_text.text.toString().isNotBlank()) {
-            roomID?.let { roomID ->
-
-                ChatMessageSocketData(
-                    roomID, myID, chat_edit_text.text.toString(),
-                    chatRoomMembers, readMembers, null
-                )
-                    .toJSONString()?.let {
-
-                        addDisposable(stompClient!!.send("/pub/chat/message", it)
-                            .doOnError { error -> Log.e(TAG, "message error : $error") }
-                            .subscribe { })
-
-                        chat_edit_text.text.clear()
-                    }
-
-                scrollToBottom()
-            }
-        }
-    }
-
     private fun scrollToBottom() {
         chat_recycler_view.postDelayed({
             chat_recycler_view.scrollToPosition(chat_recycler_view.adapter!!.itemCount - 1)
@@ -462,6 +438,33 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
     private fun enableSendButton() {
         isOkToSend = true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.inner_chat_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_info -> {
+                drawer_layout.openDrawer(GravityCompat.END)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        // drawer 가 열렸을경우 닫고 닫혔을 경우 뒤로가기
+        when (drawer_layout.isDrawerOpen(GravityCompat.END)) {
+            true -> {
+                drawer_layout.closeDrawer(GravityCompat.END)
+            }
+            false -> {
+                super.onBackPressed()
+            }
+        }
     }
 
     private fun onSocket() {
