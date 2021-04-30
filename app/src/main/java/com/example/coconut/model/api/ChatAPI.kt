@@ -1,8 +1,8 @@
 package com.example.coconut.model.api
 
-import com.example.coconut.model.request.chat.ChatRoomInfoRequest
+import com.example.coconut.model.request.chat.ChatRoomDataRequest
 import com.example.coconut.model.request.chat.ChatRoomSaveRequest
-import com.example.coconut.model.response.chat.ChatRoomSaveResponse
+import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import io.reactivex.Single
@@ -18,25 +18,25 @@ interface ChatAPI {
         @Part("chatUserId") chatUserId : String?,
         @Part("content") content : String?,
         @Part images : ArrayList<MultipartBody.Part?>?
-    ) : Single<ChatRoomSaveResponse>
+    ) : Single<ChatRoomDataResponse>
 
     @POST("/api/chat/room/make")
     fun makeChatRoom(
         @Body chatRoomSaveRequest: ChatRoomSaveRequest
-    ): Single<ChatRoomSaveResponse>
+    ): Single<ChatRoomDataResponse>
 
     @POST("/api/chat/room/info")
-    fun getChatRoomInfo(
-        @Body chatRoomInfoRequest: ChatRoomInfoRequest
-    ) : Single<ChatRoomSaveResponse>
+    fun getChatRoomData(
+        @Body chatRoomDataRequest: ChatRoomDataRequest
+    ) : Single<ChatRoomDataResponse>
 
-    @GET("/api/chat/{id}")
+    @GET("/api/chat/{chatRoomId}")
     fun getChatHistory(
-        @Path("id") chatRoomId : String?
+        @Path("chatRoomId") chatRoomId : String?
     ): Single<ArrayList<ChatHistoryResponse>>
 
-    @GET("/api/chat/list/{id}")
+    @GET("/api/chat/room/list/{userId}")
     fun getChatRoomLists(
-        @Path("id") myId : String?
+        @Path("userId") userId : String?
     ) : Single<ArrayList<ChatRoomListResponse>>
 }

@@ -11,30 +11,31 @@ import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
-import com.example.coconut.model.response.chat.ChatRoomSaveResponse
+import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.ChatAPI
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
-import com.example.coconut.model.request.chat.ChatRoomInfoRequest
+import com.example.coconut.model.request.chat.ChatRoomDataRequest
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import io.reactivex.Single
 
-class MyRepositoryImpl(private val authAPI: AuthAPI,
-                       private val accountAPI: AccountAPI,
-                       private val chatAPI: ChatAPI
-                       ) : MyRepository {
+class MyRepositoryImpl(
+    private val authAPI: AuthAPI,
+    private val accountAPI: AccountAPI,
+    private val chatAPI: ChatAPI
+) : MyRepository {
 
 
     /** authService*/
 
-    override fun googleLogin() : Single<LoginResponse> {
+    override fun googleLogin(): Single<LoginResponse> {
         return authAPI.googleLogin()
     }
 
-    override fun naverLogin() : Single<LoginResponse> {
+    override fun naverLogin(): Single<LoginResponse> {
         return authAPI.naverLogin()
     }
 
@@ -86,31 +87,20 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
         )
     }
 
-    override fun makeChatRoom(
-        myId : String,
-       people: ArrayList<String>
-    ): Single<ChatRoomSaveResponse> {
-        return chatAPI.makeChatRoom(
-            ChatRoomSaveRequest(myId,people)
-        )
+    override fun makeChatRoom(chatRoomSaveRequest: ChatRoomSaveRequest): Single<ChatRoomDataResponse> {
+        return chatAPI.makeChatRoom(chatRoomSaveRequest)
     }
 
-    override fun getChatRoomInfo(
-        myId: String,
-        chatRoomId: String?,
-        people: java.util.ArrayList<String>
-    ): Single<ChatRoomSaveResponse> {
-        return chatAPI.getChatRoomInfo(
-            ChatRoomInfoRequest(myId,chatRoomId,people)
-        )
+    override fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse> {
+        return chatAPI.getChatRoomData(chatRoomDataRequest)
     }
 
     override fun getChatHistory(chatRoomId: String?)
             : Single<ArrayList<ChatHistoryResponse>> {
-       return chatAPI.getChatHistory(chatRoomId)
+        return chatAPI.getChatHistory(chatRoomId)
     }
 
-    override fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomSaveResponse> {
+    override fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse> {
         return chatAPI.sendMessage(
             chatMessageRequest.chatRoomId,
             chatMessageRequest.userId,
@@ -119,8 +109,8 @@ class MyRepositoryImpl(private val authAPI: AuthAPI,
         )
     }
 
-    override fun getChatRoomLists(myId: String?)
+    override fun getChatRoomLists(userId: String?)
             : Single<ArrayList<ChatRoomListResponse>> {
-        return chatAPI.getChatRoomLists(myId)
+        return chatAPI.getChatRoomLists(userId)
     }
 }

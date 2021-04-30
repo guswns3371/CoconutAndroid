@@ -22,8 +22,8 @@ class ChatViewModel(private val myRepository: MyRepository) : BaseKotlinViewMode
             .subscribe({
                 it?.run {
                     forEach {chatList ->
-                        val info = chatList.chat_room_Info_info!!
-                        Log.e(TAG, "getChatRoomLists response : [${chatList.chat_room_id} 번방] ${chatList.room_name} ${info.last_content} ${info.last_time}\n")
+                        val info = chatList.chatRoomInfo!!
+                        Log.e(TAG, "getChatRoomLists response : [${chatList.chatRoomId} 번방] ${chatList.chatRoomName} ${info.lastMessage} ${info.lastTime}\n")
                     }
                     _chatListResponseLiveData.postValue(this)
                 }

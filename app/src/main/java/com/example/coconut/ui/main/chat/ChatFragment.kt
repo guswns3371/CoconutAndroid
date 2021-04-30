@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.R
 import com.example.coconut.SocketReceive
-import com.example.coconut.adapter.ChatListRecyclerAdpater
+import com.example.coconut.adapter.ChatListRecyclerAdapter
 import com.example.coconut.base.BaseKotlinFragment
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.FragmentChatBinding
@@ -34,7 +34,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding,ChatViewModel>() , S
     override val layoutResourceId: Int
         get() = R.layout.fragment_chat
     override val viewModel: ChatViewModel by viewModel()
-    private val recyclerAdapter : ChatListRecyclerAdpater by inject()
+    private val recyclerAdapter : ChatListRecyclerAdapter by inject()
     private lateinit var chatRoomRoomList : ArrayList<ChatRoomListResponse>
 
     private val pref : MyPreference by inject()

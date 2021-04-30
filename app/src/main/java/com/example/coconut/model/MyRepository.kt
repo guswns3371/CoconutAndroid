@@ -6,13 +6,15 @@ import com.example.coconut.model.request.auth.LoginRequest
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.request.chat.ChatMessageRequest
+import com.example.coconut.model.request.chat.ChatRoomDataRequest
+import com.example.coconut.model.request.chat.ChatRoomSaveRequest
 import com.example.coconut.model.request.chat.FcmTokenRequest
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import com.example.coconut.model.response.auth.RegisterResponse
-import com.example.coconut.model.response.chat.ChatRoomSaveResponse
+import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import io.reactivex.Single
@@ -46,17 +48,13 @@ interface MyRepository {
     fun updateAccountData(accountEditRequest: AccountEditRequest): Single<BaseResponse>
 
     /** @ChatAPI */
-    fun makeChatRoom(myId: String, people: ArrayList<String>): Single<ChatRoomSaveResponse>
+    fun makeChatRoom(chatRoomSaveRequest: ChatRoomSaveRequest): Single<ChatRoomDataResponse>
 
-    fun getChatRoomInfo(
-        myId: String,
-        chatRoomId: String?,
-        people: java.util.ArrayList<String>
-    ): Single<ChatRoomSaveResponse>
+    fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse>
 
     fun getChatHistory(chatRoomId: String?): Single<ArrayList<ChatHistoryResponse>>
 
-    fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomSaveResponse>
+    fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse>
 
-    fun getChatRoomLists(myId: String?): Single<ArrayList<ChatRoomListResponse>>
+    fun getChatRoomLists(userId: String?): Single<ArrayList<ChatRoomListResponse>>
 }

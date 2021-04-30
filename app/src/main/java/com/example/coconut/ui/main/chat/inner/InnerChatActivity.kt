@@ -104,8 +104,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         /**
          * 서버에서 roomID, fixedPeopleList, 툴바제목을 받아온다
          * */
-        // makeChatRoom
-        viewModel.chatRoomSaveResponseLiveData.observe(this, { res ->
+        // makeChatRoom & getChatRoomData
+        viewModel.chatRoomDataResponseLiveData.observe(this, { res ->
             // charRoomId
             res.chatRoomId?.let {
                 Log.e(TAG, "채팅방 id : $it")
@@ -125,7 +125,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 setToolbarTitle(it)
             }
 
-            // fixedPeopleList
+            // chatRoomMembers
             res.chatRoomMembers?.let {
                 it.run {
                     chatRoomMembers = this@run
@@ -207,7 +207,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             viewModel.makeChatRoom(myID, chatRoomMembers)
         } else {
             // 채팅방 목록에서 클릭한 경우
-            viewModel.getChatRoomInfo(myID, roomID, chatRoomMembers)
+            viewModel.getChatRoomData(myID, roomID, chatRoomMembers)
         }
 
         // 채팅방 id를 얻기 전까지 채팅버튼 비활성화
@@ -239,14 +239,12 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
             // 채팅방 입장,퇴장할 때
             addDisposable(this.join("/sub/chat/room/$roomID")
-                .doOnError { error ->
-                    Log.e(TAG, "onStompSubscribe error: $error")
-                }
+                .doOnError { error -> Log.e(TAG, "onStompSubscribe error: $error") }
                 .subscribe { message ->
-                    runOnUiThread {
-                        readMembers = ArrayList(message.toCleanString().toArrayList())
-                        Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
+                    readMembers = ArrayList(message.toCleanString().toArrayList())
+                    Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
 
+                    runOnUiThread {
                         Thread.sleep(100)
                         /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
                         viewModel.updateReadMembers(roomID)
@@ -267,8 +265,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
                         chatHistoryList.add(chatHistory)
                         recyclerAdapter.addChatItem(chatHistoryList)
-
-                        scrollToBottom()
                     }
                 })
 
@@ -279,12 +275,15 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         roomID?.let {
 
             Log.e(TAG, "enter $it 번방")
-            addDisposable(stompClient!!.send(
-                "/pub/chat/enter",
-                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
-            )
-                .doOnError { error -> Log.e(TAG, "enter error : $error") }
-                .subscribe { })
+            stompClient?.let { stomp ->
+                addDisposable(stomp.send(
+                    "/pub/chat/enter",
+                    ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
+                )
+                    .doOnError { error -> Log.e(TAG, "enter error : $error") }
+                    .subscribe { })
+            }
+
         }
     }
 
@@ -292,12 +291,15 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         roomID?.let {
 
             Log.e(TAG, "exit $it 번방")
-            addDisposable(stompClient!!.send(
-                "/pub/chat/exit",
-                ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
-            )
-                .doOnError { error -> Log.e(TAG, "exit error : $error") }
-                .subscribe { })
+            stompClient?.let { stomp ->
+                addDisposable(stomp.send(
+                    "/pub/chat/exit",
+                    ChatRoomSocketData(it, "${pref.userIdx}").toJSONString()!!
+                )
+                    .doOnError { error -> Log.e(TAG, "exit error : $error") }
+                    .subscribe { })
+            }
+
         }
     }
 

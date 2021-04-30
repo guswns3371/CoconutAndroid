@@ -3,7 +3,7 @@ package com.example.coconut.model.response.chat
 import com.example.coconut.model.response.account.UserDataResponse
 import com.google.gson.annotations.SerializedName
 
-data class ChatRoomSaveResponse(
+data class ChatRoomDataResponse(
     @SerializedName("chatRoomId") var chatRoomId: String?,
     @SerializedName("chatRoomName") var chatRoomName: String?,
     @SerializedName("chatRoomMembers") var chatRoomMembers: ArrayList<String>?,

@@ -14,15 +14,12 @@ import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.chat.ChatRoomInfoResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
-import com.example.coconut.util.MyPreference
-import com.example.coconut.util.gone
-import com.example.coconut.util.hide
-import com.example.coconut.util.show
+import com.example.coconut.util.*
 import kotlinx.android.synthetic.main.item_chat_fragment.view.*
 
-class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatListRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val TAG = "ChatListRecyclerAdpater"
+    private val TAG = "ChatListRecyclerAdapter"
     private var itemRoomList : ArrayList<ChatRoomListResponse> = arrayListOf()
 
      inner class ChatListHolder(parent: ViewGroup): RecyclerView.ViewHolder(
@@ -36,10 +33,10 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
         @SuppressLint("SetTextI18n")
         fun onBind(item : ChatRoomListResponse){
             itemView.run {
-                roomInfoInfo = item.chat_room_Info_info!!
-                userInfos = item.user_info!!
+                roomInfoInfo = item.chatRoomInfo!!
+                userInfos = item.userInfo!!
 
-                chat_list_name.text = item.room_name
+                chat_list_name.text = item.chatRoomName
                 chat_list_people_size.text = "${userInfos.size+1}"
 
                 image_layout_for_one.gone()
@@ -52,7 +49,7 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         //1명
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profilePicture)
+                            .load(userInfos[0].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image11)
 
@@ -69,12 +66,12 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profilePicture)
+                            .load(userInfos[0].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image21)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profilePicture)
+                            .load(userInfos[1].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image22)
 
@@ -86,15 +83,15 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profilePicture)
+                            .load(userInfos[0].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image31)
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profilePicture)
+                            .load(userInfos[1].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image32)
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[2].profilePicture)
+                            .load(userInfos[2].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image33)
 
@@ -105,22 +102,22 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                         chat_list_people_size.show()
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[0].profilePicture)
+                            .load(userInfos[0].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image41)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[1].profilePicture)
+                            .load(userInfos[1].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image42)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[2].profilePicture)
+                            .load(userInfos[2].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image43)
 
                         Glide.with(context)
-                            .load(Constant.BASE_URL+userInfos[3].profilePicture)
+                            .load(userInfos[3].profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)
                             .into(chat_list_image44)
 
@@ -129,12 +126,20 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                     }
                 }
 
-                chat_list_last_content.text = roomInfoInfo.last_content
-                chat_list_last_time.text = roomInfoInfo.last_time
+                chat_list_last_content.text = roomInfoInfo.lastMessage
+                chat_list_last_time.text = roomInfoInfo.lastTime
 
-                item.unread_num?.run {
+                roomInfoInfo.lastMessage?.run {
+                    if (!isNullOrBlank()){
+                        chat_list_last_content.show()
+                    }else{
+                        chat_list_last_content.hide()
+                    }
+                }
+
+                item.unReads?.run {
                     if (toInt() > 0) {
-                        chat_list_unread_num.text = item.unread_num
+                        chat_list_unread_num.text = item.unReads
                         chat_list_unread_num.show()
                     }else{
                         chat_list_unread_num.hide()
@@ -144,8 +149,8 @@ class ChatListRecyclerAdpater(private var pref: MyPreference) : RecyclerView.Ada
                 setOnClickListener {
                     Intent(context,InnerChatActivity::class.java).apply {
                         putExtra(IntentID.CHAT_MODE,IntentID.CHAT_WITH_PEOPLE_FROM_CHAT_FRAG)
-                        putExtra(IntentID.CHAT_ROOM_TITLE,item.room_name)
-                        putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST,roomInfoInfo.people)
+                        putExtra(IntentID.CHAT_ROOM_TITLE,item.chatRoomName)
+                        putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST,roomInfoInfo.members)
                         putExtra(IntentID.CHAT_ROOM_ID,roomInfoInfo.id)
                         putExtra(IntentID.CHAT_ROOM_PEOPLE_INFOS,userInfos)
                         ContextCompat.startActivity(context, this,null)

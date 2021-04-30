@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.chat.ChatMessageRequest
-import com.example.coconut.model.response.chat.ChatRoomSaveResponse
+import com.example.coconut.model.request.chat.ChatRoomDataRequest
+import com.example.coconut.model.request.chat.ChatRoomSaveRequest
+import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -15,8 +17,8 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
 
     private val TAG = "InnerChatViewModel"
 
-    private val _chatRoomSaveResponseLiveData = MutableLiveData<ChatRoomSaveResponse>()
-    val chatRoomSaveResponseLiveData : LiveData<ChatRoomSaveResponse> = _chatRoomSaveResponseLiveData
+    private val _chatRoomDataResponseLiveData = MutableLiveData<ChatRoomDataResponse>()
+    val chatRoomDataResponseLiveData : LiveData<ChatRoomDataResponse> = _chatRoomDataResponseLiveData
 
     private val _chatResponseLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
     val chatHistoryResponseLiveData : LiveData<ArrayList<ChatHistoryResponse>> = _chatResponseLiveData
@@ -53,27 +55,27 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
     }
 
     fun makeChatRoom(myId : String, people : ArrayList<String>){
-        addDisposable(myRepository.makeChatRoom(myId,people)
+        addDisposable(myRepository.makeChatRoom(ChatRoomSaveRequest(myId,people))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it?.run {
                     Log.e(TAG,"makeChatRoom response : ${toString()}")
-                    _chatRoomSaveResponseLiveData.postValue(this)
+                    _chatRoomDataResponseLiveData.postValue(this)
                 }
             },{
                 Log.d(TAG, "makeChatRoom response error, message : ${it.message}")
             }))
     }
 
-    fun getChatRoomInfo(myId : String, chatRoomId: String?, people : ArrayList<String>){
-        addDisposable(myRepository.getChatRoomInfo(myId,chatRoomId,people)
+    fun getChatRoomData(myId : String, chatRoomId: String?, people : ArrayList<String>){
+        addDisposable(myRepository.getChatRoomData(ChatRoomDataRequest(myId,chatRoomId,people))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it?.run {
                     Log.e(TAG,"getChatRoomInfo response : ${toString()}")
-                    _chatRoomSaveResponseLiveData.postValue(this)
+                    _chatRoomDataResponseLiveData.postValue(this)
                 }
             },{
                 Log.d(TAG, "getChatRoomInfo response error, message : ${it.message}")
@@ -87,7 +89,7 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
             .subscribe({
                 it?.run {
                     Log.e(TAG,"sendMessage response : ${toString()}")
-                    _chatRoomSaveResponseLiveData.postValue(this)
+                    _chatRoomDataResponseLiveData.postValue(this)
                 }
             },{
                 Log.d(TAG, "sendMessage response error, message : ${it.message}")

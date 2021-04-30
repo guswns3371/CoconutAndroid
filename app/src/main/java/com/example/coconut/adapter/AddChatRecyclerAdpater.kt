@@ -10,6 +10,7 @@ import com.example.coconut.R
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.util.gone
 import com.example.coconut.util.show
+import com.example.coconut.util.toHTTPString
 import kotlinx.android.synthetic.main.item_account_fragment.view.*
 import kotlinx.android.synthetic.main.item_add_chat.view.*
 
@@ -41,7 +42,7 @@ class AddChatRecyclerAdpater : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         ){
             itemView.run {
                 Glide.with(context)
-                    .load(Constant.BASE_URL+item.profilePicture)
+                    .load(item.profilePicture?.toHTTPString())
                     .placeholder(R.drawable.account)
                     .into(account_image)
 
@@ -102,7 +103,7 @@ class AddChatRecyclerAdpater : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 itemView.run {
                     Log.e(TAG,item.name)
                     Glide.with(context)
-                        .load(Constant.BASE_URL+item.profilePicture)
+                        .load(item.profilePicture?.toHTTPString())
                         .placeholder(R.drawable.account)
                         .into(chat_add_horiz_image)
 
