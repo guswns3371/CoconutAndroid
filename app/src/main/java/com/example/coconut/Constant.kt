@@ -26,6 +26,8 @@ class BroadCastIntentID {
     companion object{
         const val SEND_USER_LIST = "SEND_USER_LIST"
         const val SEND_LOGOUT = "SEND_LOGOUT"
+        const val SEND_ON_CONNECT = "SEND_ON_CONNECT"
+        const val SEND_ON_DISCONNECT = "SEND_ON_DISCONNECT"
     }
 }
 class IntentID{

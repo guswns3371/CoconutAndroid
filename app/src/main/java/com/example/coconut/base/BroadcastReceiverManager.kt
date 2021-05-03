@@ -15,4 +15,6 @@ interface BroadcastReceiverManager {
     fun unregisterBroadcastReceiver(context: Context?) {
         context?.unregisterReceiver(mBroadcastReceiver)
     }
+
+    fun getBroadcastReceiver() = mBroadcastReceiver
 }

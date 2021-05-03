@@ -2,21 +2,22 @@ package com.example.coconut.ui.main.chat.inner
 
 import android.app.Dialog
 import android.app.NotificationManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.ServiceConnection
+import android.content.*
 import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.*
 import com.example.coconut.adapter.InnerChatRecyclerAdapter
 import com.example.coconut.adapter.InnerDrawerAdapter
 import com.example.coconut.base.BaseKotlinActivity
+import com.example.coconut.base.BroadcastReceiverManager
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.ActivityInnerChatBinding
 import com.example.coconut.model.response.account.UserDataResponse
@@ -25,6 +26,7 @@ import com.example.coconut.model.socket.ChatRoomSocketData
 import com.example.coconut.model.socket.ChatMessageSocketData
 import com.example.coconut.service.SocketService
 import com.example.coconut.util.*
+import com.gmail.bishoybasily.stomp.lib.Event
 import kotlinx.android.synthetic.main.activity_inner_chat.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -37,7 +39,7 @@ import kotlinx.serialization.json.Json
 import java.lang.Exception
 
 class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChatViewModel>(),
-    SocketServiceManager {
+    SocketServiceManager, BroadcastReceiverManager {
 
     private var chatMode: Int = -1
     private val TAG = "InnerChatActivity"
@@ -50,6 +52,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
     private var progressDialog: Dialog? = null
     private var isOkToSend = false
+    private var isEndOfHistory: Boolean = true
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
@@ -71,7 +74,22 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
         }
     }
-
+    override val mBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            when (p1?.action) {
+                BroadCastIntentID.SEND_ON_CONNECT -> {
+                    onStompSubscribe()
+                    onConnect()
+                }
+                BroadCastIntentID.SEND_ON_DISCONNECT -> {
+                    onDisconnect()
+                    clearDisposable()
+                }
+                else -> {
+                }
+            }
+        }
+    }
     private lateinit var myID: String
     private var roomID: String? = null
     private var chatRoomMembers: ArrayList<String> = arrayListOf()
@@ -94,7 +112,21 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
             adapter = recyclerAdapter
             setHasFixedSize(true)
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    isEndOfHistory =
+                        !recyclerView.canScrollVertically(1) || recyclerView.verticalScrollbarPosition == chat_recycler_view.adapter!!.itemCount - 1
+
+                    if (!isEndOfHistory) {
+                        scroll_bottom_btn.show()
+                    } else {
+                        scroll_bottom_btn.gone()
+                    }
+                }
+            })
         }
+
+        registerReceiver()
 
         bindService(this)
     }
@@ -189,6 +221,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             //채팅기록을 뿌려준다
             it?.forEach { chat -> chatHistoryList.add(chat) }
             recyclerAdapter.addChatItem(chatHistoryList)
+
         })
     }
 
@@ -197,6 +230,12 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         chat_send.setOnClickListener { sendMessage() }
         // 키보드에서 완료버튼 누를때에도 메시지 보내기
         chat_edit_text.onDone { sendMessage() }
+
+        scroll_bottom_btn.setOnClickListener {
+            scroll_bottom_btn.gone()
+            scrollToBottom()
+            isEndOfHistory = true
+        }
 
         // roomID와 fixedPeopleList 를 설정한다
         chatRoomMembers = whereChatFrom()
@@ -214,6 +253,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         disableSendButton()
     }
 
+
     override fun onResume() {
         super.onResume()
         // 채팅방 입장
@@ -226,8 +266,14 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         exitChatRoom()
     }
 
+    override fun onStop() {
+        super.onStop()
+        clearDisposable()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver()
         unbindService(this)
     }
 
@@ -236,7 +282,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private fun onStompSubscribe() {
         if (stompClient == null) Log.e(TAG, "onStompClient is null")
         stompClient?.apply {
-
             // 채팅방 입장,퇴장할 때
             addDisposable(this.join("/sub/chat/room/$roomID")
                 .doOnError { error -> Log.e(TAG, "onStompSubscribe error: $error") }
@@ -245,7 +290,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
 
                     runOnUiThread {
-                        Thread.sleep(100)
+                        Thread.sleep(30)
                         /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
                         viewModel.updateReadMembers(roomID)
                     }
@@ -265,9 +310,29 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
                         chatHistoryList.add(chatHistory)
                         recyclerAdapter.addChatItem(chatHistoryList)
+
+                        if (isEndOfHistory) {
+                            scrollToBottom()
+                        } else {
+                            if (chatHistory.userInfo.id != myID)
+                                showToast("${chatHistory.userInfo.name} : ${chatHistory.history}")
+                        }
                     }
                 })
+        }
+    }
 
+    private fun onConnect() {
+        runOnUiThread {
+            enterChatRoom()
+            enableSendButton()
+        }
+    }
+
+    private fun onDisconnect() {
+        runOnUiThread {
+            disableSendButton()
+            exitChatRoom()
         }
     }
 
@@ -367,13 +432,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 }
 
                 intent.getStringExtra(IntentID.CHAT_ROOM_PEOPLE_LIST)?.let {
-                    it.split(",").toTypedArray().run {
-                        forEach { id ->
-                            // 이렇게 해줘야 "2 가 2로
-                            // 3] 이 3으로 , [3 이 3으로 바뀐다
-                            if (id.toCleanString() != "")
-                                fixedList.add(id.toCleanString())
-                        }
+                    it.toCleanString().toArrayList().run {
+                        fixedList = ArrayList(this)
                     }
                 }
 
@@ -398,13 +458,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 }
 
                 intent.getStringExtra(IntentID.CHAT_ROOM_PEOPLE_LIST)?.let {
-                    it.split(",").toTypedArray().run {
-                        forEach { id ->
-                            // 이렇게 해줘야 "2 가 2로
-                            // 3] 이 3으로 , [3 이 3으로 바뀐다
-                            if (id.toCleanString() != "")
-                                fixedList.add(id.toCleanString())
-                        }
+                    it.toCleanString().toArrayList().run {
+                        fixedList = this
                     }
                 }
             }
@@ -420,6 +475,17 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         Log.e(TAG, "[$roomID 번방 사람들] ${fixedList.showElements()}")
 
         return fixedList
+    }
+
+    private fun registerReceiver() {
+        IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
+            it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            registerBroadcastReceiver(this, it)
+        }
+    }
+
+    private fun unregisterReceiver() {
+        unregisterBroadcastReceiver(this)
     }
 
     private fun scrollToBottom() {
@@ -549,6 +615,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             exitChatRoom()
         }
     }
+
     private val onChatMessageReceive = Emitter.Listener {
         runOnUiThread {
             (it[0] as JSONObject).apply {
@@ -562,4 +629,5 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
         }
     }
+
 }

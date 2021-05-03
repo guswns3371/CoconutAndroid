@@ -14,6 +14,8 @@ import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.model.socket.EchoSocketData
 import com.example.coconut.ui.main.account.AccountFragment
+import com.example.coconut.ui.main.chat.ChatFragment
+import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
 import com.example.coconut.util.showToast
 import com.example.coconut.util.toArrayList
@@ -48,13 +50,16 @@ class SocketService : Service() {
     private var socket: Socket? = null
     private lateinit var stompClient: StompClient
     private var compositeDisposable: CompositeDisposable? = null
+    private lateinit var serviceDisposable: Disposable
 
     private var onlineUserList: ArrayList<String>? by Delegates.observable(null) { property, oldValue, newValue ->
         Log.e(TAG, "onlineUserList observable old: $oldValue")
         Log.e(TAG, "onlineUserList observable new: $newValue")
     }
 
-    private lateinit var mReceiver: BroadcastReceiver
+    private lateinit var accountFragReceiver: BroadcastReceiver
+    private lateinit var innerChatActivityReceiver: BroadcastReceiver
+    private lateinit var chatFragReceiver: BroadcastReceiver
 
     /**
      * https://bitsoul.tistory.com/149
@@ -95,9 +100,6 @@ class SocketService : Service() {
             .connectTimeout(10, TimeUnit.SECONDS)
             .build()
         try {
-            // Socket IO
-            // socket = IO.socket(Constant.SOCKET_SERVER)
-
             // Spring Boot WebSocket과 연결
             stompClient = StompClient(client, intervalMillis)
                 .apply { this@apply.url = Constant.STOMP_URL }
@@ -105,18 +107,18 @@ class SocketService : Service() {
             throw RuntimeException(e)
         }
 
-        // socketConnect()
         stompConnect()
+
     }
 
     /**
      * 설정에서 배터리 사용량 최적화하면 서비스가 제대로 작동하지 않는다
      * */
+
     override fun onDestroy() {
-        offline()
-        // socketDisconnect()
-        stompDisconnect()
         super.onDestroy()
+        offline()
+        stompDisconnect()
         unregisterSocketReceiver()
         Log.e(TAG, "onDestroy")
     }
@@ -134,10 +136,6 @@ class SocketService : Service() {
         return stompClient
     }
 
-    fun getConnectedUserList(): ArrayList<String>? {
-        return onlineUserList
-    }
-
     private fun addDisposable(disposable: Disposable) {
         if (compositeDisposable == null) {
             compositeDisposable = CompositeDisposable()
@@ -151,26 +149,57 @@ class SocketService : Service() {
 
     }
 
+    private fun clearDisposable() {
+        compositeDisposable?.clear()
+    }
+
     private fun runOnUiThread(runnable: Runnable) {
         handler.post(runnable)
     }
 
 
-    private fun sendUserListBroadcast(userList: ArrayList<String>?) {
-        val intent = Intent()
-        intent.action = BroadCastIntentID.SEND_USER_LIST
-        intent.putExtra(IntentID.RECEIVE_USER_LIST, userList)
-        sendBroadcast(intent)
+    private fun sendAccountFragBroadcast(userList: ArrayList<String>?) {
+        Intent().let {
+            it.action = BroadCastIntentID.SEND_USER_LIST
+            it.putExtra(IntentID.RECEIVE_USER_LIST, userList)
+            sendBroadcast(it)
+        }
+    }
+
+    private fun sendOnConnectBroadcast() {
+        Intent().let {
+            it.action = BroadCastIntentID.SEND_ON_CONNECT
+            sendBroadcast(it)
+        }
+    }
+
+    private fun sendOnDisconnectBroadcast() {
+        Intent().let {
+            it.action = BroadCastIntentID.SEND_ON_DISCONNECT
+            sendBroadcast(it)
+        }
     }
 
     private fun registerSocketReceiver() {
-        val filter = IntentFilter(BroadCastIntentID.SEND_USER_LIST)
-        mReceiver = AccountFragment().getReceiver()
-        registerReceiver(mReceiver, filter)
+        accountFragReceiver = AccountFragment().getBroadcastReceiver()
+        innerChatActivityReceiver = InnerChatActivity().getBroadcastReceiver()
+        chatFragReceiver = ChatFragment().getBroadcastReceiver()
+
+        IntentFilter(BroadCastIntentID.SEND_USER_LIST).let {
+            registerReceiver(accountFragReceiver, it)
+        }
+
+        IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
+            it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            registerReceiver(innerChatActivityReceiver, it)
+            registerReceiver(chatFragReceiver, it)
+        }
     }
 
     private fun unregisterSocketReceiver() {
-        unregisterReceiver(mReceiver)
+        unregisterReceiver(accountFragReceiver)
+        unregisterReceiver(innerChatActivityReceiver)
+        unregisterReceiver(chatFragReceiver)
     }
 
     private fun stompConnect() {
@@ -180,28 +209,28 @@ class SocketService : Service() {
             .subscribe { event ->
                 when (event.type) {
                     Event.Type.OPENED -> {
-                        if (!isConnected) {
-                            Log.e(TAG, "onConnect")
-                            showToast("서버와 연결되었습니다")
-                            onlineUserList = arrayListOf()
-                            isConnected = true
-                            joinToTopic()
-                            online()
-                        }
+                        Log.e(TAG, "onConnect")
+                        onlineUserList = arrayListOf()
+                        serviceDisposable = joinToTopicDisposable()
+                        online()
+                        sendOnConnectBroadcast()
+                        showToast("서버와 연결되었습니다")
                     }
                     Event.Type.CLOSED -> {
-                        isConnected = false
                         Log.e(TAG, "Disconnected")
+                        showToast("서버와의 연결이 끊어졌습니다")
                         resetLine()
                         offline()
-                        showToast("서버와의 연결이 끊어졌습니다")
+                        serviceDisposable.dispose()
+                        sendOnDisconnectBroadcast()
                     }
                     Event.Type.ERROR -> {
-                        isConnected = false
                         Log.e(TAG, "onConnectionError")
+                        showToast("서버와의 연결이 불안정합니다")
                         resetLine()
                         offline()
-                        showToast("서버와의 연결이 불안정합니다")
+                        serviceDisposable.dispose()
+                        sendOnDisconnectBroadcast()
                     }
                 }
             })
@@ -212,23 +241,22 @@ class SocketService : Service() {
         disposeDisposable()
     }
 
-    private fun joinToTopic() {
-        addDisposable(stompClient.join("/sub/users/service")
+    private fun joinToTopicDisposable(): Disposable {
+        return stompClient.join("/sub/users/service")
             .doOnError { error -> Log.e(TAG, "onlineUserList error: $error") }
             .subscribe { userListJsonString ->
-                val userList = userListJsonString.toCleanString().toArrayList()
-                onlineUserList = ArrayList(userList)
+                onlineUserList = userListJsonString.toCleanString().toArrayList()
                 Log.e(TAG, "onlineUserList: $onlineUserList")
 
                 // 브로드캐스트
-                sendUserListBroadcast(onlineUserList)
-            })
+                sendAccountFragBroadcast(onlineUserList)
+            }
     }
 
     private fun resetLine() {
         Log.e(TAG, "resetLine")
         onlineUserList = null
-        sendUserListBroadcast(onlineUserList)
+        sendAccountFragBroadcast(onlineUserList)
     }
 
     private fun online() {
@@ -256,12 +284,12 @@ class SocketService : Service() {
     fun logout() {
         Log.e(TAG, "logout")
         addDisposable(stompClient.send(
-            "/users/offline",
+            "/pub/users/offline",
             "${pref.userIdx}"
         )
             .doOnError { error -> Log.e(TAG, "offline error : $error") }
             .doAfterNext { pref.resetUserId() }
-            .subscribe { })
+            .subscribe { Log.e(TAG, "logout complete") })
 
     }
 

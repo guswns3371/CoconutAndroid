@@ -50,11 +50,12 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
         override fun onReceive(p0: Context?, p1: Intent?) {
             when (p1?.action) {
                 BroadCastIntentID.SEND_USER_LIST -> {
-                    val userList = p1.getSerializableExtra(IntentID.RECEIVE_USER_LIST) as ArrayList<String>?
+                    val userList =
+                        p1.getSerializableExtra(IntentID.RECEIVE_USER_LIST) as ArrayList<String>?
                     Log.e(TAG, "onReceive: SEND_BROADCAST : $userList")
                     recyclerAdapter.updateUserStateArrayList(userList)
                 }
-                else -> { Log.e(TAG, "onReceive: 뭐징?") }
+                else -> { }
             }
         }
     }
@@ -191,15 +192,11 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     }
 
     private fun registerReceiver() {
-        registerBroadcastReceiver(activity,IntentFilter(BroadCastIntentID.SEND_USER_LIST))
+        registerBroadcastReceiver(activity, IntentFilter(BroadCastIntentID.SEND_USER_LIST))
     }
 
     private fun unregisterReceiver() {
         unregisterBroadcastReceiver(activity)
-    }
-
-    fun getReceiver(): BroadcastReceiver {
-        return mBroadcastReceiver
     }
 
     fun socketForUserStatus() {

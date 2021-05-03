@@ -49,8 +49,9 @@ fun String.toCleanString(): String = this
     .replace("\\r\\n|\\r|\\n|\\n\\r".toRegex(), "")
     .replace("[", "")
     .replace("]", "")
+    .replace(" ","")
 
-fun String.toArrayList(): List<String> = this.split(",").toList()
+fun String.toArrayList(): ArrayList<String> = ArrayList(this.split(",").toList())
 
 fun String.toHTTPString(): String =
     if (this.startsWith("http")) this

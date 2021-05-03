@@ -63,9 +63,12 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
 
     private val compositeDisposable = CompositeDisposable()
 
-
     fun addDisposable(disposable: Disposable) {
         compositeDisposable.add(disposable)
+    }
+
+    fun clearDisposable() {
+        compositeDisposable.clear()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,8 +84,8 @@ abstract class BaseKotlinActivity<T : ViewDataBinding, R : BaseKotlinViewModel> 
     }
 
     override fun onDestroy() {
-        compositeDisposable.clear()
         super.onDestroy()
+        compositeDisposable.dispose()
     }
 
     private fun snackbarObserving() {

@@ -21,10 +21,6 @@ class ChatViewModel(private val myRepository: MyRepository) : BaseKotlinViewMode
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it?.run {
-                    forEach {chatList ->
-                        val info = chatList.chatRoomInfo!!
-                        Log.e(TAG, "getChatRoomLists response : [${chatList.chatRoomId} 번방] ${chatList.chatRoomName} ${info.lastMessage} ${info.lastTime}\n")
-                    }
                     _chatListResponseLiveData.postValue(this)
                 }
             },{

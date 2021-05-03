@@ -8,8 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import com.example.coconut.util.showToast
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
-abstract class BaseKotlinFragment<T : ViewDataBinding, R : BaseKotlinViewModel>  : Fragment() {
+abstract class BaseKotlinFragment<T : ViewDataBinding, R : BaseKotlinViewModel> : Fragment() {
 
     lateinit var viewDataBinding: T
 
@@ -24,11 +26,15 @@ abstract class BaseKotlinFragment<T : ViewDataBinding, R : BaseKotlinViewModel> 
      */
     abstract val viewModel: R
 
-    abstract val baseToolBar : Toolbar?
+    abstract val baseToolBar: Toolbar?
 
-    fun setToolbarTitle(title : String) { baseToolBar?.let { it.title = title } }
+    fun setToolbarTitle(title: String) {
+        baseToolBar?.let { it.title = title }
+    }
 
-    fun showToast(message : String) { activity?.showToast(message) }
+    fun showToast(message: String) {
+        activity?.showToast(message)
+    }
 
 
     /**
@@ -52,6 +58,15 @@ abstract class BaseKotlinFragment<T : ViewDataBinding, R : BaseKotlinViewModel> 
      */
     abstract fun initAfterBinding()
 
+    private val compositeDisposable = CompositeDisposable()
+
+    fun addDisposable(disposable: Disposable) {
+        compositeDisposable.add(disposable)
+    }
+
+    fun clearDisposable() {
+        compositeDisposable.clear()
+    }
 
     abstract fun setBaseToolbarItemClickListener(itemId: Int)
 
@@ -91,6 +106,11 @@ abstract class BaseKotlinFragment<T : ViewDataBinding, R : BaseKotlinViewModel> 
          * (destroy all menu and re-call onCreateOptionsMenu)
          * */
         activity?.invalidateOptionsMenu()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.dispose()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
