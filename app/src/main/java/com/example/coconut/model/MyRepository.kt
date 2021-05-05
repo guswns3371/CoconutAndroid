@@ -57,4 +57,5 @@ interface MyRepository {
     fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse>
 
     fun getChatRoomLists(userId: String?): Single<ArrayList<ChatRoomListResponse>>
+
 }

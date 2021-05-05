@@ -14,11 +14,11 @@ interface ChatAPI {
     @POST("/api/chat")
     @Multipart
     fun sendMessage(
-        @Part("chatRoomId") chatRoomId : String?,
-        @Part("chatUserId") chatUserId : String?,
-        @Part("content") content : String?,
-        @Part images : ArrayList<MultipartBody.Part?>?
-    ) : Single<ChatRoomDataResponse>
+        @Part("chatRoomId") chatRoomId: String?,
+        @Part("chatUserId") chatUserId: String?,
+        @Part("content") content: String?,
+        @Part images: ArrayList<MultipartBody.Part?>?
+    ): Single<ChatRoomDataResponse>
 
     @POST("/api/chat/room/make")
     fun makeChatRoom(
@@ -28,15 +28,15 @@ interface ChatAPI {
     @POST("/api/chat/room/info")
     fun getChatRoomData(
         @Body chatRoomDataRequest: ChatRoomDataRequest
-    ) : Single<ChatRoomDataResponse>
+    ): Single<ChatRoomDataResponse>
 
     @GET("/api/chat/{chatRoomId}")
     fun getChatHistory(
-        @Path("chatRoomId") chatRoomId : String?
+        @Path("chatRoomId") chatRoomId: String?
     ): Single<ArrayList<ChatHistoryResponse>>
 
     @GET("/api/chat/room/list/{userId}")
     fun getChatRoomLists(
-        @Path("userId") userId : String?
-    ) : Single<ArrayList<ChatRoomListResponse>>
+        @Path("userId") userId: String?
+    ): Single<ArrayList<ChatRoomListResponse>>
 }

@@ -55,7 +55,8 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
                     Log.e(TAG, "onReceive: SEND_BROADCAST : $userList")
                     recyclerAdapter.updateUserStateArrayList(userList)
                 }
-                else -> { }
+                else -> {
+                }
             }
         }
     }
@@ -73,11 +74,6 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
             socket = binder.getService().getSocket()
             stompClient = binder.getService().getStompClient()
             isBind = true
-
-            // 여기서 socket on을 해줘야 됨
-            // frag의 onCreateView 보다 onServiceConnected 가 느리므로
-            // socketForUserStatus()
-            registerReceiver()
         }
     }
 
@@ -88,36 +84,12 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
         viewDataBinding.viewModel = viewModel
         viewDataBinding.lifecycleOwner = this
 
-        //서비스 바운딩 시작 => 이제부터 service 객체 사용가능
-        //activity?.bindService(Intent(activity,SocketService::class.java),serviceConn, AppCompatActivity.BIND_AUTO_CREATE)
-        bindService(activity)
-
         setToolbarTitle(getString(R.string.title_account))
         viewDataBinding.root.findViewById<RecyclerView>(R.id.account_recycler_view).apply {
             layoutManager = LinearLayoutManager(activity!!)
             adapter = recyclerAdapter
             setHasFixedSize(true)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.e(TAG, "onStart")
-        viewModel.getAllAccounts()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.e(TAG, "onDestroy")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Log.e(TAG, "onDestroyView")
-
-        unregisterReceiver()
-        //서비스 바운딩 종료 => 바운딩했던 곳에서 unbindService를 해줘야한다
-        unbindService(activity)
     }
 
     override fun initDataBinding() {
@@ -149,6 +121,24 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     }
 
     override fun initAfterBinding() {
+        registerReceiver()
+        bindService(activity)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e(TAG, "onStart")
+        viewModel.getAllAccounts()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver()
+        unbindService(activity)
     }
 
     override fun setBaseToolbarItemClickListener(itemId: Int) {

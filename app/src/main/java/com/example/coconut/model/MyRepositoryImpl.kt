@@ -113,4 +113,5 @@ class MyRepositoryImpl(
             : Single<ArrayList<ChatRoomListResponse>> {
         return chatAPI.getChatRoomLists(userId)
     }
+
 }

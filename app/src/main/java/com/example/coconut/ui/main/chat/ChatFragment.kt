@@ -73,9 +73,14 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         override fun onReceive(p0: Context?, p1: Intent?) {
             when (p1?.action) {
                 BroadCastIntentID.SEND_ON_CONNECT -> {
-                    socketForChatListUpdate()
+                    if (isBind) {
+                        socketForChatListUpdate()
+                    }
                 }
                 BroadCastIntentID.SEND_ON_DISCONNECT -> {
+                    clearDisposable()
+                }
+                BroadCastIntentID.SEND_ON_ERROR -> {
                     clearDisposable()
                 }
                 else -> {
@@ -84,40 +89,9 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         }
     }
 
-    private fun socketForChatListUpdate() {
-        if (stompClient == null) Log.e(TAG, "onStompClient is null")
-        stompClient?.apply {
-            // 안읽은 메시지가 있는 경우
-            addDisposable(this.join("/sub/chat/frag/$myIdPref")
-                .doOnError { error -> Log.e(TAG, "socketForChatListUpdate error: $error") }
-                .subscribe {
-                    activity?.runOnUiThread {
-                        Log.e(TAG, "socketForChatListUpdate: $it")
-                        Thread.sleep(10)
-                        viewModel.getChatRoomLists(myIdPref)
-                    }
-                })
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.getChatRoomLists(myIdPref)
-    }
-
-    override fun onStop() {
-        Log.e(TAG, "onStop")
-        super.onStop()
-        clearDisposable()
-    }
-
     override fun initStartView() {
         viewDataBinding.viewModel = viewModel
         viewDataBinding.lifecycleOwner = this
-
-        registerReceiver()
-
-        bindService(activity)
 
         myIdPref = pref.userIdx!!
 
@@ -144,15 +118,42 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
     override fun initAfterBinding() {
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        unregisterReceiver()
+    private fun socketForChatListUpdate() {
+        if (stompClient == null) Log.e(TAG, "onStompClient is null")
+        stompClient?.apply {
+            // 안읽은 메시지가 있는 경우
+            addDisposable(this.join("/sub/chat/frag/$myIdPref")
+                .doOnError { error -> Log.e(TAG, "socketForChatListUpdate error: $error") }
+                .subscribe {
+                    activity?.runOnUiThread {
+                        Log.e(TAG, "socketForChatListUpdate: $it")
+                        Thread.sleep(10)
+                        viewModel.getChatRoomLists(myIdPref)
+                    }
+                })
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver()
+        bindService(activity)
+        viewModel.getChatRoomLists(myIdPref)
+    }
+
+    override fun onStop() {
+        Log.e(TAG, "onStop")
+        super.onStop()
+        clearDisposable()
         unbindService(activity)
+        isBind = false
+        unregisterReceiver()
     }
 
     private fun registerReceiver() {
         IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
             it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
             registerBroadcastReceiver(activity!!, it)
         }
     }

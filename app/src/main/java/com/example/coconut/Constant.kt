@@ -28,6 +28,7 @@ class BroadCastIntentID {
         const val SEND_LOGOUT = "SEND_LOGOUT"
         const val SEND_ON_CONNECT = "SEND_ON_CONNECT"
         const val SEND_ON_DISCONNECT = "SEND_ON_DISCONNECT"
+        const val SEND_ON_ERROR = "SEND_ON_ERROR"
     }
 }
 class IntentID{

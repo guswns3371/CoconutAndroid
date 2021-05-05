@@ -7,6 +7,8 @@ import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -50,6 +52,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val pref: MyPreference by inject()
     private val recyclerAdapter: InnerChatRecyclerAdapter by inject()
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
+    private var imm: InputMethodManager? = null
     private var progressDialog: Dialog? = null
     private var isOkToSend = false
     private var isEndOfHistory: Boolean = true
@@ -71,18 +74,22 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             socket = binder.getService().getSocket()
             stompClient = binder.getService().getStompClient()
             isBind = true
-
         }
     }
     override val mBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
             when (p1?.action) {
                 BroadCastIntentID.SEND_ON_CONNECT -> {
-                    onStompSubscribe()
-                    onConnect()
+                    if (isBind) {
+                        onStompSubscribe()
+                        onConnect()
+                    }
                 }
                 BroadCastIntentID.SEND_ON_DISCONNECT -> {
                     onDisconnect()
+                    clearDisposable()
+                }
+                BroadCastIntentID.SEND_ON_ERROR -> {
                     clearDisposable()
                 }
                 else -> {
@@ -105,6 +112,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         intent.getStringExtra(IntentID.CHAT_ROOM_TITLE)?.let {
             setToolbarTitle(it)
         }
+        imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager?
 
         chat_recycler_view.apply {
             layoutManager = LinearLayoutManager(this@InnerChatActivity).apply {
@@ -125,10 +133,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 }
             })
         }
-
-        registerReceiver()
-
-        bindService(this)
     }
 
     override fun initDataBinding() {
@@ -237,6 +241,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             isEndOfHistory = true
         }
 
+        registerReceiver()
+
+        bindService(this)
+
         // roomID와 fixedPeopleList 를 설정한다
         chatRoomMembers = whereChatFrom()
 
@@ -253,6 +261,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         disableSendButton()
     }
 
+    override fun onStart() {
+        super.onStart()
+        onStompSubscribe()
+    }
 
     override fun onResume() {
         super.onResume()
@@ -268,7 +280,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
     override fun onStop() {
         super.onStop()
-        clearDisposable()
     }
 
     override fun onDestroy() {
@@ -282,18 +293,19 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private fun onStompSubscribe() {
         if (stompClient == null) Log.e(TAG, "onStompClient is null")
         stompClient?.apply {
+
+            // add하기 전에 clear한다
+            clearDisposable()
+
             // 채팅방 입장,퇴장할 때
             addDisposable(this.join("/sub/chat/room/$roomID")
                 .doOnError { error -> Log.e(TAG, "onStompSubscribe error: $error") }
                 .subscribe { message ->
                     readMembers = ArrayList(message.toCleanString().toArrayList())
                     Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
-
-                    runOnUiThread {
-                        Thread.sleep(30)
-                        /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
-                        viewModel.updateReadMembers(roomID)
-                    }
+                    Thread.sleep(30)
+                    /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
+                    viewModel.updateReadMembers(roomID)
                 })
 
 
@@ -323,17 +335,13 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     }
 
     private fun onConnect() {
-        runOnUiThread {
-            enterChatRoom()
-            enableSendButton()
-        }
+        enterChatRoom()
+        enableSendButton()
     }
 
     private fun onDisconnect() {
-        runOnUiThread {
-            disableSendButton()
-            exitChatRoom()
-        }
+        disableSendButton()
+        exitChatRoom()
     }
 
     private fun enterChatRoom() {
@@ -480,6 +488,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private fun registerReceiver() {
         IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
             it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
             registerBroadcastReceiver(this, it)
         }
     }
@@ -508,6 +517,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         isOkToSend = true
     }
 
+    private fun hideKeyboard() {
+        imm?.hideSoftInputFromWindow(chat_edit_text.windowToken, 0)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.inner_chat_menu, menu)
         return true
@@ -516,6 +529,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_info -> {
+                hideKeyboard()
                 drawer_layout.openDrawer(GravityCompat.END)
                 return true
             }

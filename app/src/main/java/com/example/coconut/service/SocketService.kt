@@ -50,7 +50,7 @@ class SocketService : Service() {
     private var socket: Socket? = null
     private lateinit var stompClient: StompClient
     private var compositeDisposable: CompositeDisposable? = null
-    private lateinit var serviceDisposable: Disposable
+    private var serviceDisposable: Disposable? = null
 
     private var onlineUserList: ArrayList<String>? by Delegates.observable(null) { property, oldValue, newValue ->
         Log.e(TAG, "onlineUserList observable old: $oldValue")
@@ -191,6 +191,7 @@ class SocketService : Service() {
 
         IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
             it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
             registerReceiver(innerChatActivityReceiver, it)
             registerReceiver(chatFragReceiver, it)
         }
@@ -221,7 +222,7 @@ class SocketService : Service() {
                         showToast("서버와의 연결이 끊어졌습니다")
                         resetLine()
                         offline()
-                        serviceDisposable.dispose()
+                        serviceDisposable?.dispose()
                         sendOnDisconnectBroadcast()
                     }
                     Event.Type.ERROR -> {
@@ -229,7 +230,7 @@ class SocketService : Service() {
                         showToast("서버와의 연결이 불안정합니다")
                         resetLine()
                         offline()
-                        serviceDisposable.dispose()
+                        serviceDisposable?.dispose()
                         sendOnDisconnectBroadcast()
                     }
                 }

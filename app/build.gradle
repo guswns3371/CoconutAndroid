@@ -44,6 +44,7 @@ android {
     }
 
     signingConfigs {
+        // keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias secret -storepass secret -keypass secret
         secret {
             storeFile file("${rootDir}/secret.keystore")
             storePassword "secret"

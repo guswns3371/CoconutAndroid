@@ -15,3 +15,5 @@
 
 # keep secret files out of git
 /secret.*
+secret.keystore
+secret.gradle

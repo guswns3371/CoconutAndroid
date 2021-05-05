@@ -10,35 +10,36 @@ import com.example.coconut.util.MyPreference
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class AccountViewModel(private val myRepository: MyRepository,
-                       private val pref: MyPreference) : BaseKotlinViewModel() {
+class AccountViewModel(
+    private val myRepository: MyRepository,
+    private val pref: MyPreference
+) : BaseKotlinViewModel() {
 
     private val TAG = "AccountViewModel"
 
     private val _userDataResponseLiveData = MutableLiveData<ArrayList<UserDataResponse>>()
     val userDataResponseLiveData: LiveData<ArrayList<UserDataResponse>> = _userDataResponseLiveData
 
-    fun getAllAccounts(){
-        pref.userIdx?.let { id->
+    fun getAllAccounts() {
+        pref.userIdx?.let { id ->
             addDisposable(
                 myRepository.getAccountData(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it.run {
-                        if (it.size>0){
-                            Log.e(TAG, "response : \n${toString()}")
-                            _userDataResponseLiveData.postValue(this)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        it.run {
+                            if (it.size > 0) {
+                                Log.e(TAG, "response : \n${toString()}")
+                                _userDataResponseLiveData.postValue(this)
+                            }
                         }
-                    }
-                },{
-                    Log.e(TAG, "response error, message : ${it.message}")
-                })
+                    }, {
+                        Log.e(TAG, "response error, message : ${it.message}")
+                    })
             )
         }
 
     }
-
 
 
 }

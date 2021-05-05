@@ -62,6 +62,11 @@ fun ArrayList<String>.addIfNotInclude(string: String) {
         this.add(string)
 }
 
+fun <T> Collection<T>.filterNotIn(collection: Collection<T>): Collection<T> {
+    val set = collection.toSet()
+    return filterNot { set.contains(it) }
+}
+
 fun ArrayList<String>.showElements(): String {
     var str = ""
     for (a: String in this)

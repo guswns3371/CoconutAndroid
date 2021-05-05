@@ -28,7 +28,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) : RecyclerView.Ad
         fun onBind(item : ChatHistoryResponse){
             itemView.run {
                 val userInfo = item.userInfo
-                val count = fixedPeopleList.size - stringToArrayList(item.readMembers).size
+                val count = fixedPeopleList.size - item.readMembers.toInt()
                 when(userInfo.id == pref.userIdx){
                     true->{
                         // 유저편 view (내가 보낸 메시지)
