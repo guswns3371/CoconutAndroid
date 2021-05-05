@@ -22,7 +22,7 @@ class LogoActivity : AppCompatActivity() {
     }
 
     private val pref : MyPreference by inject()
-    private val viewModel : LoginViewModel by viewModel()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +40,6 @@ class LogoActivity : AppCompatActivity() {
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
                 }
                 false -> {
-                    pref.fcmToken?.let {
-                        viewModel.sendFcmTokenToServer(pref.userIdx!!, it)
-                    }
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                 }
             }

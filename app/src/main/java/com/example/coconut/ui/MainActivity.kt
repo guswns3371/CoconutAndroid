@@ -29,15 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-//        registerSocketReceiver()
-    }
-
-    override fun onPause() {
-//        unregisterSocketReceiver()
-        super.onPause()
-    }
     override fun onDestroy() {
         super.onDestroy()
         //서비스 종료

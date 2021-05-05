@@ -22,6 +22,7 @@ import com.example.coconut.databinding.FragmentAccountBinding
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.service.SocketService
 import com.example.coconut.ui.auth.login.LoginActivity
+import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.ui.setting.SettingActivity
 import com.example.coconut.util.MyPreference
 import com.example.coconut.util.showElements
@@ -38,8 +39,10 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     private val TAG = "AccountFragment"
     override val layoutResourceId: Int = R.layout.fragment_account
     override val viewModel: AccountViewModel by viewModel()
+    private val loginViewModel : LoginViewModel by viewModel()
     private lateinit var list: ArrayList<UserDataResponse>
     private val recyclerAdapter: AccountRecyclerAdapter by inject()
+
     private val pref: MyPreference by inject()
 
     override var isBind: Boolean = false
@@ -123,6 +126,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     override fun initAfterBinding() {
         registerReceiver()
         bindService(activity)
+        loginViewModel.sendFcmTokenToServer(pref.userIdx!!, pref.fcmToken!!)
     }
 
     override fun onStart() {
