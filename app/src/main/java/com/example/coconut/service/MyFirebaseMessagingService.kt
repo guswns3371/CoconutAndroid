@@ -17,6 +17,7 @@ import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.chat.FcmTokenRequest
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
+import com.example.coconut.util.toHTTPString
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,11 +26,12 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
 
-class MyFirebaseMessagingService  : FirebaseMessagingService() {
+class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val pref : MyPreference by inject()
-    private val myRepository : MyRepository by inject()
+    private val pref: MyPreference by inject()
+    private val myRepository: MyRepository by inject()
     private val TAG = MyFirebaseMessagingService::class.java.simpleName
+
     /**
      * Called when message is received.
      *
@@ -85,7 +87,6 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
     // [END on_new_token]
 
 
-
     /**
      * Schedule async work using WorkManager.
      */
@@ -136,7 +137,7 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         => fcmToken()를 통해 서버에 전달 (LogoActivity)
          */
         pref.userIdx?.let {
-            sendFcmTokenToServer(it,pref.fcmToken)
+            sendFcmTokenToServer(it, pref.fcmToken)
         }
 
     }
@@ -146,12 +147,12 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
      *
      * @param message FCM message body received.
      */
-    private fun sendNotification(data: Map<String,String>) {
-        Log.e(TAG,"sendNotification")
+    private fun sendNotification(data: Map<String, String>) {
+        Log.e(TAG, "sendNotification")
         val intent = Intent(this, InnerChatActivity::class.java)
-        intent.putExtra(IntentID.CHAT_MODE,IntentID.CHAT_FROM_NOTIFICATION)
-        intent.putExtra(IntentID.CHAT_ROOM_ID,data["room_id"])
-        intent.putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST,data["room_people"])
+        intent.putExtra(IntentID.CHAT_MODE, IntentID.CHAT_FROM_NOTIFICATION)
+        intent.putExtra(IntentID.CHAT_ROOM_ID, data["roomId"])
+        intent.putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST, data["roomPeople"])
         /**
          * manifests 에서
          * InnerChatActivity 속에  android:noHistory="true" 속성 추가하면
@@ -165,8 +166,8 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         )
 
         val bitmapImage = Glide.with(this).asBitmap()
-            .load(Constant.BASE_URL+data["user_image"])
-            .transform(CenterCrop(),RoundedCorners(25))
+            .load(data["userImage"]?.toHTTPString())
+            .transform(CenterCrop(), RoundedCorners(25))
             .submit().get()
 
         val channelId = getString(R.string.default_notification_channel_id)
@@ -197,35 +198,43 @@ class MyFirebaseMessagingService  : FirebaseMessagingService() {
         }
 
         // data["id"] 값으로 notification id를 설정하면 그룹화 된다
-        data["room_id"]?.toInt()?.let { notificationManager.notify(it/* ID of notification */, notificationBuilder.build()) }
+        data["roomId"]?.toInt()?.let {
+            notificationManager.notify(
+                it/* ID of notification */,
+                notificationBuilder.build()
+            )
+        }
     }
 
-    private fun createNotificationChannel(){
+    private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create channel to show notifications.
             val channelId = getString(R.string.default_notification_channel_id)
             val channelName = getString(R.string.default_notification_channel_name)
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(
-                NotificationChannel(channelId,
-                    channelName, NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(
+                    channelId,
+                    channelName, NotificationManager.IMPORTANCE_HIGH
+                )
             )
         }
     }
 
-    private fun sendFcmTokenToServer(id : String, token : String?){
+    private fun sendFcmTokenToServer(id: String, token: String?) {
         CompositeDisposable().add((myRepository.sendFcmTokenToServer(
-                FcmTokenRequest(id,token)
-            )
+            FcmTokenRequest(id, token)
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 it?.run {
                     Log.e(TAG, "response : ${toString()}")
                 }
-            },{
+            }, {
                 Log.e(TAG, "response error, message : ${it.message}")
-            })))
+            }))
+        )
 
     }
 }
