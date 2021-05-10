@@ -152,6 +152,15 @@
                     android:textColor="@color/PrimaryColorText"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/user_name_edit_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="108dp"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="invisible"
+                    app:srcCompat="@drawable/ic_edit_location_black_24dp" />
             </LinearLayout>
 
             <TextView
@@ -222,17 +231,6 @@
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/user_name_edit_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="116dp"
-                android:layout_marginBottom="16dp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
-                app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
-                app:srcCompat="@drawable/ic_edit_location_black_24dp" />
 
             <TextView
                 android:id="@+id/user_msg"

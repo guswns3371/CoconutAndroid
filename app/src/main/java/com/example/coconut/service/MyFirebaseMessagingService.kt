@@ -197,7 +197,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // data["id"] 값으로 notification id를 설정하면 그룹화 된다
+        // data["roomId"] 값으로 notification id를 설정하면 그룹화 된다
         data["roomId"]?.toInt()?.let {
             notificationManager.notify(
                 it/* ID of notification */,

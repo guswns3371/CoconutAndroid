@@ -41,7 +41,6 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         get() = R.layout.fragment_chat
     override val viewModel: ChatViewModel by viewModel()
     private val recyclerAdapter: ChatListRecyclerAdapter by inject()
-    private lateinit var chatRoomRoomList: ArrayList<ChatRoomListResponse>
 
     private val pref: MyPreference by inject()
     override val baseToolBar: Toolbar?
@@ -106,45 +105,45 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
     }
 
     override fun initDataBinding() {
-        viewModel.chatRoomListResponseLiveData.observe(this, Observer {
-            chatRoomRoomList = arrayListOf()
-            it.forEach { chatList ->
-                chatRoomRoomList.add(chatList)
-            }
-            recyclerAdapter.addChatList(chatRoomRoomList)
+        viewModel.chatRoomListResponseLiveData.observe(this, {
+            recyclerAdapter.addChatList(it)
         })
     }
 
     override fun initAfterBinding() {
+        registerReceiver()
+        bindService(activity)
     }
 
     private fun socketForChatListUpdate() {
         if (stompClient == null) Log.e(TAG, "onStompClient is null")
         stompClient?.apply {
+
+            clearDisposable()
+
             // 안읽은 메시지가 있는 경우
             addDisposable(this.join("/sub/chat/frag/$myIdPref")
                 .doOnError { error -> Log.e(TAG, "socketForChatListUpdate error: $error") }
                 .subscribe {
-                    activity?.runOnUiThread {
-                        Log.e(TAG, "socketForChatListUpdate: $it")
-                        Thread.sleep(10)
-                        viewModel.getChatRoomLists(myIdPref)
-                    }
+                    Log.e(TAG, "socketForChatListUpdate: $it")
+                    Thread.sleep(15)
+                    viewModel.getChatRoomLists(myIdPref)
                 })
         }
     }
 
     override fun onStart() {
         super.onStart()
-        registerReceiver()
-        bindService(activity)
         viewModel.getChatRoomLists(myIdPref)
     }
 
     override fun onStop() {
         Log.e(TAG, "onStop")
         super.onStop()
-        clearDisposable()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
         unbindService(activity)
         isBind = false
         unregisterReceiver()

@@ -100,7 +100,7 @@ class SocketService : Service() {
             .connectTimeout(10, TimeUnit.SECONDS)
             .build()
         try {
-            // Spring Boot WebSocket과 연결
+            // Spring Boot WebSocket 과 연결
             stompClient = StompClient(client, intervalMillis)
                 .apply { this@apply.url = Constant.STOMP_URL }
         } catch (e: Exception) {
