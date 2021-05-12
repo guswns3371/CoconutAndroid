@@ -193,6 +193,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
         unregisterBroadcastReceiver(activity)
     }
 
+    /**
     fun socketForUserStatus() {
         if (socket == null) Log.e(TAG, "socket is null")
         socket?.apply {
@@ -225,5 +226,6 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
             }
         }
     }
+    **/
 
 }

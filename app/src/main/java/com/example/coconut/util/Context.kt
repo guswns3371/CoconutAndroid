@@ -24,10 +24,6 @@ fun Context.showToast(msg: String, length: Int = Toast.LENGTH_SHORT) {
     toast(msg, length)
 }
 
-fun Context.toast(id: Int, length: Int = Toast.LENGTH_SHORT) {
-    toast(getString(id), length)
-}
-
 fun Context.toast(msg: String, length: Int = Toast.LENGTH_SHORT) {
     try {
         Handler(Looper.getMainLooper()).post {
@@ -125,23 +121,4 @@ private fun doToast(context: Context, message: String, length: Int) {
 
 fun Context.log(log: Any) {
     Log.e(this::class.java.simpleName, "$log")
-}
-
-@NonNull
-fun Context.prepareFilePart(fieldName: String, fileName: String?)
-        : MultipartBody.Part? {
-
-    return fileName?.let {
-        val file = File(it)
-        val requestFile =
-            RequestBody.create(MediaType.parse("multipart/form-data; boundary=$it"), file)
-        MultipartBody.Part.createFormData(fieldName, file.name, requestFile)
-    }
-}
-
-@NonNull
-fun Context.createPartFromString(descriptionString: String?): RequestBody? {
-    return descriptionString?.let {
-        RequestBody.create(MultipartBody.FORM, it)
-    }
 }

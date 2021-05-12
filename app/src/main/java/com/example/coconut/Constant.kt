@@ -55,6 +55,7 @@ class IntentID{
 
         const val PROFILE_IMAGE = 0
         const val BACKGROUND_IMAGE = 1
+        const val CHAT_IMAGE = 2
 
         const val RECEIVE_USER_LIST = "RECEIVE_USER_LIST"
         const val RECEIVE_LOGOUT = "RECEIVE_LOGOUT"
@@ -97,5 +98,12 @@ class SocketSend{
         const val CHATROOM_ENTER = "chat_room_enter"
         const val CHATROOM_EXIT = "chat_room_exit"
         const val CHAT_MESSAGE = "chat_message"
+    }
+}
+
+class MessageType{
+    companion object{
+        const val TEXT = "TEXT"
+        const val IMAGE = "IMAGE"
     }
 }

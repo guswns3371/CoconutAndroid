@@ -4,9 +4,6 @@ import com.example.coconut.model.request.account.AccountEditRequest
 import com.example.coconut.model.request.auth.EmailVerifyRequest
 import com.example.coconut.model.request.auth.LoginRequest
 import com.example.coconut.model.request.auth.RegisterRequest
-import com.example.coconut.model.request.chat.ChatMessageRequest
-import com.example.coconut.model.request.chat.FcmTokenRequest
-import com.example.coconut.model.request.chat.ChatRoomSaveRequest
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
@@ -18,9 +15,10 @@ import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.ChatAPI
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
-import com.example.coconut.model.request.chat.ChatRoomDataRequest
+import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import io.reactivex.Single
+import okhttp3.MultipartBody
 
 class MyRepositoryImpl(
     private val authAPI: AuthAPI,
@@ -112,6 +110,14 @@ class MyRepositoryImpl(
     override fun getChatRoomLists(userId: String?)
             : Single<ArrayList<ChatRoomListResponse>> {
         return chatAPI.getChatRoomLists(userId)
+    }
+
+    override fun uploadChatImages(chatUploadImageRequest: ChatUploadImageRequest): Single<ArrayList<String>> {
+        return chatAPI.uploadChatImages(
+            chatUploadImageRequest.userId,
+            chatUploadImageRequest.chatRoomId,
+            chatUploadImageRequest.images
+        )
     }
 
 }

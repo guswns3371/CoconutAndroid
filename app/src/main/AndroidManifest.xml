@@ -59,6 +59,7 @@
         <activity
             android:name=".ui.main.chat.inner.InnerChatActivity"
             android:windowSoftInputMode="adjustResize" />
+
         <activity android:name=".ui.ZoomableImageActivity" />
         <activity android:name=".ui.main.account.info.AccountInfoActivity" />
         <activity android:name=".ui.setting.SettingActivity" />

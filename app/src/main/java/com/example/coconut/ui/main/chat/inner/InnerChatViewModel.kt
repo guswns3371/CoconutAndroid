@@ -8,10 +8,12 @@ import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.chat.ChatMessageRequest
 import com.example.coconut.model.request.chat.ChatRoomDataRequest
 import com.example.coconut.model.request.chat.ChatRoomSaveRequest
+import com.example.coconut.model.request.chat.ChatUploadImageRequest
 import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import okhttp3.MultipartBody
 
 class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinViewModel() {
 
@@ -27,6 +29,10 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
     private val _chatUpdateReadMembersLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
     val chatUpdateReadMembersLiveData: LiveData<ArrayList<ChatHistoryResponse>> =
         _chatUpdateReadMembersLiveData
+
+    private val _chatUploadImagesLiveData = MutableLiveData<ArrayList<String>>()
+    val chatUploadImagesLiveData: LiveData<ArrayList<String>> =
+        _chatUploadImagesLiveData
 
     fun getChatHistory(chatRoomId: String?) {
         addDisposable(
@@ -60,9 +66,9 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
         )
     }
 
-    fun makeChatRoom(myId: String, people: ArrayList<String>) {
+    fun makeChatRoom(chatRoomSaveRequest: ChatRoomSaveRequest) {
         addDisposable(
-            myRepository.makeChatRoom(ChatRoomSaveRequest(myId, people))
+            myRepository.makeChatRoom(chatRoomSaveRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -76,9 +82,9 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
         )
     }
 
-    fun getChatRoomData(myId: String, chatRoomId: String?, people: ArrayList<String>) {
+    fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest) {
         addDisposable(
-            myRepository.getChatRoomData(ChatRoomDataRequest(myId, chatRoomId, people))
+            myRepository.getChatRoomData(chatRoomDataRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -104,6 +110,22 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
                     }
                 }, {
                     Log.d(TAG, "sendMessage response error, message : ${it.message}")
+                })
+        )
+    }
+
+    fun uploadChatImages(chatUploadImageRequest: ChatUploadImageRequest) {
+        addDisposable(
+            myRepository.uploadChatImages(chatUploadImageRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it.run {
+                        Log.e(TAG, "response : \n${toString()}")
+                        _chatUploadImagesLiveData.postValue(this)
+                    }
+                }, {
+                    Log.e(TAG, "response error, message : ${it.message}")
                 })
         )
     }

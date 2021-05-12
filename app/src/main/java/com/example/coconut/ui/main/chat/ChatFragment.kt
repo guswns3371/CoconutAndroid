@@ -199,10 +199,12 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         menu.findItem(R.id.action_chat_add).isVisible = true
     }
 
+    /**
     private val onChatListUpdate = Emitter.Listener {
         activity?.runOnUiThread {
             viewModel.getChatRoomLists(myIdPref)
         }
     }
+    **/
 
 }

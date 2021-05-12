@@ -5,10 +5,7 @@ import com.example.coconut.model.request.auth.EmailVerifyRequest
 import com.example.coconut.model.request.auth.LoginRequest
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.request.auth.RegisterRequest
-import com.example.coconut.model.request.chat.ChatMessageRequest
-import com.example.coconut.model.request.chat.ChatRoomDataRequest
-import com.example.coconut.model.request.chat.ChatRoomSaveRequest
-import com.example.coconut.model.request.chat.FcmTokenRequest
+import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
@@ -18,6 +15,7 @@ import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import io.reactivex.Single
+import okhttp3.MultipartBody
 
 interface MyRepository {
 
@@ -57,5 +55,7 @@ interface MyRepository {
     fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse>
 
     fun getChatRoomLists(userId: String?): Single<ArrayList<ChatRoomListResponse>>
+
+    fun uploadChatImages(chatUploadImageRequest: ChatUploadImageRequest): Single<ArrayList<String>>
 
 }

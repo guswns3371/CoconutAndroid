@@ -81,8 +81,9 @@
                     <ImageView
                         android:id="@+id/chat_content_image_nm"
                         android:visibility="gone"
-                        android:layout_width="270dp"
+                        android:layout_width="260dp"
                         android:layout_height="260dp"
+
                         android:scaleType="centerCrop"
                         android:background="@drawable/image_round"
                         app:srcCompat="@drawable/black" />
@@ -202,9 +203,10 @@
 
                 <ImageView
                     android:id="@+id/chat_content_image_mine"
-                    android:layout_width="270dp"
-                    android:layout_height="260dp"
+                    android:layout_width="280dp"
+                    android:layout_height="280dp"
                     android:background="@drawable/image_round"
+                    android:padding="8dp"
                     android:scaleType="centerCrop"
                     android:visibility="gone"
                     app:srcCompat="@drawable/black" />

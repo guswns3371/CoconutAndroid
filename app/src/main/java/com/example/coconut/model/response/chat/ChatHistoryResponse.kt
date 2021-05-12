@@ -14,9 +14,10 @@ data class ChatHistoryResponse(
     @SerializedName("readMembers") var readMembers : String,
     @SerializedName("time") var time : String,
     @SerializedName("history") var history : String,
+    @SerializedName("chatImages") var chatImages : ArrayList<String>?,
     @SerializedName("messageType") var messageType : String?
 ) {
     override fun toString(): String {
-        return "ChatHistoryResponse(userInfo=$userInfo, chatRoomId='$chatRoomId', chatUserId='$chatUserId', readMembers='$readMembers', time='$time', history='$history', messageType=$messageType)"
+        return "ChatHistoryResponse(userInfo=$userInfo, chatRoomId='$chatRoomId', chatUserId='$chatUserId', readMembers='$readMembers', time='$time', history='$history', chatImages='$chatImages', messageType=$messageType)"
     }
 }

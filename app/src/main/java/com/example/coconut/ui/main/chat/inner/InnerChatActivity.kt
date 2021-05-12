@@ -1,5 +1,6 @@
 package com.example.coconut.ui.main.chat.inner
 
+import android.Manifest
 import android.app.Dialog
 import android.app.NotificationManager
 import android.content.*
@@ -7,9 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
@@ -22,22 +21,26 @@ import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.base.BroadcastReceiverManager
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.ActivityInnerChatBinding
+import com.example.coconut.model.request.chat.ChatRoomDataRequest
+import com.example.coconut.model.request.chat.ChatRoomSaveRequest
+import com.example.coconut.model.request.chat.ChatUploadImageRequest
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.socket.ChatRoomSocketData
 import com.example.coconut.model.socket.ChatMessageSocketData
 import com.example.coconut.service.SocketService
 import com.example.coconut.util.*
-import com.gmail.bishoybasily.stomp.lib.Event
 import kotlinx.android.synthetic.main.activity_inner_chat.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
-import org.json.JSONObject
 import com.gmail.bishoybasily.stomp.lib.StompClient
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
+import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import okhttp3.MultipartBody
 import java.lang.Exception
 
 class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChatViewModel>(),
@@ -52,10 +55,20 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val pref: MyPreference by inject()
     private val recyclerAdapter: InnerChatRecyclerAdapter by inject()
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
+
     private var imm: InputMethodManager? = null
     private var progressDialog: Dialog? = null
     private var isOkToSend = false
     private var isEndOfHistory: Boolean = true
+
+    private lateinit var myID: String
+    private var roomID: String? = null
+    private var chatRoomMembers: ArrayList<String> = arrayListOf()
+    private var readMembers: ArrayList<String> = arrayListOf()
+    private var chatHistoryList: ArrayList<ChatHistoryResponse> = arrayListOf()
+    private var memberInfoList: ArrayList<UserDataResponse> = arrayListOf()
+    private var chatImages: ArrayList<String?> = arrayListOf()
+
 
     override var isBind: Boolean = false
     override var socket: Socket? = null
@@ -97,12 +110,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
         }
     }
-    private lateinit var myID: String
-    private var roomID: String? = null
-    private var chatRoomMembers: ArrayList<String> = arrayListOf()
-    private var readMembers: ArrayList<String> = arrayListOf()
-    private var chatHistoryList: ArrayList<ChatHistoryResponse> = arrayListOf()
-    private var memberInfoList: ArrayList<UserDataResponse> = arrayListOf()
 
     override fun initStartView() {
 
@@ -112,7 +119,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         intent.getStringExtra(IntentID.CHAT_ROOM_TITLE)?.let {
             setToolbarTitle(it)
         }
-        imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
 
         chat_recycler_view.apply {
             layoutManager = LinearLayoutManager(this@InnerChatActivity).apply {
@@ -123,7 +130,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     isEndOfHistory =
-                        !recyclerView.canScrollVertically(1) || recyclerView.verticalScrollbarPosition == chat_recycler_view.adapter!!.itemCount - 1
+                        !recyclerView.canScrollVertically(1)
+                                || recyclerView.verticalScrollbarPosition == chat_recycler_view.adapter!!.itemCount - 1
 
                     if (!isEndOfHistory) {
                         scroll_bottom_btn.show()
@@ -147,11 +155,11 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 Log.e(TAG, "채팅방 id : $it")
                 roomID = it
 
-                //charRoomId를 받아야 socket을 열수있다
+                //charRoomId를 받아야 socket 을 열수있다
                 onStompSubscribe()
 
-                // notification을 cancel 시킨다
-                // notification id 가 chatRoomId이므로 chatRoomId받은 후에 실행
+                // notification 을 cancel 시킨다
+                // notification id 가 chatRoomId 이므로 chatRoomId 받은 후에 실행
                 cancelNotification()
             }
 
@@ -227,13 +235,49 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             recyclerAdapter.addChatItem(chatHistoryList)
 
         })
+
+        viewModel.chatUploadImagesLiveData.observe(this, { imageList ->
+            Log.e(TAG, "chatUploadImagesLiveData: $roomID")
+            roomID?.let {
+                sendMessage(
+                    ChatMessageSocketData(
+                        it, myID, null,
+                        chatRoomMembers, readMembers, imageList, MessageType.IMAGE
+                    )
+                )
+            }
+        })
     }
 
     override fun initAfterBinding() {
         //메시지 보내기
-        chat_send.setOnClickListener { sendMessage() }
+        chat_send.setOnClickListener {
+            roomID?.let {
+                sendMessage(
+                    ChatMessageSocketData(
+                        it, myID, chat_edit_text.text.toString(),
+                        chatRoomMembers, readMembers, null, MessageType.TEXT
+                    )
+                )
+            }
+        }
         // 키보드에서 완료버튼 누를때에도 메시지 보내기
-        chat_edit_text.onDone { sendMessage() }
+        chat_edit_text.onDone {
+            roomID?.let {
+                sendMessage(
+                    ChatMessageSocketData(
+                        it, myID, chat_edit_text.text.toString(),
+                        chatRoomMembers, readMembers, null, MessageType.TEXT
+                    )
+                )
+            }
+
+        }
+
+        chat_add_btn.setOnClickListener {
+            chatImages = arrayListOf()
+            selectImage(IntentID.CHAT_IMAGE)
+        }
 
         scroll_bottom_btn.setOnClickListener {
             scroll_bottom_btn.gone()
@@ -242,7 +286,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         }
 
         registerReceiver()
-
         bindService(this)
 
         // roomID와 fixedPeopleList 를 설정한다
@@ -251,10 +294,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         // 채팅방을 만든다
         if (roomID == null) {
             // 프로필에서 채팅하기 버튼을 클릭한 경우
-            viewModel.makeChatRoom(myID, chatRoomMembers)
+            viewModel.makeChatRoom(ChatRoomSaveRequest(myID, chatRoomMembers))
         } else {
             // 채팅방 목록에서 클릭한 경우
-            viewModel.getChatRoomData(myID, roomID, chatRoomMembers)
+            viewModel.getChatRoomData(ChatRoomDataRequest(myID, roomID, chatRoomMembers))
         }
 
         // 채팅방 id를 얻기 전까지 채팅버튼 비활성화
@@ -276,10 +319,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         super.onPause()
         //채팅방 나감
         exitChatRoom()
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 
     override fun onDestroy() {
@@ -376,30 +415,29 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         }
     }
 
-    private fun sendMessage() {
+    private fun sendMessage(chatMessageSocketData: ChatMessageSocketData) {
         if (!isOkToSend) {
             showToast("잠시만 기다려주세요")
             return
         }
 
         if (chat_edit_text.text.toString().isNotBlank()) {
-            roomID?.let { roomID ->
-
-                ChatMessageSocketData(
-                    roomID, myID, chat_edit_text.text.toString(),
-                    chatRoomMembers, readMembers, null
-                )
-                    .toJSONString()?.let {
-
-                        addDisposable(stompClient!!.send("/pub/chat/message", it)
-                            .doOnError { error -> Log.e(TAG, "message error : $error") }
-                            .subscribe { })
-
-                        chat_edit_text.text.clear()
-                    }
-
-                scrollToBottom()
+            chatMessageSocketData.toJSONString()?.let {
+                addDisposable(stompClient!!.send("/pub/chat/message", it)
+                    .doOnError { error -> Log.e(TAG, "message error : $error") }
+                    .subscribe { })
             }
+            chat_edit_text.text.clear()
+            scrollToBottom()
+        }
+
+        if (chatMessageSocketData.chatImages != null) {
+            chatMessageSocketData.toJSONString()?.let {
+                addDisposable(stompClient!!.send("/pub/chat/message", it)
+                    .doOnError { error -> Log.e(TAG, "message error : $error") }
+                    .subscribe { })
+            }
+            scrollToBottom()
         }
     }
 
@@ -419,6 +457,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     fixedList.add(it)
                 }
             }
+
             IntentID.CHAT_WITH_ONE_PARTNER -> {
                 // AccountInfo에서 채팅을 클릭한 것
                 // 1 : 1 채팅
@@ -430,6 +469,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 }
 
             }
+
             IntentID.CHAT_WITH_PEOPLE_FROM_CHAT_FRAG -> {
                 // chatfragment에서 들어옴
                 // 채팅방에서 나가기 할경우도 또는 새로 초대할경우
@@ -446,6 +486,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 }
 
             }
+
             IntentID.CHAT_WITH_PEOPLE_FROM_INVITING -> {
                 // 채팅방 막 만듦
                 // 여러 유저의 id가 넘어온다
@@ -457,11 +498,12 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     fixedList.add(myID)
                 }
             }
+
             IntentID.CHAT_FROM_NOTIFICATION -> {
                 // notification으로 들어올때
 
                 intent.getStringExtra(IntentID.CHAT_ROOM_ID)?.let {
-                    Log.e(TAG, "CHAT_FROM_NOTIFICATION")
+                    Log.e(TAG, "CHAT_FROM_NOTIFICATION 채팅방 id = $it")
                     roomID = it
                 }
 
@@ -471,6 +513,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     }
                 }
             }
+
             -1 -> {
                 Log.e(TAG, "CHAT_MODE ERROR")
                 throw Exception()
@@ -544,104 +587,190 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 drawer_layout.closeDrawer(GravityCompat.END)
             }
             false -> {
+                exitChatRoom()
                 super.onBackPressed()
             }
         }
     }
 
-    private fun onSocket() {
-        if (socket == null) Log.e(TAG, "socket is null")
-        socket?.apply {
-            Log.e(TAG, "onSocket $roomID 번방")
+    private fun selectImage(to: Int) {
+        val permissionListener = object : PermissionListener {
+            override fun onPermissionGranted() {
+                Log.e("cameraPermission", "Permission Granted")
 
-            on(SocketReceive.CHATROOM_ENTER + roomID, onChatRoomEnter)
-            on(SocketReceive.CHATROOM_EXIT + roomID, onChatRoomExit)
-            on(SocketReceive.CHAT_MESSAGE, onChatMessageReceive)
+                // 카메라 , 앨범 퍼미션 허가시
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    type = "image/*"
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    startActivityForResult(Intent.createChooser(this, "Select Picture"), to)
+                }
+            }
 
-            // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
-            on(Socket.EVENT_CONNECT, onConnect)
-            on(Socket.EVENT_DISCONNECT, onDisconnect)
+            override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                Log.e("cameraPermission", "Permission Denied : ${deniedPermissions.toString()}")
+            }
         }
+
+        TedPermission.with(applicationContext)
+            .setPermissionListener(permissionListener)
+            .setDeniedMessage(getString(R.string.permission_denied))
+            .setPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            )
+            .check()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != RESULT_OK)
+            return
+
+        when (requestCode) {
+            IntentID.CHAT_IMAGE -> {
+
+                data!!.clipData?.let { clipData ->
+                    for (i in 0 until clipData.itemCount) {
+                        try {
+                            val imageUri = clipData.getItemAt(i).uri
+                            chatImages.add(getPath(imageUri))
+                        } catch (e: Exception) {
+                            showToast("앨범에서 사진 가져오기 에러")
+                            Log.e(TAG, "앨범에서 사진 가져오기 에러 : ${e.message}")
+                        }
+                    }
+                }
+
+                data.data?.let { selectedImageUri ->
+                    try {
+                        chatImages.add(getPath(selectedImageUri))
+                        Log.e(TAG, "chatImage : $chatImages")
+
+                    } catch (e: Exception) {
+                        showToast("앨범에서 사진 가져오기 에러")
+                        Log.e(TAG, "앨범에서 사진 가져오기 에러 : ${e.message}")
+                    }
+                }
+
+                if (chatImages.size > 0) {
+                    val multipartList = arrayListOf<MultipartBody.Part?>()
+
+                    chatImages.forEachIndexed { index, imageUri ->
+                        multipartList.add(prepareFilePart("images", imageUri))
+                    }
+
+                    // 이미지 보내기
+                    viewModel.uploadChatImages(
+                        ChatUploadImageRequest(
+                            createPartFromString(myID),
+                            createPartFromString(roomID),
+                            multipartList
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+    private fun onSocket() {
+    if (socket == null) Log.e(TAG, "socket is null")
+    socket?.apply {
+    Log.e(TAG, "onSocket $roomID 번방")
+
+    on(SocketReceive.CHATROOM_ENTER + roomID, onChatRoomEnter)
+    on(SocketReceive.CHATROOM_EXIT + roomID, onChatRoomExit)
+    on(SocketReceive.CHAT_MESSAGE, onChatMessageReceive)
+
+    // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
+    on(Socket.EVENT_CONNECT, onConnect)
+    on(Socket.EVENT_DISCONNECT, onDisconnect)
+    }
     }
 
     private fun offSocket() {
-        if (socket == null) Log.e(TAG, "socket is null")
-        socket?.apply {
-            Log.e(TAG, "offSocket $roomID 번방")
+    if (socket == null) Log.e(TAG, "socket is null")
+    socket?.apply {
+    Log.e(TAG, "offSocket $roomID 번방")
 
-            off(SocketReceive.CHATROOM_ENTER + roomID, onChatRoomEnter)
-            off(SocketReceive.CHATROOM_EXIT + roomID, onChatRoomExit)
-            off(SocketReceive.CHAT_MESSAGE, onChatMessageReceive)
+    off(SocketReceive.CHATROOM_ENTER + roomID, onChatRoomEnter)
+    off(SocketReceive.CHATROOM_EXIT + roomID, onChatRoomExit)
+    off(SocketReceive.CHAT_MESSAGE, onChatMessageReceive)
 
-            // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
-            off(Socket.EVENT_CONNECT, onConnect)
-            off(Socket.EVENT_DISCONNECT, onDisconnect)
-        }
+    // 채팅방에서 네트워크 오류 발생시 나갔다가 들어오도록
+    off(Socket.EVENT_CONNECT, onConnect)
+    off(Socket.EVENT_DISCONNECT, onDisconnect)
+    }
     }
 
     private val onChatRoomEnter = Emitter.Listener {
-        runOnUiThread {
-            (it[0] as String).apply {
-                readMembers = arrayListOf()
+    runOnUiThread {
+    (it[0] as String).apply {
+    readMembers = arrayListOf()
 
-                this.split(",").toTypedArray().run {
-                    this.toCollection(ArrayList()).forEach {
-                        if (it.toCleanString() != "")
-                            readMembers.add(it.toCleanString())
-                    }
-                }
+    this.split(",").toTypedArray().run {
+    this.toCollection(ArrayList()).forEach {
+    if (it.toCleanString() != "")
+    readMembers.add(it.toCleanString())
+    }
+    }
 
-                Log.e(TAG, "[enter $roomID 번방] 현재사람들 ${readMembers.showElements()}")
-            }
+    Log.e(TAG, "[enter $roomID 번방] 현재사람들 ${readMembers.showElements()}")
+    }
 
-            /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
-            viewModel.getChatHistory(roomID)
-        }
+    /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
+    viewModel.getChatHistory(roomID)
+    }
     }
 
     private val onChatRoomExit = Emitter.Listener {
-        runOnUiThread {
-            (it[0] as String).apply {
-                readMembers = arrayListOf()
+    runOnUiThread {
+    (it[0] as String).apply {
+    readMembers = arrayListOf()
 
-                this.split(",").toTypedArray().run {
-                    this.toCollection(ArrayList()).forEach {
-                        if (it.toCleanString() != "")
-                            readMembers.add(it.toCleanString())
-                    }
-                }
+    this.split(",").toTypedArray().run {
+    this.toCollection(ArrayList()).forEach {
+    if (it.toCleanString() != "")
+    readMembers.add(it.toCleanString())
+    }
+    }
 
-                Log.e(TAG, "[exit $roomID 번방] 현재사람들 ${readMembers.showElements()}")
-            }
-        }
+    Log.e(TAG, "[exit $roomID 번방] 현재사람들 ${readMembers.showElements()}")
+    }
+    }
     }
 
     private val onConnect = Emitter.Listener {
-        runOnUiThread {
-            enterChatRoom()
-            enableSendButton()
-        }
+    runOnUiThread {
+    enterChatRoom()
+    enableSendButton()
+    }
     }
 
     private val onDisconnect = Emitter.Listener {
-        runOnUiThread {
-            disableSendButton()
-            exitChatRoom()
-        }
+    runOnUiThread {
+    disableSendButton()
+    exitChatRoom()
+    }
     }
 
     private val onChatMessageReceive = Emitter.Listener {
-        runOnUiThread {
-            (it[0] as JSONObject).apply {
-                Log.e(TAG, "[chat] received message : ${this["content"]}")
+    runOnUiThread {
+    (it[0] as JSONObject).apply {
+    Log.e(TAG, "[chat] received message : ${this["content"]}")
 
-                val message = this.toObject(ChatHistoryResponse::class.java)
-                chatHistoryList.add(message)
-                recyclerAdapter.addChatItem(chatHistoryList)
+    val message = this.toObject(ChatHistoryResponse::class.java)
+    chatHistoryList.add(message)
+    recyclerAdapter.addChatItem(chatHistoryList)
 
-                scrollToBottom()
-            }
-        }
+    scrollToBottom()
     }
+    }
+    }
+
+     **/
 
 }

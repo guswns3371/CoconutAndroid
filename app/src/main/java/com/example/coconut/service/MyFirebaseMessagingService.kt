@@ -10,7 +10,6 @@ import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.MyRepository
@@ -136,6 +135,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         앱이 다시 실행되고, pref.token 값이 null 일경우
         => fcmToken()를 통해 서버에 전달 (LogoActivity)
          */
+
         pref.userIdx?.let {
             sendFcmTokenToServer(it, pref.fcmToken)
         }
@@ -149,20 +149,25 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      */
     private fun sendNotification(data: Map<String, String>) {
         Log.e(TAG, "sendNotification")
-        val intent = Intent(this, InnerChatActivity::class.java)
-        intent.putExtra(IntentID.CHAT_MODE, IntentID.CHAT_FROM_NOTIFICATION)
-        intent.putExtra(IntentID.CHAT_ROOM_ID, data["roomId"])
-        intent.putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST, data["roomPeople"])
-        /**
-         * manifests 에서
-         * InnerChatActivity 속에  android:noHistory="true" 속성 추가하면
-         * 액티비티 스택에 쌓이지 않는다.
-         * */
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        val intent = Intent(this, InnerChatActivity::class.java).apply {
+            putExtra(IntentID.CHAT_MODE, IntentID.CHAT_FROM_NOTIFICATION)
+            putExtra(IntentID.CHAT_ROOM_ID, data["roomId"])
+            putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST, data["roomPeople"])
 
+            /**
+             * manifests 에서
+             * InnerChatActivity 속에  android:noHistory="true" 속성 추가하면
+             * 액티비티 스택에 쌓이지 않는다.
+             * */
+            addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+//            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+
+        // 각 노티를 클릭했을때 requestCode 를 고유한 값으로 구분하지 않으면
+        // 모두 동일한 값을 엑티비티로 전달하게 된다
         val pendingIntent = PendingIntent.getActivity(
-            this, 0 /* Request code */, intent,
-            PendingIntent.FLAG_ONE_SHOT
+            this, data["roomId"]!!.toInt() /* Request code */, intent,
+            PendingIntent.FLAG_CANCEL_CURRENT
         )
 
         val bitmapImage = Glide.with(this).asBitmap()
@@ -180,6 +185,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            /* data["roomId"] 값으로 notification id를 설정하면 그룹화 된다 */
+            .setGroup(data["roomId"])
+            .setGroupSummary(true)
             .setOnlyAlertOnce(false)
             .setContentIntent(pendingIntent)
 
@@ -197,13 +205,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // data["roomId"] 값으로 notification id를 설정하면 그룹화 된다
         data["roomId"]?.toInt()?.let {
             notificationManager.notify(
                 it/* ID of notification */,
                 notificationBuilder.build()
             )
         }
+
     }
 
     private fun createNotificationChannel() {
@@ -222,18 +230,19 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendFcmTokenToServer(id: String, token: String?) {
-        CompositeDisposable().add((myRepository.sendFcmTokenToServer(
-            FcmTokenRequest(id, token)
-        )
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                it?.run {
-                    Log.e(TAG, "response : ${toString()}")
-                }
-            }, {
-                Log.e(TAG, "response error, message : ${it.message}")
-            }))
+        CompositeDisposable().add(
+            (myRepository.sendFcmTokenToServer(
+                FcmTokenRequest(id, token)
+            )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.run {
+                        Log.e(TAG, "response : ${toString()}")
+                    }
+                }, {
+                    Log.e(TAG, "response error, message : ${it.message}")
+                }))
         )
 
     }
