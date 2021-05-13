@@ -48,11 +48,12 @@ var adapterPart = module {
     //factory : inject 시점에 해당 객체를 샐성한다
     single { AccountRecyclerAdapter() }
     factory { InnerChatRecyclerAdapter(get()) }
+    factory { ChatListRecyclerAdapter(get()) }
 
     /** single로 할지 factory로 할지 나중에 결정*/
-    factory { ChatListRecyclerAdapter(get()) }
     factory { AddChatRecyclerAdpater() }
     factory { InnerDrawerAdapter() }
+    factory { ZoomableRecyclerAdapter() }
 }
 
 var modelPart = module {

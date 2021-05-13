@@ -56,6 +56,8 @@ class IntentID{
         const val PROFILE_IMAGE = 0
         const val BACKGROUND_IMAGE = 1
         const val CHAT_IMAGE = 2
+        const val CHAT_IMAGES = "CHAT_IMAGES"
+        const val CHAT_IMAGE_INDEX = "CHAT_IMAGE_INDEX"
 
         const val RECEIVE_USER_LIST = "RECEIVE_USER_LIST"
         const val RECEIVE_LOGOUT = "RECEIVE_LOGOUT"

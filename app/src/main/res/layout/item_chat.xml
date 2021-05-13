@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/transparent_00"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/transparent_00"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/not_mine_linear"
-        android:layout_weight="1"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_gravity="start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_gravity="start"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="37dp"
@@ -35,9 +34,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:orientation="horizontal">
+            android:paddingEnd="10dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -48,75 +47,209 @@
                     android:id="@+id/chat_user_name_nm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13dp"
-                    android:textColor="@color/chat_around_text_color"
-                    android:paddingBottom="2dp"
                     android:paddingStart="2dp"
                     android:paddingEnd="2dp"
-                    android:text="Name" />
+                    android:paddingBottom="2dp"
+                    android:text="Name"
+                    android:textColor="@color/chat_around_text_color"
+                    android:textSize="13dp" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/chat_content_text_nm"
 
-                        android:textIsSelectable="true"
-                        android:linksClickable="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:autoLink="web"
 
                         android:background="@drawable/chat_round_not_mine"
 
-                        android:padding="8dp"
+                        android:linksClickable="true"
 
-                        android:textSize="15sp"
-                        android:textColor="@color/chat_content_text_color"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:maxWidth="250dp"
                         android:maxHeight="550dp"
-                        android:text="TextView" />
+                        android:padding="8dp"
+                        android:text="TextView"
+                        android:textColor="@color/chat_content_text_color"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp" />
 
-                    <ImageView
-                        android:id="@+id/chat_content_image_nm"
-                        android:visibility="gone"
-                        android:layout_width="260dp"
-                        android:layout_height="260dp"
+                    <LinearLayout
+                        android:id="@+id/chat_image_layout_for_nm"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:visibility="visible">
 
-                        android:scaleType="centerCrop"
-                        android:background="@drawable/image_round"
-                        app:srcCompat="@drawable/black" />
+                        <!-- 1개-->
+                        <LinearLayout
+                            android:id="@+id/chat_image_layout_for_one_nm"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm11"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+                        </LinearLayout>
+
+                        <!--2개-->
+                        <LinearLayout
+                            android:id="@+id/chat_image_layout_for_two_nm"
+                            android:layout_width="240dp"
+                            android:layout_height="120dp"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm21"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm22"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                        </LinearLayout>
+                        <!--3개-->
+                        <LinearLayout
+                            android:id="@+id/chat_image_layout_for_three_nm"
+                            android:layout_width="240dp"
+                            android:layout_height="80dp"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm31"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm32"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_nm33"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                        </LinearLayout>
+                        <!--4개-->
+                        <LinearLayout
+                            android:id="@+id/chat_image_layout_for_four_nm"
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="240dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:id="@+id/chat_content_image_nm41"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:background="@drawable/image_round"
+                                    android:scaleType="centerCrop"
+                                    app:srcCompat="@drawable/black" />
+
+                                <ImageView
+                                    android:id="@+id/chat_content_image_nm42"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:background="@drawable/image_round"
+                                    android:scaleType="centerCrop"
+                                    app:srcCompat="@drawable/black" />
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="240dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:id="@+id/chat_content_image_nm43"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:background="@drawable/image_round"
+                                    android:scaleType="centerCrop"
+                                    app:srcCompat="@drawable/black" />
+
+                                <ImageView
+                                    android:id="@+id/chat_content_image_nm44"
+                                    android:layout_width="120dp"
+                                    android:layout_height="120dp"
+                                    android:background="@drawable/image_round"
+                                    android:scaleType="centerCrop"
+                                    app:srcCompat="@drawable/black" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="5dp"
                         android:layout_gravity="bottom"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp">
 
                         <TextView
                             android:id="@+id/chat_read_count_nm"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/chat_around_text_color"
-                            android:textStyle="bold"
-                            android:textSize="10dp"
+                            android:layout_gravity="bottom"
                             android:paddingStart="2dp"
                             android:paddingEnd="2dp"
-                            android:layout_gravity="bottom"
-                             />
+                            android:textColor="@color/chat_around_text_color"
+                            android:textSize="10dp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/chat_time_nm"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/chat_around_text_color"
-                            android:textSize="10dp"
+                            android:layout_gravity="bottom"
                             android:paddingStart="2dp"
                             android:paddingEnd="2dp"
-                            android:layout_gravity="bottom"
-                            android:text="Time" />
+                            android:text="Time"
+                            android:textColor="@color/chat_around_text_color"
+                            android:textSize="10dp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -130,19 +263,18 @@
 
     <LinearLayout
         android:id="@+id/mine_linear"
-        android:layout_weight="1"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-  >
+            android:orientation="horizontal">
 
 
             <LinearLayout
@@ -158,11 +290,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|bottom"
-                    android:textSize="10dp"
                     android:paddingStart="2dp"
                     android:paddingEnd="2dp"
-
                     android:textColor="@color/chat_around_text_color"
+
+                    android:textSize="10dp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -170,11 +302,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end|bottom"
-                    android:textSize="10dp"
                     android:paddingStart="2dp"
                     android:paddingEnd="2dp"
                     android:text="Time"
-                    android:textColor="@color/chat_around_text_color" />
+                    android:textColor="@color/chat_around_text_color"
+                    android:textSize="10dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -201,15 +333,147 @@
                     android:textIsSelectable="true"
                     android:textSize="15sp" />
 
-                <ImageView
-                    android:id="@+id/chat_content_image_mine"
-                    android:layout_width="280dp"
-                    android:layout_height="280dp"
-                    android:background="@drawable/image_round"
-                    android:padding="8dp"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/black" />
+                <LinearLayout
+                    android:id="@+id/chat_image_layout_for_mine"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:visibility="visible">
+
+                    <!-- 1개-->
+                    <LinearLayout
+                        android:id="@+id/chat_image_layout_for_one_mine"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine11"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+                    </LinearLayout>
+
+                    <!--2개-->
+                    <LinearLayout
+                        android:id="@+id/chat_image_layout_for_two_mine"
+                        android:layout_width="240dp"
+                        android:layout_height="120dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine21"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine22"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+
+                    </LinearLayout>
+                    <!--3개-->
+                    <LinearLayout
+                        android:id="@+id/chat_image_layout_for_three_mine"
+                        android:layout_width="240dp"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine31"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine32"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+
+                        <ImageView
+                            android:id="@+id/chat_content_image_mine33"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="@drawable/image_round"
+                            android:scaleType="centerCrop"
+                            app:srcCompat="@drawable/black" />
+
+                    </LinearLayout>
+                    <!--4개-->
+                    <LinearLayout
+                        android:id="@+id/chat_image_layout_for_four_mine"
+                        android:layout_width="240dp"
+                        android:layout_height="240dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="240dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_mine41"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_mine42"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                            android:layout_width="240dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_mine43"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+
+                            <ImageView
+                                android:id="@+id/chat_content_image_mine44"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:background="@drawable/image_round"
+                                android:scaleType="centerCrop"
+                                app:srcCompat="@drawable/black" />
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

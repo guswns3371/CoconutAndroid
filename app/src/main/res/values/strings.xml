@@ -56,6 +56,7 @@
     <string name="changing_user_name">이름 변경</string>
     <string name="changing_user_desc">상태메시지 변경</string>
     <string name="loading">로딩중</string>
+    <string name="uploading">업로드 중</string>
     <string name="default_notification_channel_name">coconut</string>
     <string name="msg_token_fmt">InstanceID Token: %s</string>
 

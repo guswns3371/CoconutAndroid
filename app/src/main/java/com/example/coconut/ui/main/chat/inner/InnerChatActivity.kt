@@ -57,7 +57,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
 
     private var imm: InputMethodManager? = null
-    private var progressDialog: Dialog? = null
+    private var loadingDialog: Dialog? = null
+    private var uploadingDialog: Dialog? = null
     private var isOkToSend = false
     private var isEndOfHistory: Boolean = true
 
@@ -193,7 +194,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             viewModel.getChatHistory(roomID)
 
             // 로딩 다이얼로그 시작
-            progressDialog = Dialog(this@InnerChatActivity).apply {
+            loadingDialog = Dialog(this@InnerChatActivity).apply {
                 setContentView(R.layout.custom_loading_dialog)
                 setCancelable(true)
                 show()
@@ -208,7 +209,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             Log.e(TAG, "getChatHistory observing $roomID 번방")
 
             //로딩 다이얼로그 dismiss
-            progressDialog!!.dismiss()
+            loadingDialog!!.dismiss()
 
             it?.let { chatList ->
 
@@ -238,6 +239,9 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
         viewModel.chatUploadImagesLiveData.observe(this, { imageList ->
             Log.e(TAG, "chatUploadImagesLiveData: $roomID")
+
+            uploadingDialog!!.dismiss()
+
             roomID?.let {
                 sendMessage(
                     ChatMessageSocketData(
@@ -670,6 +674,12 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                             multipartList
                         )
                     )
+
+                    uploadingDialog = Dialog(this@InnerChatActivity).apply {
+                        setContentView(R.layout.custom_uploading_dialog)
+                        setCancelable(true)
+                        show()
+                    }
                 }
             }
         }
