@@ -11,7 +11,7 @@ data class ChatHistoryResponse(
     @SerializedName("userInfo") var userInfo : UserDataResponse,
     @SerializedName("chatRoomId") var chatRoomId : String,
     @SerializedName("chatUserId") var chatUserId : String,
-    @SerializedName("readMembers") var readMembers : String,
+    @SerializedName("readMembers") var readMembers : String?,
     @SerializedName("time") var time : String,
     @SerializedName("history") var history : String,
     @SerializedName("chatImages") var chatImages : ArrayList<String>?,

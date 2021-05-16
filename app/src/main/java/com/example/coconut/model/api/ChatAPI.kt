@@ -1,6 +1,8 @@
 package com.example.coconut.model.api
 
 import com.example.coconut.model.request.chat.ChatRoomDataRequest
+import com.example.coconut.model.request.chat.ChatRoomExitRequest
+import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.example.coconut.model.request.chat.ChatRoomSaveRequest
 import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
@@ -44,8 +46,18 @@ interface ChatAPI {
     @POST("/api/chat/upload/image")
     @Multipart
     fun uploadChatImages(
-        @Part("userId") userId : RequestBody?,
-        @Part("chatRoomId") chatRoomId : RequestBody?,
-        @Part images: ArrayList<MultipartBody.Part?>?)
-    : Single<ArrayList<String>>
+        @Part("userId") userId: RequestBody?,
+        @Part("chatRoomId") chatRoomId: RequestBody?,
+        @Part images: ArrayList<MultipartBody.Part?>?
+    ): Single<ArrayList<String>>
+
+    @POST("/api/chat/room/name")
+    fun changeChatRoomName(
+        @Body chatRoomNameChangeRequest: ChatRoomNameChangeRequest
+    ): Single<Boolean>
+
+    @POST("/api/chat/room/exit")
+    fun exitChatRoom(
+        @Body chatRoomExitRequest: ChatRoomExitRequest
+    ): Single<Boolean>
 }

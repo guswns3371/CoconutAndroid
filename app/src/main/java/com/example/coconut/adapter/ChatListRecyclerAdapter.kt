@@ -1,25 +1,41 @@
 package com.example.coconut.adapter
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.ListView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.coconut.IntentID
 import com.example.coconut.R
+import com.example.coconut.RoomType
+import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.chat.ChatRoomInfoResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
+import com.example.coconut.ui.main.chat.ChatViewModel
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.*
+import kotlinx.android.synthetic.main.custom_dialog_default.*
 import kotlinx.android.synthetic.main.item_chat_fragment.view.*
 
-class ChatListRecyclerAdapter(private var pref: MyPreference) :
+class ChatListRecyclerAdapter(
+    private var pref: MyPreference,
+    private var chatViewModel: ChatViewModel
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemLongClickListener(v: View, item: ChatRoomListResponse)
+    }
+
+    private var listener: OnItemClickListener? = null
 
     private var itemRoomList: ArrayList<ChatRoomListResponse> = arrayListOf()
 
@@ -27,7 +43,7 @@ class ChatListRecyclerAdapter(private var pref: MyPreference) :
         LayoutInflater.from(parent.context).inflate(R.layout.item_chat_fragment, parent, false)
     ) {
         private var roomName = ""
-        private lateinit var roomInfoInfo: ChatRoomInfoResponse
+        private lateinit var roomInfo: ChatRoomInfoResponse
         private lateinit var userInfoList: ArrayList<UserDataResponse>
         private val userImageViews = arrayListOf<ArrayList<ImageView?>>(
             arrayListOf(
@@ -60,23 +76,23 @@ class ChatListRecyclerAdapter(private var pref: MyPreference) :
         @SuppressLint("SetTextI18n")
         fun onBind(item: ChatRoomListResponse) {
             itemView.run {
-                roomInfoInfo = item.chatRoomInfo!!
+                roomInfo = item.chatRoomInfo!!
                 userInfoList = item.userInfo!!
 
                 chat_list_name.text = item.chatRoomName
                 chat_list_people_size.text = "${userInfoList.size + 1}"
 
                 imageLayouts.forEach { it?.gone() }
+                chat_list_people_size.hide()
 
                 val userCount = if (userInfoList.size > 4) 4 else userInfoList.size
 
-                if (userCount == 1) {
-                    chat_list_people_size.hide()
-                    if (userInfoList[0].id == pref.userIdx) {
-                        chat_list_people_size.text = "ME"
-                        chat_list_people_size.show()
-                    }
-                } else {
+                if (roomInfo.roomType == RoomType.ME) {
+                    chat_list_people_size.text = "ME"
+                    chat_list_people_size.show()
+                }
+
+                if (userCount > 1) {
                     chat_list_people_size.show()
                 }
 
@@ -89,10 +105,10 @@ class ChatListRecyclerAdapter(private var pref: MyPreference) :
 
                 imageLayouts[userCount - 1]?.show()
 
-                chat_list_last_content.text = roomInfoInfo.lastMessage
-                chat_list_last_time.text = roomInfoInfo.lastTime
+                chat_list_last_content.text = roomInfo.lastMessage
+                chat_list_last_time.text = roomInfo.lastTime
 
-                roomInfoInfo.lastMessage?.run {
+                roomInfo.lastMessage?.run {
                     if (!isNullOrBlank()) {
                         chat_list_last_content.show()
                     } else {
@@ -109,16 +125,23 @@ class ChatListRecyclerAdapter(private var pref: MyPreference) :
                     }
                 }
 
+
                 setOnClickListener {
                     Intent(context, InnerChatActivity::class.java).apply {
                         putExtra(IntentID.CHAT_MODE, IntentID.CHAT_WITH_PEOPLE_FROM_CHAT_FRAG)
                         putExtra(IntentID.CHAT_ROOM_TITLE, item.chatRoomName)
-                        putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST, roomInfoInfo.members)
-                        putExtra(IntentID.CHAT_ROOM_ID, roomInfoInfo.id)
+                        putExtra(IntentID.CHAT_ROOM_PEOPLE_LIST, roomInfo.members)
+                        putExtra(IntentID.CHAT_ROOM_ID, roomInfo.id)
                         putExtra(IntentID.CHAT_ROOM_PEOPLE_INFOS, userInfoList)
                         ContextCompat.startActivity(context, this, null)
                     }
                 }
+
+                setOnLongClickListener {
+                    listener?.onItemLongClickListener(itemView, item)
+                    false
+                }
+
             }
         }
 
@@ -133,6 +156,9 @@ class ChatListRecyclerAdapter(private var pref: MyPreference) :
         (holder as ChatListHolder).onBind(itemRoomList[position])
     }
 
+    fun setOnItemLongClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
 
     fun addChatList(itemRoomList: ArrayList<ChatRoomListResponse>) {
         this.itemRoomList = itemRoomList

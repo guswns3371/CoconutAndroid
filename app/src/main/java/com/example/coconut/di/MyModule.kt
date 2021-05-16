@@ -48,7 +48,7 @@ var adapterPart = module {
     //factory : inject 시점에 해당 객체를 샐성한다
     single { AccountRecyclerAdapter() }
     factory { InnerChatRecyclerAdapter(get()) }
-    factory { ChatListRecyclerAdapter(get()) }
+    factory { ChatListRecyclerAdapter(get(), get()) }
 
     /** single로 할지 factory로 할지 나중에 결정*/
     factory { AddChatRecyclerAdpater() }
@@ -63,7 +63,7 @@ var modelPart = module {
 }
 
 var authPart = module {
-    single { AuthRepo(androidApplication() as MyApplication, get() ) }
+    single { AuthRepo(androidApplication() as MyApplication, get()) }
 }
 
 var viewModelPart = module {

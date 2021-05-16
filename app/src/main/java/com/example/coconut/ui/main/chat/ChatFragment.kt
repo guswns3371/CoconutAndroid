@@ -1,37 +1,36 @@
 package com.example.coconut.ui.main.chat
 
+import android.app.Dialog
 import android.content.*
 import android.os.IBinder
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.FOCUS_DOWN
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.coconut.BroadCastIntentID
 import com.example.coconut.R
-import com.example.coconut.SocketReceive
 import com.example.coconut.adapter.ChatListRecyclerAdapter
 import com.example.coconut.base.BaseKotlinFragment
 import com.example.coconut.base.BroadcastReceiverManager
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.FragmentChatBinding
+import com.example.coconut.model.request.chat.ChatRoomExitRequest
+import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.service.SocketService
 import com.example.coconut.ui.main.chat.add.AddChatActivity
 import com.example.coconut.ui.setting.SettingActivity
-import com.example.coconut.util.MyPreference
-import com.example.coconut.util.toArrayList
-import com.example.coconut.util.toCleanString
+import com.example.coconut.util.*
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.gmail.bishoybasily.stomp.lib.StompClient
+import kotlinx.android.synthetic.main.custom_dialog_default.*
 
 class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
     SocketServiceManager, BroadcastReceiverManager {
@@ -97,7 +96,86 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         setToolbarTitle(getString(R.string.title_chat))
         viewDataBinding.root.findViewById<RecyclerView>(R.id.chat_recycler_view).apply {
             layoutManager = LinearLayoutManager(activity!!)
-            adapter = recyclerAdapter
+            adapter = recyclerAdapter.apply {
+
+                setOnItemLongClickListener(object : ChatListRecyclerAdapter.OnItemClickListener {
+                    override fun onItemLongClickListener(v: View, item: ChatRoomListResponse) {
+                        Dialog(activity!!).apply {
+                            setContentView(R.layout.custom_dialog_list)
+                            val titleList = arrayOf("채팅방 나가기", "채팅방 이름 바꾸기")
+                            val arrayAdapter = ArrayAdapter<String>(
+                                context,
+                                R.layout.item_dialog_simple_list,
+                                R.id.dialog_item_text,
+                                titleList
+                            )
+
+                            findViewById<ListView>(R.id.dialog_list_view).apply {
+                                adapter = arrayAdapter
+                                setOnItemClickListener { parent, view, position, id ->
+                                    cancel()
+                                    when (position) {
+                                        0 -> {
+                                            Dialog(activity!!).apply {
+
+                                                setContentView(R.layout.custom_dialog_default)
+                                                setCancelable(false)
+                                                show()
+
+                                                dialog_title.text = "정말 나가시겠습니까?"
+                                                dialog_edit_textinput.gone()
+                                                dialog_content.gone()
+
+                                                dialog_negative.setOnClickListener { dismiss() }
+
+                                                dialog_positive.setOnClickListener {
+                                                    viewModel.exitChatRoom(
+                                                        ChatRoomExitRequest(
+                                                            item.chatRoomInfo?.id,
+                                                            pref.userIdx
+                                                        )
+                                                    )
+                                                    dismiss()
+                                                }
+                                            }
+                                        }
+                                        1 -> {
+                                            Dialog(activity!!).apply {
+
+                                                setContentView(R.layout.custom_dialog_default)
+                                                setCancelable(false)
+                                                show()
+
+                                                dialog_title.text = titleList[1]
+                                                dialog_edit_text.text =
+                                                    item.chatRoomName?.toEditable()
+                                                dialog_content.gone()
+
+                                                dialog_negative.setOnClickListener { dismiss() }
+
+                                                dialog_positive.setOnClickListener {
+                                                    dialog_edit_text.text.toString().let { text ->
+                                                        viewModel.changeChatRoomName(
+                                                            ChatRoomNameChangeRequest(
+                                                                text,
+                                                                item.chatRoomInfo?.id,
+                                                                pref.userIdx
+                                                            )
+                                                        )
+                                                        dismiss()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            setCancelable(true)
+                            show()
+                        }
+                    }
+                })
+            }
             setHasFixedSize(true)
         }
 
@@ -108,6 +186,15 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         viewModel.chatRoomListResponseLiveData.observe(this, {
             recyclerAdapter.addChatList(it)
         })
+
+        viewModel.chatChangeResponseLiveData.observe(this, {
+            if (it) {
+                viewModel.getChatRoomLists(myIdPref)
+            } else {
+                showToast("채팅방 업데이트 오류")
+            }
+        })
+
     }
 
     override fun initAfterBinding() {
@@ -126,7 +213,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                 .doOnError { error -> Log.e(TAG, "socketForChatListUpdate error: $error") }
                 .subscribe {
                     Log.e(TAG, "socketForChatListUpdate: $it")
-                    Thread.sleep(15)
+                    Thread.sleep(10)
                     viewModel.getChatRoomLists(myIdPref)
                 })
         }
@@ -201,10 +288,10 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
 
     /**
     private val onChatListUpdate = Emitter.Listener {
-        activity?.runOnUiThread {
-            viewModel.getChatRoomLists(myIdPref)
-        }
+    activity?.runOnUiThread {
+    viewModel.getChatRoomLists(myIdPref)
     }
-    **/
+    }
+     **/
 
 }

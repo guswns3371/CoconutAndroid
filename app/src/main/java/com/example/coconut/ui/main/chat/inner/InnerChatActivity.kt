@@ -9,6 +9,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
@@ -57,10 +60,10 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
 
     private var imm: InputMethodManager? = null
-    private var loadingDialog: Dialog? = null
-    private var uploadingDialog: Dialog? = null
     private var isOkToSend = false
     private var isEndOfHistory: Boolean = true
+    private var loadingDialog: Dialog? = null
+    private var uploadingDialog: Dialog? = null
 
     private lateinit var myID: String
     private var roomID: String? = null
@@ -279,8 +282,29 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         }
 
         chat_add_btn.setOnClickListener {
-            chatImages = arrayListOf()
-            selectImage(IntentID.CHAT_IMAGE)
+            Dialog(this@InnerChatActivity).apply {
+                setContentView(R.layout.custom_dialog_list)
+                val arrayAdapter = ArrayAdapter<String>(
+                    this@InnerChatActivity,
+                    R.layout.item_dialog_simple_list,
+                    R.id.dialog_item_text,
+                    arrayOf("사진 보내기")
+                )
+
+                findViewById<ListView>(R.id.dialog_list_view).apply {
+                    adapter = arrayAdapter
+                    setOnItemClickListener { parent, view, position, id ->
+                        cancel()
+                        if (position == 0) {
+                            chatImages = arrayListOf()
+                            selectImage(IntentID.CHAT_IMAGE)
+                        }
+                    }
+                }
+                setCancelable(true)
+                show()
+            }
+
         }
 
         scroll_bottom_btn.setOnClickListener {
@@ -374,6 +398,9 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                         }
                     }
                 })
+            
+            // 채팅방 나가기
+
         }
     }
 

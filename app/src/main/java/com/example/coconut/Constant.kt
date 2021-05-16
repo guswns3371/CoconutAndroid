@@ -107,5 +107,14 @@ class MessageType{
     companion object{
         const val TEXT = "TEXT"
         const val IMAGE = "IMAGE"
+        const val FILE = "FILE"
+        const val INFO = "INFO"
+    }
+}
+
+class RoomType{
+    companion object{
+        const val GROUP = "GROUP"
+        const val ME = "ME"
     }
 }

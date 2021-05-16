@@ -18,7 +18,6 @@ import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import io.reactivex.Single
-import okhttp3.MultipartBody
 
 class MyRepositoryImpl(
     private val authAPI: AuthAPI,
@@ -120,4 +119,11 @@ class MyRepositoryImpl(
         )
     }
 
+    override fun changeChatRoomName(chatRoomNameChangeRequest: ChatRoomNameChangeRequest): Single<Boolean> {
+        return chatAPI.changeChatRoomName(chatRoomNameChangeRequest)
+    }
+
+    override fun exitChatRoom(chatRoomExitRequest: ChatRoomExitRequest): Single<Boolean> {
+        return chatAPI.exitChatRoom(chatRoomExitRequest)
+    }
 }

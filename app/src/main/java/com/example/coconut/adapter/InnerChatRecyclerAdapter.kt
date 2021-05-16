@@ -89,10 +89,18 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
 
         fun onBind(item: ChatHistoryResponse) {
             itemView.run {
-                val userInfo = item.userInfo
                 val messageType = item.messageType
-                val count = fixedPeopleList.size - item.readMembers.toInt()
+                if (messageType == MessageType.INFO){
+                    not_mine_linear.gone()
+                    mine_linear.gone()
+                    info_linear.show()
 
+                    info_text.text = item.history
+                    return
+                }
+
+                val userInfo = item.userInfo
+                val count = fixedPeopleList.size - item.readMembers!!.toInt()
                 when (userInfo.id == pref.userIdx) {
                     true -> {
 
@@ -100,6 +108,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
 
                         // 유저편 view (내가 보낸 메시지)
                         not_mine_linear.gone()
+                        info_linear.gone()
                         mine_linear.show()
 
                         //읽음표시
@@ -142,6 +151,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
 
                                 imageLayoutsMine[imageCount - 1]?.show()
                             }
+
                         }
 
                         chat_content_text_mine.setOnLongClickListener {
@@ -156,6 +166,8 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
                         // 상대편 view (상대가 보낸 메시지)
                         not_mine_linear.show()
                         mine_linear.gone()
+                        info_linear.gone()
+
                         Glide.with(context)
                             .load(userInfo.profilePicture?.toHTTPString())
                             .placeholder(R.drawable.account)

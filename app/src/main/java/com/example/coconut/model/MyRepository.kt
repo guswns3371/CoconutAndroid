@@ -15,7 +15,6 @@ import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import io.reactivex.Single
-import okhttp3.MultipartBody
 
 interface MyRepository {
 
@@ -57,5 +56,10 @@ interface MyRepository {
     fun getChatRoomLists(userId: String?): Single<ArrayList<ChatRoomListResponse>>
 
     fun uploadChatImages(chatUploadImageRequest: ChatUploadImageRequest): Single<ArrayList<String>>
+
+    fun changeChatRoomName(chatRoomNameChangeRequest: ChatRoomNameChangeRequest): Single<Boolean>
+
+    fun exitChatRoom(chatRoomExitRequest: ChatRoomExitRequest): Single<Boolean>
+
 
 }
