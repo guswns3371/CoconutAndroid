@@ -164,4 +164,10 @@ class ChatListRecyclerAdapter(
         this.itemRoomList = itemRoomList
         notifyDataSetChanged()
     }
+
+    fun removeAt(position: Int) {
+        itemRoomList.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemRoomList.size)
+    }
 }

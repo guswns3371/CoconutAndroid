@@ -213,7 +213,6 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                 .doOnError { error -> Log.e(TAG, "socketForChatListUpdate error: $error") }
                 .subscribe {
                     Log.e(TAG, "socketForChatListUpdate: $it")
-                    Thread.sleep(10)
                     viewModel.getChatRoomLists(myIdPref)
                 })
         }

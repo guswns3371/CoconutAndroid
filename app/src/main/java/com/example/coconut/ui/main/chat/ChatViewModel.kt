@@ -27,19 +27,10 @@ class ChatViewModel(private val myRepository: MyRepository) : BaseKotlinViewMode
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    when {
-                        it == null -> {
-                            _chatListResponseLiveData.postValue(arrayListOf())
-                        }
-                        it.size == 0 -> {
-                            _chatListResponseLiveData.postValue(arrayListOf())
-                        }
-                        else -> {
-                            _chatListResponseLiveData.postValue(it)
-                        }
-                    }
+                    _chatListResponseLiveData.postValue(it)
                 }, {
                     Log.d(TAG, "getChatRoomLists response error, message : ${it.message}")
+                    _chatListResponseLiveData.postValue(arrayListOf())
                 })
         )
     }
