@@ -24,14 +24,15 @@ import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.base.BroadcastReceiverManager
 import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.ActivityInnerChatBinding
-import com.example.coconut.model.request.chat.ChatRoomDataRequest
-import com.example.coconut.model.request.chat.ChatRoomSaveRequest
-import com.example.coconut.model.request.chat.ChatUploadImageRequest
+import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.socket.ChatRoomSocketData
 import com.example.coconut.model.socket.ChatMessageSocketData
 import com.example.coconut.service.SocketService
+import com.example.coconut.ui.main.chat.ChatFragment
+import com.example.coconut.ui.main.chat.ChatViewModel
+import com.example.coconut.ui.main.chat.add.AddChatActivity
 import com.example.coconut.util.*
 import kotlinx.android.synthetic.main.activity_inner_chat.*
 import org.koin.android.ext.android.inject
@@ -41,6 +42,7 @@ import com.gmail.bishoybasily.stomp.lib.StompClient
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_account_info.*
+import kotlinx.android.synthetic.main.custom_dialog_default.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
@@ -58,6 +60,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private val pref: MyPreference by inject()
     private val recyclerAdapter: InnerChatRecyclerAdapter by inject()
     private val innerDrawerAdapter: InnerDrawerAdapter by inject()
+    private val chatViewModel: ChatViewModel by inject()
 
     private var imm: InputMethodManager? = null
     private var isOkToSend = false
@@ -215,7 +218,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             loadingDialog!!.dismiss()
 
             it?.let { chatList ->
-
                 chatHistoryList = arrayListOf()
 
                 //채팅기록을 뿌려준다
@@ -224,6 +226,30 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
                 //맨 밑으로 스크롤
                 scrollToBottom()
+            }
+        })
+
+        // updateChatRoomData & inviteUser
+        viewModel.chatUpdateRoomDataLiveData.observe(this, { res ->
+            // charRoomId
+            res.chatRoomId?.let { roomID = it }
+
+            // 툴바제목
+            res.chatRoomName?.let { setToolbarTitle(it) }
+
+            // chatRoomMembers
+            res.chatRoomMembers?.let {
+                it.run {
+                    chatRoomMembers = this@run
+                    recyclerAdapter.setFixedPeopleList(chatRoomMembers)
+                }
+            }
+
+            // drawer 속 list view
+            res.chatRoomMembersInfo?.let {
+                memberInfoList = it
+                innerDrawerAdapter.addItemList(memberInfoList)
+                navi_list_view.adapter = innerDrawerAdapter
             }
         })
 
@@ -313,11 +339,67 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             isEndOfHistory = true
         }
 
-        registerReceiver()
-        bindService(this)
+        drawer_setting.setOnClickListener {
+            Dialog(this).apply {
+                setContentView(R.layout.custom_dialog_list)
+                val arrayAdapter = ArrayAdapter<String>(
+                    context,
+                    R.layout.item_dialog_simple_list,
+                    R.id.dialog_item_text,
+                    arrayOf("초대하기", "채팅방 나가기")
+                )
+
+                findViewById<ListView>(R.id.dialog_list_view).apply {
+                    adapter = arrayAdapter
+                    setOnItemClickListener { parent, view, position, id ->
+                        cancel()
+                        when (position) {
+                            0 -> {
+                                Intent(this@InnerChatActivity, AddChatActivity::class.java).apply {
+                                    putExtra(From.WHERE, From.INNER_CHAT_ACTIVITY)
+                                    putExtra(IntentID.CHAT_ROOM_ID, roomID)
+                                    putStringArrayListExtra(
+                                        IntentID.CHAT_ROOM_PEOPLE_LIST,
+                                        chatRoomMembers
+                                    )
+                                    startActivity(this)
+                                }
+                            }
+                            1 -> {
+                                Dialog(this@InnerChatActivity).apply {
+
+                                    setContentView(R.layout.custom_dialog_default)
+                                    setCancelable(false)
+                                    show()
+
+                                    dialog_title.text = "정말 나가시겠습니까?"
+                                    dialog_edit_textinput.gone()
+                                    dialog_content.gone()
+
+                                    dialog_negative.setOnClickListener { dismiss() }
+
+                                    dialog_positive.setOnClickListener {
+                                        chatViewModel.exitChatRoom(
+                                            ChatRoomExitRequest(
+                                                roomID,
+                                                pref.userIdx
+                                            )
+                                        )
+                                        dismiss()
+                                        this@InnerChatActivity.finish()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                setCancelable(true)
+                show()
+            }
+        }
 
         // roomID와 fixedPeopleList 를 설정한다
-        chatRoomMembers = whereChatFrom()
+        chatRoomMembers = whereChatFrom(intent)
 
         // 채팅방을 만든다
         if (roomID == null) {
@@ -330,6 +412,9 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
 
         // 채팅방 id를 얻기 전까지 채팅버튼 비활성화
         disableSendButton()
+
+        registerReceiver()
+        bindService(this)
     }
 
     override fun onStart() {
@@ -337,11 +422,31 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         onStompSubscribe()
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        // onNewIntent ->  onResume
+        intent?.let {
+            // roomID와 fixedPeopleList 를 설정한다
+            chatRoomMembers = whereChatFrom(it)
+            chatRoomMembers.removeIf { id -> id == myID }
+            viewModel.inviteUser(
+                ChatRoomDataRequest(
+                    myID,
+                    roomID,
+                    chatRoomMembers // 초대할 유저 목록
+                )
+            )
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // 채팅방 입장
         enterChatRoom()
+        if (drawer_layout.isDrawerOpen(GravityCompat.END))
+            drawer_layout.closeDrawer(GravityCompat.END)
     }
+
 
     override fun onPause() {
         super.onPause()
@@ -390,6 +495,16 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                         chatHistoryList.add(chatHistory)
                         recyclerAdapter.addChatItem(chatHistoryList)
 
+                        // INFO 메시지를 받으면 채팅방 정보를 업데이트한다다
+                        if (chatHistory.messageType == MessageType.INFO)
+                            viewModel.updateChatRoomData(
+                                ChatRoomDataRequest(
+                                    myID,
+                                    roomID,
+                                    chatRoomMembers
+                                )
+                            )
+
                         if (isEndOfHistory) {
                             scrollToBottom()
                         } else {
@@ -398,9 +513,6 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                         }
                     }
                 })
-            
-            // 채팅방 나가기
-
         }
     }
 
@@ -472,17 +584,15 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
         }
     }
 
-    private fun whereChatFrom(): ArrayList<String> {
+    private fun whereChatFrom(intent: Intent): ArrayList<String> {
         myID = pref.userIdx!!
         chatMode = intent.getIntExtra(IntentID.CHAT_MODE, -1)
 
-        // 중복 add되는걸 막기위함
         var fixedList: ArrayList<String> = arrayListOf()
 
         when (chatMode) {
             IntentID.CHAT_WITH_ME -> {
                 // 나와의 채팅
-
                 myID.let {
                     Log.e(TAG, "CHAT_WITH_ME")
                     fixedList.add(it)
@@ -490,9 +600,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
 
             IntentID.CHAT_WITH_ONE_PARTNER -> {
-                // AccountInfo에서 채팅을 클릭한 것
-                // 1 : 1 채팅
-
+                // AccountInfo 에서 채팅을 클릭한 것
                 intent.getStringExtra(IntentID.ID)?.let {
                     Log.e(TAG, "CHAT_WITH_ONE_PARTNER")
                     fixedList.add(myID)
@@ -502,9 +610,8 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
 
             IntentID.CHAT_WITH_PEOPLE_FROM_CHAT_FRAG -> {
-                // chatfragment에서 들어옴
+                // chatFragment 에서 들어옴
                 // 채팅방에서 나가기 할경우도 또는 새로 초대할경우
-
                 intent.getStringExtra(IntentID.CHAT_ROOM_ID)?.let {
                     Log.e(TAG, "CHAT_WITH_PEOPLE_FROM_CHAT_FRAG")
                     roomID = it
@@ -515,24 +622,26 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                         fixedList = ArrayList(this)
                     }
                 }
-
             }
 
             IntentID.CHAT_WITH_PEOPLE_FROM_INVITING -> {
                 // 채팅방 막 만듦
                 // 여러 유저의 id가 넘어온다
-                // 채팅방에서 나가기 할경우도 또는 새로 초대할경우
 
                 intent.getStringArrayListExtra(IntentID.PEOPLE_IDS)?.let {
-                    Log.e(TAG, "CHAT_WITH_MANY_FIRST")
+                    Log.e(TAG, "CHAT_WITH_PEOPLE_FROM_INVITING")
                     fixedList = it
                     fixedList.add(myID)
+                }
+
+                // 채팅방에서 초대한 경우
+                intent.getStringExtra(IntentID.CHAT_ROOM_ID)?.let {
+                    roomID = it
                 }
             }
 
             IntentID.CHAT_FROM_NOTIFICATION -> {
-                // notification으로 들어올때
-
+                // notification 으로 들어올때
                 intent.getStringExtra(IntentID.CHAT_ROOM_ID)?.let {
                     Log.e(TAG, "CHAT_FROM_NOTIFICATION 채팅방 id = $it")
                     roomID = it
@@ -546,13 +655,14 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             }
 
             -1 -> {
-                Log.e(TAG, "CHAT_MODE ERROR")
-                throw Exception()
+                throw Exception("CHAT_MODE ERROR")
             }
         }
 
         // 오름차순 배열
         fixedList.sortBy { it }
+        // 중복 제거
+        fixedList = ArrayList(fixedList.distinct())
 
         Log.e(TAG, "[$roomID 번방 사람들] ${fixedList.showElements()}")
 

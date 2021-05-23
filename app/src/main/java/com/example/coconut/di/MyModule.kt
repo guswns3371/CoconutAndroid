@@ -51,7 +51,7 @@ var adapterPart = module {
     factory { ChatListRecyclerAdapter(get(), get()) }
 
     /** single로 할지 factory로 할지 나중에 결정*/
-    factory { AddChatRecyclerAdpater() }
+    factory { AddChatRecyclerAdapter() }
     factory { InnerDrawerAdapter() }
     factory { ZoomableRecyclerAdapter() }
 }

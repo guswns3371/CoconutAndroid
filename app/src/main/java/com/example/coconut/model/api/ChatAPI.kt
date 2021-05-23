@@ -60,4 +60,9 @@ interface ChatAPI {
     fun exitChatRoom(
         @Body chatRoomExitRequest: ChatRoomExitRequest
     ): Single<Boolean>
+
+    @POST("/api/chat/room/invite")
+    fun inviteUser(
+        @Body chatRoomDataRequest: ChatRoomDataRequest
+    ): Single<ChatRoomDataResponse>
 }

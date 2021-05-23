@@ -7,10 +7,11 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.coconut.From
 import com.example.coconut.IntentID
 import com.example.coconut.R
-import com.example.coconut.adapter.AddChatRecyclerAdpater
-import com.example.coconut.adapter.AddChatRecyclerAdpater.AddChatHorizonAdapter
+import com.example.coconut.adapter.AddChatRecyclerAdapter
+import com.example.coconut.adapter.AddChatRecyclerAdapter.AddChatHorizonAdapter
 import com.example.coconut.base.BaseKotlinActivity
 import com.example.coconut.databinding.ActivityAddChatBinding
 import com.example.coconut.model.response.account.UserDataResponse
@@ -22,18 +23,19 @@ import kotlinx.android.synthetic.main.activity_add_chat.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding,AccountViewModel>() {
+class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding, AccountViewModel>() {
 
     private val TAG = "AddChatActivity"
     override val layoutResourceId: Int = R.layout.activity_add_chat
     override var toolbar: Toolbar? = null
 
-    private val pref : MyPreference by inject()
+    private val pref: MyPreference by inject()
     override val viewModel: AccountViewModel by viewModel()
-    private val recyclerAdapter : AddChatRecyclerAdpater by inject()
-    private lateinit var recycleradapterHoriz : AddChatHorizonAdapter
-    private lateinit var list : ArrayList<UserDataResponse>
+    private val recyclerAdapter: AddChatRecyclerAdapter by inject()
+    private lateinit var horizonAdapter: AddChatHorizonAdapter
+    private lateinit var list: ArrayList<UserDataResponse>
     lateinit var myIdPref: String
+    private var removeList: ArrayList<String> = arrayListOf()
 
 
     override fun initStartView() {
@@ -52,9 +54,10 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding,AccountViewMod
 
         chat_add_horiz_recycler_view.apply {
             // 가로
-            recycleradapterHoriz = recyclerAdapter.getAddChatHorizonAdapter()
-            layoutManager = LinearLayoutManager(this@AddChatActivity, LinearLayoutManager.HORIZONTAL, false)
-            adapter = recycleradapterHoriz
+            horizonAdapter = recyclerAdapter.getAddChatHorizonAdapter()
+            layoutManager =
+                LinearLayoutManager(this@AddChatActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = horizonAdapter
             setHasFixedSize(true)
         }
 
@@ -64,11 +67,10 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding,AccountViewMod
     }
 
     override fun initDataBinding() {
-        viewModel.userDataResponseLiveData.observe(this, Observer {
-            Log.e(TAG,"observing")
+        viewModel.userDataResponseLiveData.observe(this, {
             list = arrayListOf()
             it.forEach { data ->
-                if (data.id != myIdPref)
+                if (data.id != myIdPref && !removeList.contains(data.id))
                     list.add(data)
             }
             recyclerAdapter.addChatAddItem(list)
@@ -76,32 +78,57 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding,AccountViewMod
     }
 
     override fun initAfterBinding() {
+        intent.getStringArrayListExtra(IntentID.CHAT_ROOM_PEOPLE_LIST)?.let {
+            removeList = it
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.chat_add_menu,menu)
+        menuInflater.inflate(R.menu.chat_add_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.action_add->{ toInnerChatActivity() }
+        when (item.itemId) {
+            R.id.action_add -> {
+                toInnerChatActivity()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun toInnerChatActivity(){
+    private fun toInnerChatActivity() {
         recyclerAdapter.getInvitingList().let {
-            if (it.size == 0){
+            if (it.size == 0) {
                 showToast("대화상대를 선택해주세요")
                 return@let
             }
-            Intent(this@AddChatActivity,InnerChatActivity::class.java).apply {
-                putExtra(IntentID.CHAT_MODE,IntentID.CHAT_WITH_PEOPLE_FROM_INVITING)
-                putExtra(IntentID.PEOPLE_IDS,it)
-                startActivity(this)
-                this@AddChatActivity.finish()
+
+            intent.getStringExtra(From.WHERE)?.let { where ->
+                when (where) {
+                    From.CHAT_FRAGMENT -> {
+                        Intent(this@AddChatActivity, InnerChatActivity::class.java).apply {
+                            putExtra(IntentID.CHAT_MODE, IntentID.CHAT_WITH_PEOPLE_FROM_INVITING)
+                            putExtra(IntentID.PEOPLE_IDS, it)
+                            startActivity(this)
+                            this@AddChatActivity.finish()
+                        }
+                    }
+                    From.INNER_CHAT_ACTIVITY -> {
+//                        it.forEach { id -> removeList.add(id) }
+                        Intent(this@AddChatActivity, InnerChatActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                            putExtra(IntentID.CHAT_MODE, IntentID.CHAT_WITH_PEOPLE_FROM_INVITING)
+                            putExtra(IntentID.PEOPLE_IDS, it)
+                            putExtra(IntentID.CHAT_ROOM_ID, intent.getStringExtra(IntentID.CHAT_ROOM_ID))
+                            startActivity(this)
+                            this@AddChatActivity.finish()
+                        }
+                    }
+                    else -> { }
+                }
             }
+
         }
 
     }

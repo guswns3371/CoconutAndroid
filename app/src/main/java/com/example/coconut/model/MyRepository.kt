@@ -61,5 +61,6 @@ interface MyRepository {
 
     fun exitChatRoom(chatRoomExitRequest: ChatRoomExitRequest): Single<Boolean>
 
+    fun inviteUser(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse>
 
 }

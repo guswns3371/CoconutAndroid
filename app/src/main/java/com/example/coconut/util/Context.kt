@@ -1,19 +1,26 @@
 package com.example.coconut.util
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.util.Log
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.databinding.ObservableField
 import com.example.coconut.Constant
+import com.example.coconut.R
+import com.example.coconut.model.request.chat.ChatRoomExitRequest
+import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import kotlinx.android.synthetic.main.custom_dialog_default.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -45,7 +52,7 @@ fun String.toCleanString(): String = this
     .replace("\\r\\n|\\r|\\n|\\n\\r".toRegex(), "")
     .replace("[", "")
     .replace("]", "")
-    .replace(" ","")
+    .replace(" ", "")
 
 fun String.toArrayList(): ArrayList<String> = ArrayList(this.split(",").toList())
 

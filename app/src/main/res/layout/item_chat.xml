@@ -501,7 +501,7 @@
             android:layout_margin="12dp"
             android:textAlignment="center"
             android:textColor="@color/PrimaryColorText"
-            android:textSize="14sp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
 </LinearLayout>

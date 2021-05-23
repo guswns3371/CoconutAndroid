@@ -1,8 +1,10 @@
 package com.example.coconut.service
 
 import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
@@ -10,10 +12,13 @@ import androidx.core.app.NotificationCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.coconut.BroadCastIntentID
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.chat.FcmTokenRequest
+import com.example.coconut.ui.main.account.AccountFragment
+import com.example.coconut.ui.main.chat.ChatFragment
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.MyPreference
 import com.example.coconut.util.toHTTPString

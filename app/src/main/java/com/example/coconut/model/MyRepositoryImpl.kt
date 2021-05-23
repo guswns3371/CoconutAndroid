@@ -126,4 +126,8 @@ class MyRepositoryImpl(
     override fun exitChatRoom(chatRoomExitRequest: ChatRoomExitRequest): Single<Boolean> {
         return chatAPI.exitChatRoom(chatRoomExitRequest)
     }
+
+    override fun inviteUser(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse> {
+        return chatAPI.inviteUser(chatRoomDataRequest)
+    }
 }

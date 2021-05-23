@@ -90,7 +90,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
         fun onBind(item: ChatHistoryResponse) {
             itemView.run {
                 val messageType = item.messageType
-                if (messageType == MessageType.INFO){
+                if (messageType == MessageType.INFO) {
                     not_mine_linear.gone()
                     mine_linear.gone()
                     info_linear.show()
@@ -100,7 +100,9 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
                 }
 
                 val userInfo = item.userInfo
-                val count = fixedPeopleList.size - item.readMembers!!.toInt()
+                var count = fixedPeopleList.size - item.readMembers!!.toInt()
+
+                count = if (count < 0) 0 else count
                 when (userInfo.id == pref.userIdx) {
                     true -> {
 

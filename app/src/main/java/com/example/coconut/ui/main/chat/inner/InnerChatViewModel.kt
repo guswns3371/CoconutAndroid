@@ -22,6 +22,10 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
     private val _chatRoomDataResponseLiveData = MutableLiveData<ChatRoomDataResponse>()
     val chatRoomDataResponseLiveData: LiveData<ChatRoomDataResponse> = _chatRoomDataResponseLiveData
 
+    private val _chatUpdateRoomDataLiveData = MutableLiveData<ChatRoomDataResponse>()
+    val chatUpdateRoomDataLiveData: LiveData<ChatRoomDataResponse> =
+        _chatUpdateRoomDataLiveData
+
     private val _chatResponseLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
     val chatHistoryResponseLiveData: LiveData<ArrayList<ChatHistoryResponse>> =
         _chatResponseLiveData
@@ -94,6 +98,38 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
                     }
                 }, {
                     Log.d(TAG, "getChatRoomInfo response error, message : ${it.message}")
+                })
+        )
+    }
+
+    fun updateChatRoomData(chatRoomDataRequest: ChatRoomDataRequest) {
+        addDisposable(
+            myRepository.getChatRoomData(chatRoomDataRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.run {
+                        Log.e(TAG, "updateChatRoomData response : ${toString()}")
+                        _chatUpdateRoomDataLiveData.postValue(this)
+                    }
+                }, {
+                    Log.d(TAG, "updateChatRoomData response error, message : ${it.message}")
+                })
+        )
+    }
+
+    fun inviteUser(chatRoomDataRequest: ChatRoomDataRequest) {
+        addDisposable(
+            myRepository.inviteUser(chatRoomDataRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    it?.run {
+                        Log.e(TAG, "updateChatRoomData response : ${toString()}")
+                        _chatUpdateRoomDataLiveData.postValue(this)
+                    }
+                }, {
+                    Log.d(TAG, "updateChatRoomData response error, message : ${it.message}")
                 })
         )
     }

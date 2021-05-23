@@ -13,6 +13,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.BroadCastIntentID
+import com.example.coconut.From
+import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.adapter.ChatListRecyclerAdapter
 import com.example.coconut.base.BaseKotlinFragment
@@ -82,6 +84,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                     clearDisposable()
                 }
                 else -> {
+
                 }
             }
         }
@@ -253,7 +256,10 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                 showAccountSettingPopupMenu()
             }
             R.id.action_chat_add -> {
-                startActivity(Intent(activity, AddChatActivity::class.java))
+                Intent(activity, AddChatActivity::class.java).apply {
+                    putExtra(From.WHERE,From.CHAT_FRAGMENT)
+                    startActivity(this)
+                }
             }
         }
     }
