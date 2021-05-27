@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.BroadCastIntentID
 import com.example.coconut.IntentID
 import com.example.coconut.R
-import com.example.coconut.SocketReceive
 import com.example.coconut.adapter.AccountRecyclerAdapter
 import com.example.coconut.base.BaseKotlinFragment
 import com.example.coconut.base.BroadcastReceiverManager
@@ -21,15 +20,13 @@ import com.example.coconut.base.SocketServiceManager
 import com.example.coconut.databinding.FragmentAccountBinding
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.service.SocketService
+import com.example.coconut.ui.OnFragmentInteractionListener
 import com.example.coconut.ui.auth.login.LoginActivity
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.ui.setting.SettingActivity
 import com.example.coconut.util.MyPreference
-import com.example.coconut.util.showElements
 import com.gmail.bishoybasily.stomp.lib.StompClient
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
-import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,7 +36,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     private val TAG = "AccountFragment"
     override val layoutResourceId: Int = R.layout.fragment_account
     override val viewModel: AccountViewModel by viewModel()
-    private val loginViewModel : LoginViewModel by viewModel()
+    private val loginViewModel: LoginViewModel by viewModel()
     private lateinit var list: ArrayList<UserDataResponse>
     private val recyclerAdapter: AccountRecyclerAdapter by inject()
 
@@ -48,6 +45,7 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     override var isBind: Boolean = false
     override var socket: Socket? = null
     override var stompClient: StompClient? = null
+    private var listener: OnFragmentInteractionListener? = null
 
     override val mBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
@@ -58,11 +56,19 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
                     Log.e(TAG, "onReceive: SEND_BROADCAST : $userList")
                     recyclerAdapter.updateUserStateArrayList(userList)
                 }
+                BroadCastIntentID.SEND_ON_CONNECT -> {
+                    listener?.onFragmentReload()
+                }
+                BroadCastIntentID.SEND_ON_DISCONNECT -> {
+                }
+                BroadCastIntentID.SEND_ON_ERROR -> {
+                }
                 else -> {
                 }
             }
         }
     }
+
     override val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e("serviceConn", "onServiceDisconnected")
@@ -82,6 +88,12 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
 
     override val baseToolBar: Toolbar?
         get() = activity?.findViewById(R.id.baseToolBar)
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener)
+            listener = context
+    }
 
     override fun initStartView() {
         viewDataBinding.viewModel = viewModel
@@ -124,7 +136,6 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     }
 
     override fun initAfterBinding() {
-        registerReceiver()
         bindService(activity)
         loginViewModel.sendFcmTokenToServer(pref.userIdx!!, pref.fcmToken!!)
     }
@@ -135,13 +146,18 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
         viewModel.getAllAccounts()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onResume() {
+        super.onResume()
+        registerReceiver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver()
         unbindService(activity)
     }
 
@@ -186,46 +202,52 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
     }
 
     private fun registerReceiver() {
-        registerBroadcastReceiver(activity, IntentFilter(BroadCastIntentID.SEND_USER_LIST))
+        IntentFilter(BroadCastIntentID.SEND_USER_LIST).let {
+            it.addAction(BroadCastIntentID.SEND_ON_CONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
+            registerBroadcastReceiver(activity!!, it)
+        }
     }
 
     private fun unregisterReceiver() {
         unregisterBroadcastReceiver(activity)
     }
 
+
     /**
     fun socketForUserStatus() {
-        if (socket == null) Log.e(TAG, "socket is null")
-        socket?.apply {
-            on(SocketReceive.ONLINE_USER, onConnectedUser)
-            on(SocketReceive.OFFLINE_USER, onDisconnectedUser)
-        }
+    if (socket == null) Log.e(TAG, "socket is null")
+    socket?.apply {
+    on(SocketReceive.ONLINE_USER, onConnectedUser)
+    on(SocketReceive.OFFLINE_USER, onDisconnectedUser)
+    }
     }
 
     private val onConnectedUser = Emitter.Listener {
-        activity?.runOnUiThread {
-            (it[0] as String).apply {
-                this.split(",").toTypedArray().run {
-                    Log.e("$TAG who is on now [conn]", this.showElements())
-                    recyclerAdapter.updateUserState(this)
-                }
-            }
-        }
+    activity?.runOnUiThread {
+    (it[0] as String).apply {
+    this.split(",").toTypedArray().run {
+    Log.e("$TAG who is on now [conn]", this.showElements())
+    recyclerAdapter.updateUserState(this)
+    }
+    }
+    }
     }
 
     private val onDisconnectedUser = Emitter.Listener {
-        activity?.runOnUiThread {
-            (it[0] as JSONObject).apply {
-                val whoIsOn = getString(SocketReceive.OFFLINE_USER_WHOISON)
-                //Log.e("$TAG who is on until",whoIsOn)
-                //Log.e("$TAG who is out now [disconn]",getString(SocketReceive.OFFLINE_USER_DISCONNECTED))
-                whoIsOn.split(",").toTypedArray().run {
-                    Log.e("$TAG who is on until [disconn]", this.showElements())
-                    recyclerAdapter.updateUserState(this)
-                }
-            }
-        }
+    activity?.runOnUiThread {
+    (it[0] as JSONObject).apply {
+    val whoIsOn = getString(SocketReceive.OFFLINE_USER_WHOISON)
+    //Log.e("$TAG who is on until",whoIsOn)
+    //Log.e("$TAG who is out now [disconn]",getString(SocketReceive.OFFLINE_USER_DISCONNECTED))
+    whoIsOn.split(",").toTypedArray().run {
+    Log.e("$TAG who is on until [disconn]", this.showElements())
+    recyclerAdapter.updateUserState(this)
     }
-    **/
+    }
+    }
+    }
+     **/
 
 }

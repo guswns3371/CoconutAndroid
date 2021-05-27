@@ -115,7 +115,6 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding, AccountViewMo
                         }
                     }
                     From.INNER_CHAT_ACTIVITY -> {
-//                        it.forEach { id -> removeList.add(id) }
                         Intent(this@AddChatActivity, InnerChatActivity::class.java).apply {
                             addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
                             putExtra(IntentID.CHAT_MODE, IntentID.CHAT_WITH_PEOPLE_FROM_INVITING)

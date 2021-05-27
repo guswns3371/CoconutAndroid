@@ -23,14 +23,12 @@ import kotlinx.android.synthetic.main.item_chat_fragment.view.*
 class InnerChatRecyclerAdapter(private var pref: MyPreference) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val TAG = "InnerChatRecyclerAdapter"
     private var itemList: ArrayList<ChatHistoryResponse> = arrayListOf()
     private var fixedPeopleList: ArrayList<String> = arrayListOf()
 
     inner class InnerChatHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_chat, parent, false)
     ) {
-        private val TAG = "InnerChatHolder"
         private val imageLayoutsMine = arrayListOf<View?>(
             itemView.chat_image_layout_for_one_mine,
             itemView.chat_image_layout_for_two_mine,
@@ -221,7 +219,6 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
 
 
                         chat_user_image_nm.setOnClickListener {
-                            Log.e(TAG, item.toString())
                             Intent(context, AccountInfoActivity::class.java).apply {
                                 putExtra(IntentID.USER_RESPONSE, userInfo)
                                 ContextCompat.startActivity(context, this, null)

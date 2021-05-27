@@ -13,7 +13,6 @@ import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import okhttp3.MultipartBody
 
 class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinViewModel() {
 
@@ -30,9 +29,9 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
     val chatHistoryResponseLiveData: LiveData<ArrayList<ChatHistoryResponse>> =
         _chatResponseLiveData
 
-    private val _chatUpdateReadMembersLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
-    val chatUpdateReadMembersLiveData: LiveData<ArrayList<ChatHistoryResponse>> =
-        _chatUpdateReadMembersLiveData
+    private val _chatUpdateHistoryLiveData = MutableLiveData<ArrayList<ChatHistoryResponse>>()
+    val chatUpdateHistoryLiveData: LiveData<ArrayList<ChatHistoryResponse>> =
+        _chatUpdateHistoryLiveData
 
     private val _chatUploadImagesLiveData = MutableLiveData<ArrayList<String>>()
     val chatUploadImagesLiveData: LiveData<ArrayList<String>> =
@@ -54,18 +53,18 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
         )
     }
 
-    fun updateReadMembers(chatRoomId: String?) {
+    fun updateHistory(chatRoomId: String?) {
         addDisposable(
             myRepository.getChatHistory(chatRoomId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     it?.run {
-                        _chatUpdateReadMembersLiveData.postValue(this)
+                        _chatUpdateHistoryLiveData.postValue(this)
                     }
                 }, {
                     Log.d(TAG, "updateReadMembers response error, message : ${it.message}")
-                    _chatUpdateReadMembersLiveData.postValue(null)
+                    _chatUpdateHistoryLiveData.postValue(null)
                 })
         )
     }

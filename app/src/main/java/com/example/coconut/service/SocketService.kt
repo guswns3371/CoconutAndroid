@@ -38,10 +38,9 @@ import kotlin.properties.Delegates
 class SocketService : Service() {
 
     private val TAG = "SocketService"
-    private val intervalMillis = 5000L
+    private val intervalMillis = 1000L
     private var sender: String? = null
     private val pref: MyPreference by inject()
-    private var isConnected: Boolean = false
 
     private lateinit var handler: Handler
     lateinit var context: Context
@@ -188,6 +187,9 @@ class SocketService : Service() {
         chatFragReceiver = ChatFragment().getBroadcastReceiver()
 
         IntentFilter(BroadCastIntentID.SEND_USER_LIST).let {
+            it.addAction(BroadCastIntentID.SEND_ON_CONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
             registerReceiver(accountFragReceiver, it)
         }
 
@@ -321,70 +323,73 @@ class SocketService : Service() {
             .subscribe { })
     }
 
+
+    /**
     private fun socketConnect() {
-        Log.e(TAG, "socketConnect")
-        socket?.run {
-            connect()
-            on(Socket.EVENT_CONNECT, onConnect)
-            on(Socket.EVENT_DISCONNECT, onDisconnect)
-            on(Socket.EVENT_CONNECT_ERROR, onConnectionError)
-            on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
-        }
+    Log.e(TAG, "socketConnect")
+    socket?.run {
+    connect()
+    on(Socket.EVENT_CONNECT, onConnect)
+    on(Socket.EVENT_DISCONNECT, onDisconnect)
+    on(Socket.EVENT_CONNECT_ERROR, onConnectionError)
+    on(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
+    }
 
     }
 
     private fun socketDisconnect() {
-        Log.e(TAG, "socketDisconnect")
-        socket?.run {
-            off(Socket.EVENT_CONNECT, onConnect)
-            off(Socket.EVENT_DISCONNECT, onDisconnect)
-            off(Socket.EVENT_CONNECT_ERROR, onConnectionError)
-            off(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
-        }
+    Log.e(TAG, "socketDisconnect")
+    socket?.run {
+    off(Socket.EVENT_CONNECT, onConnect)
+    off(Socket.EVENT_DISCONNECT, onDisconnect)
+    off(Socket.EVENT_CONNECT_ERROR, onConnectionError)
+    off(Socket.EVENT_CONNECT_TIMEOUT, onConnectionTimeout)
+    }
 
     }
 
     private val onConnect = Emitter.Listener {
-        runOnUiThread(
-            Runnable {
-                if (!isConnected) {
-                    Log.e(TAG, "onConnect")
-                    showToast("서버와 연결되었습니다")
-                    isConnected = true
-                    online()
-                }
-            }
-        )
+    runOnUiThread(
+    Runnable {
+    if (!isConnected) {
+    Log.e(TAG, "onConnect")
+    showToast("서버와 연결되었습니다")
+    isConnected = true
+    online()
+    }
+    }
+    )
     }
 
     private val onDisconnect = Emitter.Listener {
-        runOnUiThread(
-            Runnable {
-                isConnected = false
-                Log.e(TAG, "Disconnected")
-                offline()
-                showToast("서버와의 연결이 끊어졌습니다")
-            }
-        )
+    runOnUiThread(
+    Runnable {
+    isConnected = false
+    Log.e(TAG, "Disconnected")
+    offline()
+    showToast("서버와의 연결이 끊어졌습니다")
+    }
+    )
     }
 
     private val onConnectionError = Emitter.Listener {
-        runOnUiThread(
-            Runnable {
-                isConnected = false
-                Log.e(TAG, "onConnectionError")
-                showToast("서버와의 연결이 불안정합니다")
-            }
-        )
+    runOnUiThread(
+    Runnable {
+    isConnected = false
+    Log.e(TAG, "onConnectionError")
+    showToast("서버와의 연결이 불안정합니다")
+    }
+    )
     }
 
     private val onConnectionTimeout = Emitter.Listener {
-        runOnUiThread(
-            Runnable {
-                isConnected = false
-                Log.e(TAG, "onConnectionTimeout")
-            }
-        )
+    runOnUiThread(
+    Runnable {
+    isConnected = false
+    Log.e(TAG, "onConnectionTimeout")
     }
+    )
+    }
+     **/
 
 }

@@ -138,7 +138,7 @@
         <ListView android:id="@+id/navi_list_view"
             android:gravity="bottom"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:background="@color/PrimaryColor"/>
 
         <LinearLayout

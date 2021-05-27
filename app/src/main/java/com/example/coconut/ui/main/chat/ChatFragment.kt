@@ -25,6 +25,7 @@ import com.example.coconut.model.request.chat.ChatRoomExitRequest
 import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.service.SocketService
+import com.example.coconut.ui.OnFragmentInteractionListener
 import com.example.coconut.ui.main.chat.add.AddChatActivity
 import com.example.coconut.ui.setting.SettingActivity
 import com.example.coconut.util.*
@@ -51,6 +52,8 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
     override var isBind: Boolean = false
     override var socket: Socket? = null
     override var stompClient: StompClient? = null
+    private var listener: OnFragmentInteractionListener? = null
+
     override val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e("serviceConn", "onServiceDisconnected")
@@ -73,21 +76,26 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         override fun onReceive(p0: Context?, p1: Intent?) {
             when (p1?.action) {
                 BroadCastIntentID.SEND_ON_CONNECT -> {
-                    if (isBind) {
+                    listener?.onFragmentReload()
+                    if (isBind)
                         socketForChatListUpdate()
-                    }
                 }
                 BroadCastIntentID.SEND_ON_DISCONNECT -> {
-                    clearDisposable()
                 }
                 BroadCastIntentID.SEND_ON_ERROR -> {
-                    clearDisposable()
+                }
+                BroadCastIntentID.SEND_ON_FCM_PUSH ->{
                 }
                 else -> {
-
                 }
             }
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener)
+            listener = context
     }
 
     override fun initStartView() {
@@ -201,7 +209,6 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
     }
 
     override fun initAfterBinding() {
-        registerReceiver()
         bindService(activity)
     }
 
@@ -226,6 +233,16 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         viewModel.getChatRoomLists(myIdPref)
     }
 
+    override fun onResume() {
+        super.onResume()
+        registerReceiver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver()
+    }
+
     override fun onStop() {
         Log.e(TAG, "onStop")
         super.onStop()
@@ -235,13 +252,13 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         super.onDestroyView()
         unbindService(activity)
         isBind = false
-        unregisterReceiver()
     }
 
     private fun registerReceiver() {
         IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
             it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
             it.addAction(BroadCastIntentID.SEND_ON_ERROR)
+            it.addAction(BroadCastIntentID.SEND_ON_FCM_PUSH)
             registerBroadcastReceiver(activity!!, it)
         }
     }
@@ -257,7 +274,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
             }
             R.id.action_chat_add -> {
                 Intent(activity, AddChatActivity::class.java).apply {
-                    putExtra(From.WHERE,From.CHAT_FRAGMENT)
+                    putExtra(From.WHERE, From.CHAT_FRAGMENT)
                     startActivity(this)
                 }
             }

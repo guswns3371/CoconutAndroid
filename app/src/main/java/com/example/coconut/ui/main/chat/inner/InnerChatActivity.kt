@@ -11,7 +11,6 @@ import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Observer
@@ -30,7 +29,6 @@ import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.socket.ChatRoomSocketData
 import com.example.coconut.model.socket.ChatMessageSocketData
 import com.example.coconut.service.SocketService
-import com.example.coconut.ui.main.chat.ChatFragment
 import com.example.coconut.ui.main.chat.ChatViewModel
 import com.example.coconut.ui.main.chat.add.AddChatActivity
 import com.example.coconut.util.*
@@ -251,9 +249,11 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                 innerDrawerAdapter.addItemList(memberInfoList)
                 navi_list_view.adapter = innerDrawerAdapter
             }
+
+            viewModel.updateHistory(roomID)
         })
 
-        viewModel.chatUpdateReadMembersLiveData.observe(this, {
+        viewModel.chatUpdateHistoryLiveData.observe(this, {
             Log.e(TAG, "updateReadMembers observing $roomID 번방")
 
             /** 다른 사람들이 채팅방에 입장할 때 읽음 표시갱신을 위해 chatHistoryList 를 새로 초기화한다
@@ -477,7 +477,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     Log.e(TAG, "[$roomID 번방] 현재사람들 : $readMembers")
                     Thread.sleep(30)
                     /** 다른 유저가 들어오면 채팅방에있는 모든 사람들의 읽음 표시를 갱신한다*/
-                    viewModel.updateReadMembers(roomID)
+                    viewModel.updateHistory(roomID)
                 })
 
 

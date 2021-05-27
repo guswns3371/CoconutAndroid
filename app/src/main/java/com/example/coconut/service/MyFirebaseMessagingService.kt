@@ -35,6 +35,17 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private val pref: MyPreference by inject()
     private val myRepository: MyRepository by inject()
     private val TAG = MyFirebaseMessagingService::class.java.simpleName
+    private lateinit var chatFragReceiver: BroadcastReceiver
+
+    override fun onCreate() {
+        super.onCreate()
+        registerSocketReceiver()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterSocketReceiver()
+    }
 
     /**
      * Called when message is received.
@@ -215,6 +226,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 it/* ID of notification */,
                 notificationBuilder.build()
             )
+            sendFcmPushBroadcast()
         }
 
     }
@@ -250,5 +262,21 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 }))
         )
 
+    }
+
+    private fun registerSocketReceiver() {
+        chatFragReceiver = ChatFragment().getBroadcastReceiver()
+        registerReceiver(chatFragReceiver, IntentFilter(BroadCastIntentID.SEND_ON_FCM_PUSH))
+    }
+
+    private fun unregisterSocketReceiver() {
+        unregisterReceiver(chatFragReceiver)
+    }
+
+    private fun sendFcmPushBroadcast() {
+        Intent().let {
+            it.action = BroadCastIntentID.SEND_ON_FCM_PUSH
+            sendBroadcast(it)
+        }
     }
 }

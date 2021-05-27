@@ -72,6 +72,9 @@ class IntentID {
 
         const val RECEIVE_USER_LIST = "RECEIVE_USER_LIST"
         const val RECEIVE_LOGOUT = "RECEIVE_LOGOUT"
+
+        const val ACCOUNT_FRAGMENT = 1
+        const val CHAT_FRAGMENT = 2
     }
 }
 
