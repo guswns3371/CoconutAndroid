@@ -8,6 +8,7 @@ import com.example.coconut.model.MyRepositoryImpl
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.ChatAPI
+import com.example.coconut.model.api.CrawlAPI
 import com.example.coconut.oauth2.AuthRepo
 import com.example.coconut.ui.auth.login.LoginViewModel
 import com.example.coconut.ui.auth.passfind.PassFindViewModel
@@ -40,6 +41,7 @@ var retrofitPart = module {
     single { get<Retrofit>().create(AuthAPI::class.java) }
     single { get<Retrofit>().create(AccountAPI::class.java) }
     single { get<Retrofit>().create(ChatAPI::class.java) }
+    single { get<Retrofit>().create(CrawlAPI::class.java) }
 }
 var socketPart = module {
 //    single { socket()!! }
@@ -47,6 +49,7 @@ var socketPart = module {
 var adapterPart = module {
     //factory : inject 시점에 해당 객체를 샐성한다
     single { AccountRecyclerAdapter() }
+    single { HashTagRecyclerAdapter() }
     factory { InnerChatRecyclerAdapter(get()) }
     factory { ChatListRecyclerAdapter(get(), get()) }
 
@@ -57,7 +60,7 @@ var adapterPart = module {
 }
 
 var modelPart = module {
-    factory<MyRepository> { MyRepositoryImpl(get(), get(), get()) }
+    factory<MyRepository> { MyRepositoryImpl(get(), get(), get(), get()) }
     //get() 함수를 호출하면
     //컴포넌트 내에서 생성된 객체를 참조한다
 }
@@ -81,7 +84,7 @@ var viewModelPart = module {
     viewModel { ChatViewModel(get()) }
     viewModel { InnerChatViewModel(get()) }
 
-    viewModel { HashTagViewModel() }
+    viewModel { HashTagViewModel(get()) }
 }
 
 var sharedPreferencePart = module {
@@ -114,14 +117,15 @@ private fun retrofit() = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create(gson))
     .build()
 
-//private fun socket(): Socket? {
-//    return try {
-//        IO.socket(Constant.NODE_URL)
-//    }catch (e : Exception){
-//        Log.e("module","${e.message}")
-//        null
-//    }
-//}
-
+/**
+private fun socket(): Socket? {
+return try {
+IO.socket(Constant.NODE_URL)
+}catch (e : Exception){
+Log.e("module","${e.message}")
+null
+}
+}
+ **/
 
 

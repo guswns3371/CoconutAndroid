@@ -14,11 +14,15 @@ import com.example.coconut.model.response.auth.RegisterResponse
 import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
+import com.example.coconut.model.response.hashtag.CovidDataResponse
+import com.example.coconut.model.response.hashtag.MusicDataResponse
+import com.example.coconut.model.response.hashtag.NewsDataResponse
 import io.reactivex.Single
 
 interface MyRepository {
 
     /** @AuthAPI */
+
     fun googleLogin(): Single<LoginResponse>
 
     fun naverLogin(): Single<LoginResponse>
@@ -37,14 +41,14 @@ interface MyRepository {
 
     fun sendUserInfoToServer(oAuth2LoginRequest: OAuth2LoginRequest): Single<OAuth2LoginResponse>
 
-    /** main */
-
     /** @AccountAPI */
+
     fun getAccountData(myId: String): Single<ArrayList<UserDataResponse>>
 
     fun updateAccountData(accountEditRequest: AccountEditRequest): Single<BaseResponse>
 
     /** @ChatAPI */
+
     fun makeChatRoom(chatRoomSaveRequest: ChatRoomSaveRequest): Single<ChatRoomDataResponse>
 
     fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse>
@@ -62,5 +66,13 @@ interface MyRepository {
     fun exitChatRoom(chatRoomExitRequest: ChatRoomExitRequest): Single<Boolean>
 
     fun inviteUser(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse>
+
+    /** @CrawlAPI */
+
+    fun getCovidData(): Single<ArrayList<CovidDataResponse>>
+
+    fun getNewsData(): Single<ArrayList<NewsDataResponse>>
+
+    fun getMusicTopList(): Single<ArrayList<MusicDataResponse>>
 
 }

@@ -14,15 +14,20 @@ import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.ChatAPI
+import com.example.coconut.model.api.CrawlAPI
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
+import com.example.coconut.model.response.hashtag.CovidDataResponse
+import com.example.coconut.model.response.hashtag.MusicDataResponse
+import com.example.coconut.model.response.hashtag.NewsDataResponse
 import io.reactivex.Single
 
 class MyRepositoryImpl(
     private val authAPI: AuthAPI,
     private val accountAPI: AccountAPI,
-    private val chatAPI: ChatAPI
+    private val chatAPI: ChatAPI,
+    private val crawlAPI: CrawlAPI
 ) : MyRepository {
 
 
@@ -68,6 +73,7 @@ class MyRepositoryImpl(
     }
 
     /** mainService*/
+
     override fun getAccountData(myId: String)
             : Single<ArrayList<UserDataResponse>> {
         return accountAPI.getAllUserData(myId)
@@ -129,5 +135,17 @@ class MyRepositoryImpl(
 
     override fun inviteUser(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse> {
         return chatAPI.inviteUser(chatRoomDataRequest)
+    }
+
+    override fun getCovidData(): Single<ArrayList<CovidDataResponse>> {
+        return crawlAPI.getCovidData()
+    }
+
+    override fun getNewsData(): Single<ArrayList<NewsDataResponse>> {
+        return crawlAPI.getNewsData()
+    }
+
+    override fun getMusicTopList(): Single<ArrayList<MusicDataResponse>> {
+        return crawlAPI.getMusicTopList()
     }
 }

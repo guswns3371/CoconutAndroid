@@ -20,6 +20,14 @@ class Constant {
         const val CALL_PAGE = 6
         const val RC_FAIL = 0
         const val RC_AUTH = 100
+
+        const val KOREA_COVID_DATA_URL = "http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13"
+        const val NEWS_DATA_URL = "https://news.daum.net/ranking/popular"
+        const val MUSIC_DATA_URL = "https://www.melon.com/chart/"
+
+        const val COVID = "코로나19"
+        const val NEWS = "뉴스"
+        const val MUSIC = "실시간 음악순위"
     }
 }
 

@@ -3,7 +3,7 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_account">친구</string>
     <string name="title_chat">채팅</string>
-    <string name="title_hashtag">해쉬태그</string>
+    <string name="title_hashtag">해시태그</string>
     <string name="title_more">더보기</string>
 
     <string name="default_notification_channel_id">com.example.coconut</string>
@@ -44,6 +44,7 @@
     <string name="toolbar_account_setting">전체설정</string>
     <string name="toolbar_account_friends">친구관리</string>
     <string name="toolbar_account_edit">편집</string>
+    <string name="toolbar_account_reload">새로고침</string>
 
     <string name="invite">대화상대 초대</string>
     <string name="chatting">채 팅</string>
@@ -61,4 +62,5 @@
     <string name="msg_token_fmt">InstanceID Token: %s</string>
 
     <string name="drawer_people">대화상대</string>
+    <string name="hash">#</string>
 </resources>
