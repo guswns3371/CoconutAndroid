@@ -61,13 +61,13 @@
         <TextView
             android:id="@+id/music_num"
 
-            android:layout_width="25dp"
+            android:layout_width="35dp"
             android:layout_height="25dp"
             android:layout_gravity="end"
             android:background="@color/SecondaryColorDark"
             android:gravity="center"
             android:padding="2dp"
-            android:text="99"
+            android:text="999"
             android:textColor="@color/PrimaryColorText"
             android:textSize="14sp"
             android:textStyle="bold" />

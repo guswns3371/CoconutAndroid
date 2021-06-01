@@ -25,9 +25,9 @@ class Constant {
         const val NEWS_DATA_URL = "https://news.daum.net/ranking/popular"
         const val MUSIC_DATA_URL = "https://www.melon.com/chart/"
 
-        const val COVID = "코로나19"
         const val NEWS = "뉴스"
-        const val MUSIC = "실시간 음악순위"
+        const val COVID = "코로나19"
+        const val MUSIC = "실시간 음원차트"
     }
 }
 

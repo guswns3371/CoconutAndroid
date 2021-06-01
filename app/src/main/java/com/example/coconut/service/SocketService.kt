@@ -16,6 +16,7 @@ import com.example.coconut.model.socket.EchoSocketData
 import com.example.coconut.ui.main.account.AccountFragment
 import com.example.coconut.ui.main.chat.ChatFragment
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
+import com.example.coconut.ui.main.hashtag.HashTagFragment
 import com.example.coconut.util.MyPreference
 import com.example.coconut.util.showToast
 import com.example.coconut.util.toArrayList
@@ -59,6 +60,7 @@ class SocketService : Service() {
     private lateinit var accountFragReceiver: BroadcastReceiver
     private lateinit var innerChatActivityReceiver: BroadcastReceiver
     private lateinit var chatFragReceiver: BroadcastReceiver
+    private lateinit var hashFragReceiver: BroadcastReceiver
 
     /**
      * https://bitsoul.tistory.com/149
@@ -185,6 +187,7 @@ class SocketService : Service() {
         accountFragReceiver = AccountFragment().getBroadcastReceiver()
         innerChatActivityReceiver = InnerChatActivity().getBroadcastReceiver()
         chatFragReceiver = ChatFragment().getBroadcastReceiver()
+        hashFragReceiver = HashTagFragment().getBroadcastReceiver()
 
         IntentFilter(BroadCastIntentID.SEND_USER_LIST).let {
             it.addAction(BroadCastIntentID.SEND_ON_CONNECT)
@@ -198,6 +201,7 @@ class SocketService : Service() {
             it.addAction(BroadCastIntentID.SEND_ON_ERROR)
             registerReceiver(innerChatActivityReceiver, it)
             registerReceiver(chatFragReceiver, it)
+            registerReceiver(hashFragReceiver, it)
         }
     }
 
@@ -205,6 +209,7 @@ class SocketService : Service() {
         unregisterReceiver(accountFragReceiver)
         unregisterReceiver(innerChatActivityReceiver)
         unregisterReceiver(chatFragReceiver)
+        unregisterReceiver(hashFragReceiver)
     }
 
     private fun stompConnect() {

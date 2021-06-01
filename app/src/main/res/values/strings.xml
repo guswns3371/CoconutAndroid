@@ -63,4 +63,6 @@
 
     <string name="drawer_people">대화상대</string>
     <string name="hash">#</string>
+    <string name="to_left"><![CDATA[<]]></string>
+    <string name="to_right"><![CDATA[>]]></string>
 </resources>
