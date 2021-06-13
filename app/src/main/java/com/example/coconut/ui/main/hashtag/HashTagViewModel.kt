@@ -6,9 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.coconut.base.BaseKotlinViewModel
 import com.example.coconut.model.MyRepository
 import com.example.coconut.model.response.account.UserDataResponse
-import com.example.coconut.model.response.hashtag.CovidDataResponse
-import com.example.coconut.model.response.hashtag.MusicDataResponse
-import com.example.coconut.model.response.hashtag.NewsDataResponse
+import com.example.coconut.model.response.hashtag.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -27,6 +25,12 @@ class HashTagViewModel(
     private val _musicDataResponseLiveData = MutableLiveData<ArrayList<MusicDataResponse>>()
     val musicDataResponseLiveData: LiveData<ArrayList<MusicDataResponse>> = _musicDataResponseLiveData
 
+    private val _noticeDataResponseLiveData = MutableLiveData<ArrayList<NoticeDataResponse>>()
+    val noticeDataResponseLiveData: LiveData<ArrayList<NoticeDataResponse>> = _noticeDataResponseLiveData
+
+    private val _jobDataResponseLiveData = MutableLiveData<ArrayList<JobDataResponse>>()
+    val jobDataResponseLiveData: LiveData<ArrayList<JobDataResponse>> = _jobDataResponseLiveData
+
     fun getCovidData() {
         addDisposable(
             myRepository.getCovidData()
@@ -34,6 +38,7 @@ class HashTagViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Log.e(TAG, "response : \n${it}")
+                    it.add(0, CovidDataResponse("지역", "증가", "확진자수", "사망자", "발생률"))
                     _covidDataResponseLiveData.postValue(it)
                 }, {
                     Log.e(TAG, "response error, message : ${it.message}")
@@ -68,6 +73,36 @@ class HashTagViewModel(
                 }, {
                     Log.e(TAG, "response error, message : ${it.message}")
                     _musicDataResponseLiveData.postValue(arrayListOf())
+                })
+        )
+    }
+
+    fun getSeoulTechList() {
+        addDisposable(
+            myRepository.getSeoulTechList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.e(TAG, "response : \n${it}")
+                    _noticeDataResponseLiveData.postValue(it)
+                }, {
+                    Log.e(TAG, "response error, message : ${it.message}")
+                    _noticeDataResponseLiveData.postValue(arrayListOf())
+                })
+        )
+    }
+
+    fun getJobList() {
+        addDisposable(
+            myRepository.getJobList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Log.e(TAG, "response : \n${it}")
+                    _jobDataResponseLiveData.postValue(it)
+                }, {
+                    Log.e(TAG, "response error, message : ${it.message}")
+                    _jobDataResponseLiveData.postValue(arrayListOf())
                 })
         )
     }

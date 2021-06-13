@@ -6,9 +6,10 @@ data class NewsDataResponse(
     @SerializedName("thumbNailImage") var thumbNailImage: String,
     @SerializedName("newsUrl") var newsUrl: String,
     @SerializedName("title") var title: String,
+    @SerializedName("siteName") var siteName: String,
     @SerializedName("newsName") var newsName: String
 ) {
     override fun toString(): String {
-        return "NewsDataResponse(thumbNailImage='$thumbNailImage', newsUrl='$newsUrl', title='$title', newsName='$newsName')"
+        return "NewsDataResponse(thumbNailImage='$thumbNailImage', newsUrl='$newsUrl', title='$title', siteName='$siteName', newsName='$newsName')"
     }
 }

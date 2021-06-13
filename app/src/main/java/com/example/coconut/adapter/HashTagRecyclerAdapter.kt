@@ -8,16 +8,18 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.Constant.Companion.COVID
+import com.example.coconut.Constant.Companion.JOB
 import com.example.coconut.Constant.Companion.KOREA_COVID_DATA_URL
 import com.example.coconut.Constant.Companion.MUSIC
 import com.example.coconut.Constant.Companion.MUSIC_DATA_URL
 import com.example.coconut.Constant.Companion.NEWS
 import com.example.coconut.Constant.Companion.NEWS_DATA_URL
+import com.example.coconut.Constant.Companion.NOTICE
+import com.example.coconut.Constant.Companion.PROGRAMMERS_JOB_URL
+import com.example.coconut.Constant.Companion.SEOULTECH_NOTICE_URL
 import com.example.coconut.R
 import com.example.coconut.model.response.account.UserDataResponse
-import com.example.coconut.model.response.hashtag.CovidDataResponse
-import com.example.coconut.model.response.hashtag.MusicDataResponse
-import com.example.coconut.model.response.hashtag.NewsDataResponse
+import com.example.coconut.model.response.hashtag.*
 import kotlinx.android.synthetic.main.item_hash_tag.view.*
 import org.koin.android.ext.android.inject
 
@@ -27,19 +29,33 @@ class HashTagRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val TYPE_NEWS = 0
         const val TYPE_COVID = 1
         const val TYPE_MUSIC = 2
+        const val TYPE_NOTICE = 3
+        const val TYPE_JOB = 4
     }
 
-    private val TAG = "HashTagRecyclerAdapter"
-    private var titleList = arrayListOf(NEWS, COVID, MUSIC)
-    private var linkList = arrayListOf(NEWS_DATA_URL, KOREA_COVID_DATA_URL, MUSIC_DATA_URL)
+    private var titleList = arrayListOf(NEWS, COVID, MUSIC, NOTICE, JOB)
+    private var linkList = arrayListOf(
+        NEWS_DATA_URL,
+        KOREA_COVID_DATA_URL,
+        MUSIC_DATA_URL,
+        SEOULTECH_NOTICE_URL,
+        PROGRAMMERS_JOB_URL
+    )
     private var itemList: ArrayList<Any> =
-        arrayListOf(arrayListOf<Any>(), arrayListOf<Any>(), arrayListOf<Any>())
+        arrayListOf(
+            arrayListOf<Any>(),
+            arrayListOf<Any>(),
+            arrayListOf<Any>(),
+            arrayListOf<Any>(),
+            arrayListOf<Any>()
+        )
 
     inner class HashTagHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_hash_tag, parent, false)
     ) {
         fun onBind(itemList: Any, pos: Int) {
             itemView.run {
+
                 hash_item_title_txt.text = titleList[pos]
                 hash_item_title_dummy.text = titleList[pos]
                 hash_item_title_txt.setOnClickListener {
@@ -75,6 +91,16 @@ class HashTagRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setMusicList(musicList: ArrayList<MusicDataResponse>) {
         this.itemList[TYPE_MUSIC] = musicList
+        notifyDataSetChanged()
+    }
+
+    fun setNoticeList(noticeList: ArrayList<NoticeDataResponse>) {
+        this.itemList[TYPE_NOTICE] = noticeList
+        notifyDataSetChanged()
+    }
+
+    fun setJobList(jobList: ArrayList<JobDataResponse>) {
+        this.itemList[TYPE_JOB] = jobList
         notifyDataSetChanged()
     }
 

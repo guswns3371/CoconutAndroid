@@ -3,14 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="3dp"
+    android:foreground="?attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="90dp">
 
 
     <ImageView
         android:id="@+id/music_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:scaleType="centerCrop"
         app:srcCompat="@drawable/black" />
 
     <FrameLayout
@@ -34,7 +36,7 @@
                 android:maxLines="1"
                 android:text="TextView"
                 android:textColor="@color/PrimaryColorText"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -45,7 +47,7 @@
                 android:ellipsize="end"
                 android:text="TextView"
                 android:textColor="@color/PrimaryColorText"
-                android:textSize="13sp" />
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/music_artist"
@@ -55,21 +57,22 @@
                 android:ellipsize="end"
                 android:text="TextView"
                 android:textColor="@color/PrimaryColorText"
-                android:textSize="13sp" />
+                android:textSize="15sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/music_num"
 
-            android:layout_width="35dp"
+            android:layout_width="wrap_content"
             android:layout_height="25dp"
             android:layout_gravity="end"
             android:background="@color/SecondaryColorDark"
             android:gravity="center"
-            android:padding="2dp"
+            android:padding="3dp"
             android:text="999"
             android:textColor="@color/PrimaryColorText"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textSize="13sp"
+            android:fontFamily="@font/gotham_medium"
+            android:textStyle="bold|italic" />
     </FrameLayout>
 </LinearLayout>

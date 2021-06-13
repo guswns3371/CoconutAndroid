@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.view.Menu
 import android.view.View
 import android.widget.TextView
@@ -12,12 +13,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.coconut.BroadCastIntentID
+import com.example.coconut.Constant
 import com.example.coconut.R
 import com.example.coconut.adapter.HashTagRecyclerAdapter
 import com.example.coconut.base.BaseKotlinFragment
 import com.example.coconut.base.BroadcastReceiverManager
 import com.example.coconut.databinding.FragmentHashtagBinding
 import com.example.coconut.model.response.hashtag.CovidDataResponse
+import com.example.coconut.model.response.hashtag.NoticeDataResponse
 import com.example.coconut.ui.OnFragmentInteractionListener
 import com.example.coconut.ui.setting.SettingActivity
 import com.example.coconut.util.MyPreference
@@ -82,11 +85,11 @@ class HashTagFragment
             }
 
         viewDataBinding.root.findViewById<TextView>(R.id.hash_left_btn_txt).setOnClickListener {
-            number = if (number != 0) number - 1 else 0
+            number = if (number != 0) number - 1 else recyclerAdapter.itemCount - 1
             recyclerView.scrollToPosition(number)
         }
         viewDataBinding.root.findViewById<TextView>(R.id.hash_right_btn_txt).setOnClickListener {
-            number = if (number != recyclerView.childCount) number + 1 else recyclerView.childCount
+            number = if (number != recyclerAdapter.itemCount - 1) number + 1 else 0
             recyclerView.scrollToPosition(number)
         }
     }
@@ -97,11 +100,16 @@ class HashTagFragment
             recyclerAdapter.setNewsList(it)
         })
         viewModel.covidDataResponseLiveData.observe(this, {
-            it.add(0, CovidDataResponse("지역", "증가", "확진자수", "사망자", "일일검사", "발생률"))
             recyclerAdapter.setCovidList(it)
         })
         viewModel.musicDataResponseLiveData.observe(this, {
             recyclerAdapter.setMusicList(it)
+        })
+        viewModel.noticeDataResponseLiveData.observe(this, {
+            recyclerAdapter.setNoticeList(it)
+        })
+        viewModel.jobDataResponseLiveData.observe(this, {
+            recyclerAdapter.setJobList(it)
         })
     }
 
@@ -114,6 +122,18 @@ class HashTagFragment
         viewModel.getNewsData()
         viewModel.getCovidData()
         viewModel.getMusicTopList()
+        viewModel.getSeoulTechList()
+        viewModel.getJobList()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver()
     }
 
     override fun setBaseToolbarItemClickListener(itemId: Int) {
@@ -145,5 +165,16 @@ class HashTagFragment
         menu.findItem(R.id.action_chat_add).isVisible = false
     }
 
+    private fun registerReceiver() {
+        IntentFilter(BroadCastIntentID.SEND_ON_CONNECT).let {
+            it.addAction(BroadCastIntentID.SEND_ON_DISCONNECT)
+            it.addAction(BroadCastIntentID.SEND_ON_ERROR)
+            registerBroadcastReceiver(activity!!, it)
+        }
+    }
+
+    private fun unregisterReceiver() {
+        unregisterBroadcastReceiver(activity)
+    }
 
 }

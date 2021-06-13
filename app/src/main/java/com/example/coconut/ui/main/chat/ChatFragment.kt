@@ -120,7 +120,6 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                                 R.id.dialog_item_text,
                                 titleList
                             )
-
                             findViewById<ListView>(R.id.dialog_list_view).apply {
                                 adapter = arrayAdapter
                                 setOnItemClickListener { parent, view, position, id ->

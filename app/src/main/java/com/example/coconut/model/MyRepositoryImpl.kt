@@ -18,9 +18,7 @@ import com.example.coconut.model.api.CrawlAPI
 import com.example.coconut.model.request.auth.OAuth2LoginRequest
 import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
-import com.example.coconut.model.response.hashtag.CovidDataResponse
-import com.example.coconut.model.response.hashtag.MusicDataResponse
-import com.example.coconut.model.response.hashtag.NewsDataResponse
+import com.example.coconut.model.response.hashtag.*
 import io.reactivex.Single
 
 class MyRepositoryImpl(
@@ -147,5 +145,13 @@ class MyRepositoryImpl(
 
     override fun getMusicTopList(): Single<ArrayList<MusicDataResponse>> {
         return crawlAPI.getMusicTopList()
+    }
+
+    override fun getSeoulTechList(): Single<ArrayList<NoticeDataResponse>> {
+        return crawlAPI.getSeoulTechList()
+    }
+
+    override fun getJobList(): Single<ArrayList<JobDataResponse>> {
+        return crawlAPI.getJobList()
     }
 }

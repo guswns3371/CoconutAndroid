@@ -8,12 +8,9 @@ data class CovidDataResponse(
     @SerializedName("diffFromPrevDay") var diffFromPrevDay: String,
     @SerializedName("total") var total: String,
     @SerializedName("death") var death: String,
-    @SerializedName("incidence") var incidence: String,
     @SerializedName("inspection") var inspection: String
 ) {
-    override fun toString(): String {
-        return "CovidDataResponse(country='$country', diffFromPrevDay='$diffFromPrevDay', total='$total', death='$death', incidence='$incidence', inspection='$inspection')"
-    }
+
 }
 
 /**

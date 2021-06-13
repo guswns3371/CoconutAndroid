@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="3dp"
+    android:foreground="?attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -18,7 +19,8 @@
             android:gravity="center"
             android:text="TextView"
             android:textColor="@color/PrimaryColorText"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/covid_diff"
@@ -42,16 +44,6 @@
 
         <TextView
             android:id="@+id/covid_death"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="@color/PrimaryColorText"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/covid_incidence"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

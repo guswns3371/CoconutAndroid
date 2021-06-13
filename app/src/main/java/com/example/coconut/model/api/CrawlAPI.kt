@@ -1,8 +1,6 @@
 package com.example.coconut.model.api
 
-import com.example.coconut.model.response.hashtag.CovidDataResponse
-import com.example.coconut.model.response.hashtag.MusicDataResponse
-import com.example.coconut.model.response.hashtag.NewsDataResponse
+import com.example.coconut.model.response.hashtag.*
 import io.reactivex.Single
 import retrofit2.http.GET
 import java.util.ArrayList
@@ -17,4 +15,10 @@ interface CrawlAPI {
 
     @GET("/api/crawl/music")
     fun getMusicTopList(): Single<ArrayList<MusicDataResponse>>
+
+    @GET("/api/crawl/notice")
+    fun getSeoulTechList(): Single<ArrayList<NoticeDataResponse>>
+
+    @GET("/api/crawl/job")
+    fun getJobList(): Single<ArrayList<JobDataResponse>>
 }

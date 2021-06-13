@@ -158,7 +158,8 @@ class AccountFragment : BaseKotlinFragment<FragmentAccountBinding, AccountViewMo
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(activity)
+        if (isBind)
+            unbindService(activity)
     }
 
     override fun setBaseToolbarItemClickListener(itemId: Int) {

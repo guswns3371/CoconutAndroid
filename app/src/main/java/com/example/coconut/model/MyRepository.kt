@@ -14,9 +14,7 @@ import com.example.coconut.model.response.auth.RegisterResponse
 import com.example.coconut.model.response.chat.ChatRoomDataResponse
 import com.example.coconut.model.response.chat.ChatHistoryResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
-import com.example.coconut.model.response.hashtag.CovidDataResponse
-import com.example.coconut.model.response.hashtag.MusicDataResponse
-import com.example.coconut.model.response.hashtag.NewsDataResponse
+import com.example.coconut.model.response.hashtag.*
 import io.reactivex.Single
 
 interface MyRepository {
@@ -74,5 +72,9 @@ interface MyRepository {
     fun getNewsData(): Single<ArrayList<NewsDataResponse>>
 
     fun getMusicTopList(): Single<ArrayList<MusicDataResponse>>
+
+    fun getSeoulTechList(): Single<ArrayList<NoticeDataResponse>>
+
+    fun getJobList(): Single<ArrayList<JobDataResponse>>
 
 }

@@ -7,10 +7,10 @@ class Constant {
         // public 주소를 사용하면 외부에서 연결 가능하다
         private const val BASE_HOST = "10.0.2.2"
         const val BASE_URL = "http://${BASE_HOST}"
-        const val SPRING_BOOT_URL = "${BASE_URL}:8080/"
-        const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:8080/uploads/"
+        const val SPRING_BOOT_URL = "${BASE_URL}:8081/"
+        const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:8081/uploads/"
         const val SOCKET_SERVER = SPRING_BOOT_URL
-        const val STOMP_URL = "ws://${BASE_HOST}:8080/socket-endpoint/websocket"
+        const val STOMP_URL = "ws://${BASE_HOST}:8081/socket-endpoint/websocket"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE = 1
         const val HOME_PAGE = 2
@@ -24,10 +24,14 @@ class Constant {
         const val KOREA_COVID_DATA_URL = "http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13"
         const val NEWS_DATA_URL = "https://news.daum.net/ranking/popular"
         const val MUSIC_DATA_URL = "https://www.melon.com/chart/"
+        const val SEOULTECH_NOTICE_URL = "https://www.seoultech.ac.kr/service/info/matters/"
+        const val PROGRAMMERS_JOB_URL = "https://programmers.co.kr/job"
 
         const val NEWS = "뉴스"
         const val COVID = "코로나19"
         const val MUSIC = "실시간 음원차트"
+        const val NOTICE = "SeoulTech 학사공지"
+        const val JOB = "개발자 채용공고"
     }
 }
 
