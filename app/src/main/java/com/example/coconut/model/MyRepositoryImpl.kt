@@ -1,9 +1,6 @@
 package com.example.coconut.model
 
 import com.example.coconut.model.request.account.AccountEditRequest
-import com.example.coconut.model.request.auth.EmailVerifyRequest
-import com.example.coconut.model.request.auth.LoginRequest
-import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.auth.LoginResponse
@@ -15,7 +12,7 @@ import com.example.coconut.model.api.AuthAPI
 import com.example.coconut.model.api.AccountAPI
 import com.example.coconut.model.api.ChatAPI
 import com.example.coconut.model.api.CrawlAPI
-import com.example.coconut.model.request.auth.OAuth2LoginRequest
+import com.example.coconut.model.request.auth.*
 import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
 import com.example.coconut.model.response.hashtag.*
@@ -44,7 +41,7 @@ class MyRepositoryImpl(
         return authAPI.login(loginRequest)
     }
 
-    override fun checkEmailValidation(email: String)
+    override fun checkEmailValidation(email: EmailCheckRequest)
             : Single<RegisterResponse> {
         return authAPI.checkEmailValidation(email)
     }

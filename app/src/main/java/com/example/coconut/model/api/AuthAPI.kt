@@ -1,10 +1,7 @@
 package com.example.coconut.model.api
 
-import com.example.coconut.model.request.auth.EmailVerifyRequest
+import com.example.coconut.model.request.auth.*
 import com.example.coconut.model.request.chat.FcmTokenRequest
-import com.example.coconut.model.request.auth.LoginRequest
-import com.example.coconut.model.request.auth.OAuth2LoginRequest
-import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.response.BaseResponse
 import com.example.coconut.model.response.auth.LoginResponse
 import com.example.coconut.model.response.auth.OAuth2LoginResponse
@@ -28,38 +25,38 @@ interface AuthAPI {
     @POST("/oauth2/authorization/naver")
     fun naverLogin() : Single<LoginResponse>
 
-    @POST("/api/auth/login")
+    @POST("/api/account/login")
     fun login(
         @Body loginRequest: LoginRequest
     ): Single<LoginResponse>
 
-    @POST("/api/auth/register")
+    @POST("/api/account/register")
     fun register(
         @Body registerRequest: RegisterRequest
     ): Single<RegisterResponse>
 
-    @POST("/api/auth/register/{email}")
+    @POST("/api/account/email-check")
     fun checkEmailValidation(
-        @Path("email") email : String
+        @Body request : EmailCheckRequest
     ) : Single<RegisterResponse>
 
-    @POST("/api/auth/login/verify")
+    @POST("/api/account/login/verify")
     fun emailVerify(
         @Body emailVerifyRequest: EmailVerifyRequest
     ) : Single<LoginResponse>
 
 
-    @POST("/api/auth/user/fcm")
+    @POST("/api/account/user/fcm")
     fun fcmTokenToServer(
         @Body fcmTokenRequest: FcmTokenRequest
     ) : Single<BaseResponse>
 
-    @DELETE("/api/auth/user/fcm/{id}")
+    @DELETE("/api/account/user/fcm/{id}")
     fun deleteFcmTokenFromServer(
         @Path("id") id : String
     ) : Single<BaseResponse>
 
-    @POST("/api/auth/user/info")
+    @POST("/api/account/user/info")
     fun sendUserInfoToServer(
         @Body oAuth2LoginRequest: OAuth2LoginRequest
     ) : Single<OAuth2LoginResponse>

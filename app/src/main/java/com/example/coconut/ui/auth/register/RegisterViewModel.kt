@@ -11,6 +11,7 @@ import com.example.coconut.model.MyRepository
 import com.example.coconut.model.request.auth.RegisterRequest
 import com.example.coconut.model.response.auth.RegisterResponse
 import com.example.coconut.model.data.RegisterValidData
+import com.example.coconut.model.request.auth.EmailCheckRequest
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -62,7 +63,7 @@ class RegisterViewModel(private val model : MyRepository) : BaseKotlinViewModel(
     }
 
     fun emailCheckButton(){
-        addDisposable(model.checkEmailValidation(email.get().toString())
+        addDisposable(model.checkEmailValidation(EmailCheckRequest(email.get().toString()))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

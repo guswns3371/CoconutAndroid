@@ -1,5 +1,6 @@
 package com.example.coconut.di
 
+import android.app.Application
 import com.example.coconut.Constant
 import com.example.coconut.MyApplication
 import com.example.coconut.adapter.*
@@ -23,7 +24,9 @@ import com.example.coconut.ui.setting.SettingViewModel
 import com.example.coconut.util.MyPreference
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.ext.koin.viewModel
@@ -107,6 +110,12 @@ var gson: Gson = GsonBuilder()
     .create()
 
 private fun okHttpClient() = OkHttpClient.Builder()
+    .addInterceptor { chain ->
+        val token: String? = MyPreference(Application()).accessToken
+        val request =
+            chain.request().newBuilder().addHeader("Authorization Bearer ", token ?: "").build()
+        chain.proceed(request)
+    }
     .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
     .build()
 

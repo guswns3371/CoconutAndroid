@@ -1,10 +1,7 @@
 package com.example.coconut.model
 
 import com.example.coconut.model.request.account.AccountEditRequest
-import com.example.coconut.model.request.auth.EmailVerifyRequest
-import com.example.coconut.model.request.auth.LoginRequest
-import com.example.coconut.model.request.auth.OAuth2LoginRequest
-import com.example.coconut.model.request.auth.RegisterRequest
+import com.example.coconut.model.request.auth.*
 import com.example.coconut.model.request.chat.*
 import com.example.coconut.model.response.*
 import com.example.coconut.model.response.account.UserDataResponse
@@ -27,7 +24,7 @@ interface MyRepository {
 
     fun doLogin(loginRequest: LoginRequest): Single<LoginResponse>
 
-    fun checkEmailValidation(email: String): Single<RegisterResponse>
+    fun checkEmailValidation(email: EmailCheckRequest): Single<RegisterResponse>
 
     fun emailVerify(emailVerifyRequest: EmailVerifyRequest): Single<LoginResponse>
 
