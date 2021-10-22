@@ -1,28 +1,23 @@
 package com.example.coconut.adapter
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.ListView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.coconut.IntentID
 import com.example.coconut.R
 import com.example.coconut.RoomType
-import com.example.coconut.model.request.chat.ChatRoomNameChangeRequest
 import com.example.coconut.model.response.account.UserDataResponse
 import com.example.coconut.model.response.chat.ChatRoomInfoResponse
 import com.example.coconut.model.response.chat.ChatRoomListResponse
 import com.example.coconut.ui.main.chat.ChatViewModel
 import com.example.coconut.ui.main.chat.inner.InnerChatActivity
 import com.example.coconut.util.*
-import kotlinx.android.synthetic.main.custom_dialog_default.*
 import kotlinx.android.synthetic.main.item_chat_fragment.view.*
 
 class ChatListRecyclerAdapter(
@@ -77,7 +72,7 @@ class ChatListRecyclerAdapter(
         fun onBind(item: ChatRoomListResponse) {
             itemView.run {
                 roomInfo = item.chatRoomInfo!!
-                userInfoList = item.userInfo!!
+                userInfoList = item.userInfos!!
 
                 chat_list_name.text = item.chatRoomName
                 chat_list_people_size.text = "${userInfoList.size + 1}"

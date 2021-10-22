@@ -11,13 +11,13 @@ data class ChatHistoryResponse(
     @SerializedName("userInfo") var userInfo : UserDataResponse,
     @SerializedName("chatRoomId") var chatRoomId : String,
     @SerializedName("chatUserId") var chatUserId : String,
-    @SerializedName("readMembers") var readMembers : String?,
+    @SerializedName("readCount") var readCount : Int,
     @SerializedName("time") var time : String,
     @SerializedName("history") var history : String,
     @SerializedName("chatImages") var chatImages : ArrayList<String>?,
     @SerializedName("messageType") var messageType : String?
 ) {
     override fun toString(): String {
-        return "ChatHistoryResponse(userInfo=$userInfo, chatRoomId='$chatRoomId', chatUserId='$chatUserId', readMembers='$readMembers', time='$time', history='$history', chatImages='$chatImages', messageType=$messageType)"
+        return "ChatHistoryResponse(userInfo=$userInfo, chatRoomId='$chatRoomId', chatUserId='$chatUserId', readMembers='$readCount', time='$time', history='$history', chatImages='$chatImages', messageType=$messageType)"
     }
 }

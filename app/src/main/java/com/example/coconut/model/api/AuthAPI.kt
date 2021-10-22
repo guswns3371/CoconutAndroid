@@ -14,17 +14,6 @@ import retrofit2.http.Path
 
 interface AuthAPI {
 
-    /**
-     *  <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
-     *  <a href="/oauth2/authorization/naver" class="btn btn-secondary active" role="button">Naver Login</a>
-     */
-
-    @POST("/oauth2/authorization/google")
-    fun googleLogin() : Single<LoginResponse>
-
-    @POST("/oauth2/authorization/naver")
-    fun naverLogin() : Single<LoginResponse>
-
     @POST("/api/account/login")
     fun login(
         @Body loginRequest: LoginRequest

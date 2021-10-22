@@ -110,12 +110,12 @@ var gson: Gson = GsonBuilder()
     .create()
 
 private fun okHttpClient() = OkHttpClient.Builder()
-    .addInterceptor { chain ->
-        val token: String? = MyPreference(Application()).accessToken
-        val request =
-            chain.request().newBuilder().addHeader("Authorization Bearer ", token ?: "").build()
-        chain.proceed(request)
-    }
+//    .addInterceptor { chain ->
+//        val token: String? = MyPreference(Application()).accessToken
+//        val request =
+//            chain.request().newBuilder().addHeader("Authorization Bearer ", token ?: "").build()
+//        chain.proceed(request)
+//    }
     .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
     .build()
 

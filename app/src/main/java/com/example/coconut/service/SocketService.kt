@@ -39,7 +39,7 @@ import kotlin.properties.Delegates
 class SocketService : Service() {
 
     private val TAG = "SocketService"
-    private val intervalMillis = 1000L
+    private val intervalMillis = 300L
     private var sender: String? = null
     private val pref: MyPreference by inject()
 

@@ -84,7 +84,7 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                 }
                 BroadCastIntentID.SEND_ON_ERROR -> {
                 }
-                BroadCastIntentID.SEND_ON_FCM_PUSH ->{
+                BroadCastIntentID.SEND_ON_FCM_PUSH -> {
                 }
                 else -> {
                 }
@@ -160,23 +160,26 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
                                                 dialog_edit_text.text =
                                                     item.chatRoomName?.toEditable()
                                                 dialog_content.gone()
+                                                dialog_reset.show()
 
                                                 dialog_negative.setOnClickListener { dismiss() }
 
+                                                dialog_reset.setOnClickListener {
+                                                    dialog_edit_text.text.toString().let { _ ->
+                                                        changeChatRoomName(null, item.chatRoomInfo?.id)
+                                                        dismiss()
+                                                    }
+                                                }
+
                                                 dialog_positive.setOnClickListener {
                                                     dialog_edit_text.text.toString().let { text ->
-                                                        viewModel.changeChatRoomName(
-                                                            ChatRoomNameChangeRequest(
-                                                                text,
-                                                                item.chatRoomInfo?.id,
-                                                                pref.userIdx
-                                                            )
-                                                        )
+                                                        changeChatRoomName(text, item.chatRoomInfo?.id)
                                                         dismiss()
                                                     }
                                                 }
                                             }
                                         }
+
                                     }
                                 }
                             }
@@ -190,6 +193,16 @@ class ChatFragment : BaseKotlinFragment<FragmentChatBinding, ChatViewModel>(),
         }
 
 
+    }
+
+    private fun changeChatRoomName(text: String?, chatRoomId: String?) {
+        viewModel.changeChatRoomName(
+            ChatRoomNameChangeRequest(
+                text,
+                chatRoomId,
+                pref.userIdx
+            )
+        )
     }
 
     override fun initDataBinding() {

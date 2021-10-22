@@ -6,11 +6,12 @@ class Constant {
         // pc로컬 주소로 연결하기 위해선 10.0.2.2 를 사용할 것
         // public 주소를 사용하면 외부에서 연결 가능하다
         private const val BASE_HOST = "10.0.2.2"
+        private const val PORT = "8080"
         const val BASE_URL = "http://${BASE_HOST}"
-        const val SPRING_BOOT_URL = "${BASE_URL}:8081/"
-        const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:8081/uploads/"
+        const val SPRING_BOOT_URL = "${BASE_URL}:${PORT}/"
+        const val SPRING_BOOT_IMAGE_URL = "${BASE_URL}:${PORT}/uploads/"
         const val SOCKET_SERVER = SPRING_BOOT_URL
-        const val STOMP_URL = "ws://${BASE_HOST}:8081/socket-endpoint/websocket"
+        const val STOMP_URL = "ws://${BASE_HOST}:${PORT}/socket-endpoint/websocket"
         const val REGISTER_PAGE = 0
         const val PASSWORD_FIND_PAGE = 1
         const val HOME_PAGE = 2
