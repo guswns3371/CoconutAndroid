@@ -1,7 +1,6 @@
 package com.example.coconut.adapter
 
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.coconut.Constant
 import com.example.coconut.IntentID
 import com.example.coconut.MessageType
 import com.example.coconut.R
@@ -18,7 +16,6 @@ import com.example.coconut.ui.ZoomableImageActivity
 import com.example.coconut.ui.main.account.info.AccountInfoActivity
 import com.example.coconut.util.*
 import kotlinx.android.synthetic.main.item_chat.view.*
-import kotlinx.android.synthetic.main.item_chat_fragment.view.*
 
 class InnerChatRecyclerAdapter(private var pref: MyPreference) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -98,7 +95,7 @@ class InnerChatRecyclerAdapter(private var pref: MyPreference) :
                 }
 
                 val userInfo = item.userInfo
-                var count = fixedPeopleList.size - item.readMembers!!.toInt()
+                var count = fixedPeopleList.size - item.readCount
 
                 count = if (count < 0) 0 else count
                 when (userInfo.id == pref.userIdx) {

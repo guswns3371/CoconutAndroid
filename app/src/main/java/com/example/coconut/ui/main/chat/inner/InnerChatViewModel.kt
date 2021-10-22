@@ -85,9 +85,9 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
         )
     }
 
-    fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest) {
+    fun getChatRoomData(roomID: String?, userId: String?) {
         addDisposable(
-            myRepository.getChatRoomData(chatRoomDataRequest)
+            myRepository.getChatRoomData(roomID, userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -101,9 +101,9 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
         )
     }
 
-    fun updateChatRoomData(chatRoomDataRequest: ChatRoomDataRequest) {
+    fun updateChatRoomData(roomID: String?, userId: String?) {
         addDisposable(
-            myRepository.getChatRoomData(chatRoomDataRequest)
+            myRepository.getChatRoomData(roomID, userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -129,22 +129,6 @@ class InnerChatViewModel(private val myRepository: MyRepository) : BaseKotlinVie
                     }
                 }, {
                     Log.d(TAG, "updateChatRoomData response error, message : ${it.message}")
-                })
-        )
-    }
-
-    fun sendMessage(chatMessageRequest: ChatMessageRequest) {
-        addDisposable(
-            myRepository.sendMessage(chatMessageRequest)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it?.run {
-                        Log.e(TAG, "sendMessage response : ${toString()}")
-                        _chatRoomDataResponseLiveData.postValue(this)
-                    }
-                }, {
-                    Log.d(TAG, "sendMessage response error, message : ${it.message}")
                 })
         )
     }

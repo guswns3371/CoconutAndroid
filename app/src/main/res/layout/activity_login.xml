@@ -118,19 +118,6 @@
             android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/naverLoginBtn"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:fontFamily="@font/gotham_medium"
-            android:onClick="@{()-> viewModel.naverLogin()}"
-            android:layout_margin="5dp"
-            app:cornerRadius="20dp"
-            android:visibility="gone"
-            android:text="Login With Naver"
-            android:textColor="@color/SecondaryColorDarkText"
-            android:textStyle="bold" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/registerBtn"
             android:layout_width="match_parent"
             android:layout_height="55dp"

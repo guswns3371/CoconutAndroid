@@ -41,6 +41,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
 import kotlinx.android.synthetic.main.activity_account_info.*
 import kotlinx.android.synthetic.main.custom_dialog_default.*
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
@@ -407,7 +408,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
             viewModel.makeChatRoom(ChatRoomSaveRequest(myID, chatRoomMembers))
         } else {
             // 채팅방 목록에서 클릭한 경우
-            viewModel.getChatRoomData(ChatRoomDataRequest(myID, roomID, chatRoomMembers))
+            viewModel.getChatRoomData(roomID, myID)
         }
 
         // 채팅방 id를 얻기 전까지 채팅버튼 비활성화
@@ -465,6 +466,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
     private fun onStompSubscribe() {
         if (stompClient == null) Log.e(TAG, "onStompClient is null")
         stompClient?.apply {
+            val jsonBuilder = Json { isLenient = true }
 
             // add하기 전에 clear한다
             clearDisposable()
@@ -488,9 +490,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                     Log.e(TAG, "/sub/chat/message/ : $message")
 
                     runOnUiThread {
-                        val chatHistory = Json {
-                            isLenient = true
-                        }.decodeFromString<ChatHistoryResponse>(message)
+                        val chatHistory = jsonBuilder.decodeFromString<ChatHistoryResponse>(message)
 
                         chatHistoryList.add(chatHistory)
                         recyclerAdapter.addChatItem(chatHistoryList)
@@ -498,11 +498,7 @@ class InnerChatActivity : BaseKotlinActivity<ActivityInnerChatBinding, InnerChat
                         // INFO 메시지를 받으면 채팅방 정보를 업데이트한다다
                         if (chatHistory.messageType == MessageType.INFO)
                             viewModel.updateChatRoomData(
-                                ChatRoomDataRequest(
-                                    myID,
-                                    roomID,
-                                    chatRoomMembers
-                                )
+                                roomID, myID
                             )
 
                         if (isEndOfHistory) {

@@ -27,15 +27,6 @@ class MyRepositoryImpl(
 
 
     /** authService*/
-
-    override fun googleLogin(): Single<LoginResponse> {
-        return authAPI.googleLogin()
-    }
-
-    override fun naverLogin(): Single<LoginResponse> {
-        return authAPI.naverLogin()
-    }
-
     override fun doLogin(loginRequest: LoginRequest)
             : Single<LoginResponse> {
         return authAPI.login(loginRequest)
@@ -89,22 +80,13 @@ class MyRepositoryImpl(
         return chatAPI.makeChatRoom(chatRoomSaveRequest)
     }
 
-    override fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse> {
-        return chatAPI.getChatRoomData(chatRoomDataRequest)
+    override fun getChatRoomData(chatRoomId: String?, userId: String?): Single<ChatRoomDataResponse> {
+        return chatAPI.getChatRoomData(chatRoomId, userId)
     }
 
     override fun getChatHistory(chatRoomId: String?)
             : Single<ArrayList<ChatHistoryResponse>> {
         return chatAPI.getChatHistory(chatRoomId)
-    }
-
-    override fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse> {
-        return chatAPI.sendMessage(
-            chatMessageRequest.chatRoomId,
-            chatMessageRequest.userId,
-            chatMessageRequest.chatMessage,
-            chatMessageRequest.chatImages
-        )
     }
 
     override fun getChatRoomLists(userId: String?)

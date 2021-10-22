@@ -8,10 +8,10 @@ data class ChatRoomListResponse(
     @SerializedName("unReads") var unReads: String?,
     @SerializedName("chatRoomName") var chatRoomName: String?,
     @SerializedName("chatRoomInfo") var chatRoomInfo: ChatRoomInfoResponse?,
-    @SerializedName("userInfo") var userInfo: ArrayList<UserDataResponse>?
+    @SerializedName("userInfos") var userInfos: ArrayList<UserDataResponse>?
 ) {
     override fun toString(): String {
-        return "ChatRoomListResponse(chatRoomId=$chatRoomId, unReads=$unReads, chatRoomName=$chatRoomName, chatRoomInfo=$chatRoomInfo, userInfo=$userInfo)"
+        return "ChatRoomListResponse(chatRoomId=$chatRoomId, unReads=$unReads, chatRoomName=$chatRoomName, chatRoomInfo=$chatRoomInfo, userInfo=$userInfos)"
     }
 }
 

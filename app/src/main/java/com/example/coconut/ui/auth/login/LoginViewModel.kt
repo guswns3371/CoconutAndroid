@@ -208,29 +208,6 @@ class LoginViewModel(
         authRepo.login(loginListener)
     }
 
-    fun naverLogin() {
-        addDisposable(
-            repository.naverLogin()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it.run {
-                        Log.e(TAG, "loginCheck :${toString()}")
-                        //sharedpreference에 user id 값을 저장한다
-                        if (isConfirmed) {
-                            pref.userIdx = user_idx
-                            sendFcmTokenToServer(user_idx, pref.fcmToken)
-                        }
-                        _loginResponseLiveData.value = Event(this)
-                    }
-                }, {
-                    Log.d(TAG, "response error, message : ${it.message}")
-                    showSnackbar("${it.message}")
-                })
-        )
-    }
-
-
     /**Verify Email*/
     fun emailVerify() {
         addDisposable(

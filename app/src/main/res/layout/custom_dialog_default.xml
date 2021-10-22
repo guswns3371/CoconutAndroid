@@ -60,6 +60,15 @@
             android:textColor="@color/PrimaryColorText" />
 
         <TextView
+            android:visibility="gone"
+            android:id="@+id/dialog_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/reset"
+            android:textColor="@color/PrimaryColorText" />
+
+        <TextView
             android:id="@+id/dialog_positive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

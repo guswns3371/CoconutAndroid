@@ -17,11 +17,6 @@ import io.reactivex.Single
 interface MyRepository {
 
     /** @AuthAPI */
-
-    fun googleLogin(): Single<LoginResponse>
-
-    fun naverLogin(): Single<LoginResponse>
-
     fun doLogin(loginRequest: LoginRequest): Single<LoginResponse>
 
     fun checkEmailValidation(email: EmailCheckRequest): Single<RegisterResponse>
@@ -46,11 +41,9 @@ interface MyRepository {
 
     fun makeChatRoom(chatRoomSaveRequest: ChatRoomSaveRequest): Single<ChatRoomDataResponse>
 
-    fun getChatRoomData(chatRoomDataRequest: ChatRoomDataRequest): Single<ChatRoomDataResponse>
+    fun getChatRoomData(chatRoomId: String?, userId: String?): Single<ChatRoomDataResponse>
 
     fun getChatHistory(chatRoomId: String?): Single<ArrayList<ChatHistoryResponse>>
-
-    fun sendMessage(chatMessageRequest: ChatMessageRequest): Single<ChatRoomDataResponse>
 
     fun getChatRoomLists(userId: String?): Single<ArrayList<ChatRoomListResponse>>
 

@@ -1,11 +1,9 @@
 package com.example.coconut.ui.main.chat.add
 
 import android.content.Intent
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.coconut.From
 import com.example.coconut.IntentID
@@ -91,13 +89,13 @@ class AddChatActivity : BaseKotlinActivity<ActivityAddChatBinding, AccountViewMo
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_add -> {
-                toInnerChatActivity()
+                afterAdded()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun toInnerChatActivity() {
+    private fun afterAdded() {
         recyclerAdapter.getInvitingList().let {
             if (it.size == 0) {
                 showToast("대화상대를 선택해주세요")
