@@ -7,7 +7,7 @@
 
 # 시연 영상
 
-[https://www.youtube.com/watch?v=Qxjdj7Q9GQA](https://www.youtube.com/watch?v=Qxjdj7Q9GQA)
+[https://www.youtube.com/watch?v=2taqqWY0Bdc](https://www.youtube.com/watch?v=2taqqWY0Bdc)
 
 
 ---
