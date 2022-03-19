@@ -7,13 +7,13 @@
 
 <br/>
 
-## 시스템 아키텍쳐
+## 시스템 아키텍쳐 
 
 ![image](https://user-images.githubusercontent.com/44316546/159029390-202ea8bf-21f2-4a0d-8fff-276c33564105.png)
 
-클라이언트: 안드로이드  
+클라이언트(Front-End) : [`Android`](https://github.com/guswns3371/Coconut)  
 
-서버 : 스프링부트
+서버(Back-End) : [`Spring Boot Application`](https://github.com/guswns3371/coconut-spring-server)
 <br/>
 
 ![image](https://user-images.githubusercontent.com/44316546/159029466-644304f8-47c9-42f7-83bf-37c7bb25f24a.png)
