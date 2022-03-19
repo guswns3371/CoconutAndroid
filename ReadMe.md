@@ -83,6 +83,7 @@ Login wih Google 버튼을 눌러
 서버의 웹소켓을 이용한 STOMP 프로토콜을 이용해 
 실시간으로 유저 접속상태를 나타냈습니다.
 
+<br/>
 
 ## 실시간 채팅 기능 [`시연 영상`](https://www.youtube.com/playlist?list=PLRGgNhwOtJjyYf3EPLU7s5ufFJwA6coUI)
 
@@ -119,6 +120,8 @@ FCM 푸쉬 알림을 클릭하여 채팅방에 참가할 수 있습니다.
 
 11. 채팅방속 인원수에 따라 채팅방 목록에 보이는 
 썸네일이 변경됩니다.
+
+<br/>
 
 ## 크롤링 기능 [`시연 영상`](https://www.youtube.com/playlist?list=PLRGgNhwOtJjxCcFCmkz3JM7p_KKjjytCQ)
 
